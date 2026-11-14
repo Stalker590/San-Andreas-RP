@@ -941,7 +941,7 @@ CMD:give(playerid, params[])
     new amount = 0;
     if (!Internal_ParseTwoInts(params, targetid, amount))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /give [id игрока] [сумма наличных USD]");
+        SendClientMessage(playerid, COLOR_INFO, "Использование: /give [id игрока] [сумма USD] (для передачи предметов: /inv -> предмет -> «Передать человеку рядом»).");
         return 1;
     }
     return Internal_TransferHandCash(playerid, targetid, amount);

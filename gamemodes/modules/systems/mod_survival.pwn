@@ -534,13 +534,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
         }
         case ITEM_ID_CLOTHING_OUTFIT:
         {
-            new skinId = Storage_GetItemMetaInt1(item_slot);
-            if (skinId < 1 || skinId > 311 || skinId == 74)
-            {
-                skinId = GetPlayerSkin(playerid);
-            }
-            SetPlayerSkin(playerid, skinId);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Гардероб]: Вы переоделись в выбранный комплект верхней одежды.");
+            Character_WearOutfitItem(playerid, item_slot);
             return true;
         }
         case ITEM_ID_PASSPORT:

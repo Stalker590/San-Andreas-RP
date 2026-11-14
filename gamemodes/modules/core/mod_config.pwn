@@ -66,6 +66,14 @@
 #define CASH_FLAG_CLEAN                         (0)
 #define CASH_FLAG_DIRTY                         (1)
 
+// Состояния комплекта одежды ITEM_ID_CLOTHING_OUTFIT (meta_int2)
+#define CLOTHING_STATE_BAG                      (0)
+#define CLOTHING_STATE_EQUIPPED                 (1)
+
+// Базовые скины нижнего белья при отсутствии одежды
+#define SKIN_UNDERWEAR_MALE                     (252)
+#define SKIN_UNDERWEAR_FEMALE                   (140)
+
 // Цветовая палитра системных сообщений (RGBA)
 #define COLOR_UI_ERROR                          (0xFF4444FF)
 #define COLOR_UI_WARNING                        (0xFFAA00FF)

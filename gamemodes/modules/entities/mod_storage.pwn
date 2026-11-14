@@ -1,3 +1,4 @@
+forward OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot);
 /*
  * =============================================================================
  *  SAN ANDREAS RP Ч ”ниверсальное полиморфное хранилище, мьютексы и мировые дропы
@@ -534,6 +535,24 @@ stock Storage_GetItemMetaInt2(item_slot)
     return sStorageItems[item_slot][E_SITEM_META_INT2];
 }
 
+stock Storage_SetItemMetaInt2(item_slot, value)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+    sStorageItems[item_slot][E_SITEM_META_INT2] = value;
+    if (DB_IsConnected() && sStorageItems[item_slot][E_SITEM_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+            "UPDATE `storage_items` SET `meta_int2` = %d WHERE `id` = %d;",
+            value,
+            sStorageItems[item_slot][E_SITEM_DB_ID]);
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+    }
+    return 1;
+}
+
 stock Storage_GetItemMetaStr(item_slot, output[], len = sizeof(output))
 {
     if (!Storage_IsValidItemSlot(item_slot))
@@ -1033,6 +1052,13 @@ stock bool:Storage_RemoveItem(storage_slot, item_slot, amount)
 
     new const itemDbId = sStorageItems[item_slot][E_SITEM_DB_ID];
     new const nestedSlot = sStorageItems[item_slot][E_SITEM_NESTED_STORAGE_SLOT];
+    new const itemDefId = sStorageItems[item_slot][E_SITEM_DEF_ID];
+    new const itemMeta2 = sStorageItems[item_slot][E_SITEM_META_INT2];
+
+    if (itemDefId == ITEM_ID_CLOTHING_OUTFIT && itemMeta2 == CLOTHING_STATE_EQUIPPED)
+    {
+        CallLocalFunction("OnStorageLostEquippedClothing", "ddd", storage_slot, item_slot, INVALID_STORAGE_SLOT);
+    }
 
     Internal_UnlinkItemFromStorageList(storage_slot, item_slot);
     if (nestedSlot != INVALID_STORAGE_SLOT && Storage_IsValidSlot(nestedSlot))
@@ -1296,14 +1322,33 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
     else if (amount == sStorageItems[item_slot][E_SITEM_AMOUNT])
     {
         // ѕолный перенос экземпл€ра предмета из src_slot в dst_slot за O(1)
+        new bool:clothingWasEquipped = false;
+        if (defId == ITEM_ID_CLOTHING_OUTFIT && metaInt2 == CLOTHING_STATE_EQUIPPED)
+        {
+            if (CallLocalFunction("OnStorageLostEquippedClothing", "ddd", src_slot, item_slot, dst_slot) == 1)
+            {
+                clothingWasEquipped = true;
+                sStorageItems[item_slot][E_SITEM_META_INT2] = CLOTHING_STATE_BAG;
+            }
+        }
+
         Internal_UnlinkItemFromStorageList(src_slot, item_slot);
         Internal_LinkItemToStorageList(dst_slot, item_slot);
 
         if (DB_IsConnected() && srcItemDbId > 0 && dstStorageDbId > 0)
         {
-            mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
-                "START TRANSACTION; UPDATE `storage_items` SET `storage_id` = %d WHERE `id` = %d; COMMIT;",
-                dstStorageDbId, srcItemDbId);
+            if (clothingWasEquipped)
+            {
+                mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+                    "START TRANSACTION; UPDATE `storage_items` SET `storage_id` = %d, `meta_int2` = %d WHERE `id` = %d; COMMIT;",
+                    dstStorageDbId, CLOTHING_STATE_BAG, srcItemDbId);
+            }
+            else
+            {
+                mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+                    "START TRANSACTION; UPDATE `storage_items` SET `storage_id` = %d WHERE `id` = %d; COMMIT;",
+                    dstStorageDbId, srcItemDbId);
+            }
             mysql_tquery(gMySQL, sStorageSqlTxBuffer);
         }
     }

@@ -306,6 +306,19 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
 
         new itemName[ITEM_DISPLAY_NAME_LEN];
         Item_GetName(defId, itemName, sizeof(itemName));
+        if (defId == ITEM_ID_CLOTHING_OUTFIT)
+        {
+            new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
+            new const isEquipped = (Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED);
+            if (isEquipped)
+            {
+                format(itemName, sizeof(itemName), "Одежда (Скин %d) {66CC66}[Надето]{FFFFFF}", outfitSkin);
+            }
+            else
+            {
+                format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
+            }
+        }
 
         new totalWeightG = Item_CalculateInstanceWeight(defId, amount, ammo);
         new totalVolumeMl = Item_CalculateInstanceVolume(defId, amount);
@@ -421,6 +434,11 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
 
         new itemName[ITEM_DISPLAY_NAME_LEN];
         Item_GetName(defId, itemName, sizeof(itemName));
+        if (defId == ITEM_ID_CLOTHING_OUTFIT)
+        {
+            new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
+            format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
+        }
 
         new totalW = Item_CalculateInstanceWeight(defId, amount, ammo);
         new totalV = Item_CalculateInstanceVolume(defId, amount);
@@ -519,6 +537,19 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
 
             new itemName[ITEM_DISPLAY_NAME_LEN];
             Item_GetName(defId, itemName, sizeof(itemName));
+            if (defId == ITEM_ID_CLOTHING_OUTFIT)
+            {
+                new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
+                new const isEquipped = (Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED);
+                if (isEquipped)
+                {
+                    format(itemName, sizeof(itemName), "Одежда (Скин %d) {66CC66}[Надето]{FFFFFF}", outfitSkin);
+                }
+                else
+                {
+                    format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
+                }
+            }
 
             new metaStr[ITEM_META_STR_LEN];
             Storage_GetItemMetaStr(itemSlot, metaStr, sizeof(metaStr));
@@ -714,12 +745,27 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
 
     new actions[512];
     actions[0] = '\0';
-    strcat(actions, "1. Использовать / Экипировать\n", sizeof(actions));
+    if (defId == ITEM_ID_CLOTHING_OUTFIT)
+    {
+        if (Storage_GetItemMetaInt2(item_slot) == CLOTHING_STATE_EQUIPPED)
+        {
+            strcat(actions, "1. {FFC800}Снять одежду (Остаться в белье){FFFFFF}\n", sizeof(actions));
+        }
+        else
+        {
+            strcat(actions, "1. {66CC66}Надеть комплект одежды{FFFFFF}\n", sizeof(actions));
+        }
+    }
+    else
+    {
+        strcat(actions, "1. Использовать / Экипировать\n", sizeof(actions));
+    }
     strcat(actions, "2. Открыть (для вложенного рюкзака / сумки)\n", sizeof(actions));
     strcat(actions, "3. Разделить / Объединить пачку\n", sizeof(actions));
     strcat(actions, "4. Переложить в другой слой (Слой 1 <-> Слой 2)\n", sizeof(actions));
     strcat(actions, "5. Переложить во внешнее хранилище\n", sizeof(actions));
-    strcat(actions, "6. Выбросить на землю", sizeof(actions));
+    strcat(actions, "6. Выбросить на землю\n", sizeof(actions));
+    strcat(actions, "7. Передать человеку рядом", sizeof(actions));
 
     ShowPlayerDialog(
         playerid,
@@ -1140,6 +1186,72 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         sPlayerPendingOp[playerid] = INV_OP_DROP_TO_GROUND;
                         Internal_ExecutePendingItemOp(playerid, 1);
                     }
+                }
+                case 6: // 7. Передать человеку рядом
+                {
+                    new nearestId = INVALID_PLAYER_ID;
+                    new Float:minDist = 999.0;
+                    foreach (new targetid : Player)
+                    {
+                        if (targetid == playerid || !Character_IsLoaded(targetid)) continue;
+                        new Float:dist = Utils_GetDistanceBetweenPlayers(playerid, targetid);
+                        if (dist <= 3.0 && dist < minDist)
+                        {
+                            minDist = dist;
+                            nearestId = targetid;
+                        }
+                    }
+
+                    if (nearestId == INVALID_PLAYER_ID)
+                    {
+                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Поблизости нет игроков для передачи предмета (до 3.0 м).");
+                        Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
+                        return Y_HOOKS_BREAK_RETURN_1;
+                    }
+
+                    new targetLayer1 = Character_GetLayer1Slot(nearestId);
+                    if (!Storage_IsValidSlot(targetLayer1))
+                    {
+                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Ошибка доступа к инвентарю получателя.");
+                        Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
+                        return Y_HOOKS_BREAK_RETURN_1;
+                    }
+
+                    new E_STORAGE_RESULT:res = Storage_TransferItem(playerid, srcSlot, itemSlot, targetLayer1, 1, Character_GetId(playerid));
+                    if (res == STORAGE_RES_OK)
+                    {
+                        Character_SyncLayer1Weapons(playerid);
+                        Character_SyncLayer1Weapons(nearestId);
+                        Survival_RecalculateEncumbrance(playerid);
+                        Survival_RecalculateEncumbrance(nearestId);
+
+                        new actorName[MAX_PLAYER_NAME + 8];
+                        new targetName[MAX_PLAYER_NAME + 8];
+                        new itemNameBuf[ITEM_DISPLAY_NAME_LEN];
+                        Item_GetName(defId, itemNameBuf, sizeof(itemNameBuf));
+                        GetPlayerName(playerid, actorName, sizeof(actorName));
+                        GetPlayerName(nearestId, targetName, sizeof(targetName));
+
+                        new alertMsg[128];
+                        format(alertMsg, sizeof(alertMsg), "[Передача]: Вы передали «%s» игроку %s.", itemNameBuf, targetName);
+                        SendClientMessage(playerid, COLOR_SUCCESS, alertMsg);
+
+                        format(alertMsg, sizeof(alertMsg), "[Передача]: Вы получили «%s» от %s.", itemNameBuf, actorName);
+                        SendClientMessage(nearestId, COLOR_SUCCESS, alertMsg);
+                    }
+                    else if (res == STORAGE_RES_WEIGHT_EXCEEDED)
+                    {
+                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: У получателя переполнен инвентарь по весу.");
+                    }
+                    else if (res == STORAGE_RES_VOLUME_EXCEEDED)
+                    {
+                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: У получателя недостаточно места по объему (литров).");
+                    }
+                    else
+                    {
+                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Не удалось передать предмет.");
+                    }
+                    Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 }
             }
             return Y_HOOKS_BREAK_RETURN_1;

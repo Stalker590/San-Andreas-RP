@@ -792,7 +792,7 @@ stock Roles_ApplyTemplate(
         0,
         100.0,
         resolvedSkin,
-        role_id,
+        CLOTHING_STATE_EQUIPPED,
         outfitStr,
         dummyItemSlot);
 

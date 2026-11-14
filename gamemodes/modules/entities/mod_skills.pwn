@@ -204,18 +204,18 @@ static stock Internal_BuildSkillsUpdateQuery(playerid, char_db_id, output[], len
         return 0;
     }
 
-    new pos = format(output, len, "UPDATE `character_skills` SET ");
+    strcat(output, "UPDATE `character_skills` SET ", len);
+    new chunk[64];
     for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
     {
-        pos += format(
-            output[pos],
-            len - pos,
-            "%s`%s` = %d",
+        format(chunk, sizeof(chunk), "%s`%s` = %d",
             (i == 0) ? ("") : (", "),
             sSkillMetaTable[i][E_SMETA_SQL_COL],
             sPlayerSkills[playerid][i]);
+        strcat(output, chunk, len);
     }
-    format(output[pos], len - pos, " WHERE `char_id` = %d;", char_db_id);
+    format(chunk, sizeof(chunk), " WHERE `char_id` = %d;", char_db_id);
+    strcat(output, chunk, len);
     return 1;
 }
 
@@ -570,37 +570,25 @@ stock Skills_InsertInitialRow(playerid, char_db_id)
     }
 
     sSkillsSqlBuffer[0] = EOS;
-    new pos = format(sSkillsSqlBuffer, sizeof(sSkillsSqlBuffer),
-        "INSERT INTO `character_skills` (`char_id`");
+    strcat(sSkillsSqlBuffer, "INSERT INTO `character_skills` (`char_id`", sizeof(sSkillsSqlBuffer));
+
+    new chunk[64];
+    for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
+    {
+        format(chunk, sizeof(chunk), ", `%s`", sSkillMetaTable[i][E_SMETA_SQL_COL]);
+        strcat(sSkillsSqlBuffer, chunk, sizeof(sSkillsSqlBuffer));
+    }
+
+    format(chunk, sizeof(chunk), ") VALUES (%d", char_db_id);
+    strcat(sSkillsSqlBuffer, chunk, sizeof(sSkillsSqlBuffer));
 
     for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
     {
-        pos += format(
-            sSkillsSqlBuffer[pos],
-            sizeof(sSkillsSqlBuffer) - pos,
-            ", `%s`",
-            sSkillMetaTable[i][E_SMETA_SQL_COL]);
+        format(chunk, sizeof(chunk), ", %d", sPlayerSkills[playerid][i]);
+        strcat(sSkillsSqlBuffer, chunk, sizeof(sSkillsSqlBuffer));
     }
 
-    pos += format(
-        sSkillsSqlBuffer[pos],
-        sizeof(sSkillsSqlBuffer) - pos,
-        ") VALUES (%d",
-        char_db_id);
-
-    for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
-    {
-        pos += format(
-            sSkillsSqlBuffer[pos],
-            sizeof(sSkillsSqlBuffer) - pos,
-            ", %d",
-            sPlayerSkills[playerid][i]);
-    }
-
-    format(
-        sSkillsSqlBuffer[pos],
-        sizeof(sSkillsSqlBuffer) - pos,
-        ") ON DUPLICATE KEY UPDATE `stamina` = VALUES(`stamina`), `muscle` = VALUES(`muscle`);");
+    strcat(sSkillsSqlBuffer, ") ON DUPLICATE KEY UPDATE `stamina` = VALUES(`stamina`), `muscle` = VALUES(`muscle`);", sizeof(sSkillsSqlBuffer));
 
     mysql_tquery(gMySQL, sSkillsSqlBuffer);
     return 1;
@@ -656,14 +644,19 @@ stock Skills_ShowDialog(playerid)
         return 0;
     }
 
-    new dialogBody[3584];
+    static dialogBody[4096];
+    dialogBody[0] = EOS;
+
     new fightStyleName[40];
     Internal_FormatFightingStyleRu(sPlayerFightingStyle[playerid], fightStyleName);
 
-    new pos = format(dialogBody, sizeof(dialogBody),
-        "Навык персонажа\tКатегория\tУровень / Потолок\n\
-        {FFC800}Стиль рукопашного боя{FFFFFF}\t{AFAFAF}Боевое искусство{FFFFFF}\t{66CC66}%s{FFFFFF}\n",
+    strcat(dialogBody, "Навык персонажа\tКатегория\tУровень / Потолок\n", sizeof(dialogBody));
+
+    new rowLine[192];
+    format(rowLine, sizeof(rowLine),
+        "{FFC800}Стиль рукопашного боя{FFFFFF}\t{AFAFAF}Боевое искусство{FFFFFF}\t{66CC66}%s{FFFFFF}\n",
         fightStyleName);
+    strcat(dialogBody, rowLine, sizeof(dialogBody));
 
     for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
     {
@@ -688,15 +681,14 @@ stock Skills_ShowDialog(playerid)
             format(colorHex, sizeof(colorHex), "{FFFFFF}");
         }
 
-        pos += format(
-            dialogBody[pos],
-            sizeof(dialogBody) - pos,
+        format(rowLine, sizeof(rowLine),
             "{FFFFFF}%s\t{AFAFAF}%s\t%s%d / %d{FFFFFF}\n",
             sSkillMetaTable[i][E_SMETA_NAME_RU],
             sSkillMetaTable[i][E_SMETA_CATEGORY_RU],
             colorHex,
             val,
             cap);
+        strcat(dialogBody, rowLine, sizeof(dialogBody));
     }
 
     ShowPlayerDialog(

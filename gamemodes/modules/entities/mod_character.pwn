@@ -831,6 +831,7 @@ public OnCharacterQueryLoaded(playerid, sessionToken)
         playerid, sessionToken);
 
     sCharacters[playerid][E_CHAR_LOADED] = true;
+    Character_SyncInventorySkin(playerid);
     Character_SpawnPlayerInWorld(playerid, false);
     return 1;
 }
@@ -1021,6 +1022,201 @@ stock Character_GetLayer2Slot(playerid)
         return INVALID_STORAGE_SLOT;
     }
     return sCharacters[playerid][E_CHAR_LAYER2_SLOT];
+}
+
+stock Character_GetUnderwearSkin(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return SKIN_UNDERWEAR_MALE;
+    return (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? SKIN_UNDERWEAR_FEMALE : SKIN_UNDERWEAR_MALE;
+}
+
+stock Character_UndressToUnderwear(playerid, bool:notify = true)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+
+    new const underwearSkin = Character_GetUnderwearSkin(playerid);
+    sCharacters[playerid][E_CHAR_SKIN_ID] = underwearSkin;
+    SetPlayerSkin(playerid, underwearSkin);
+
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
+            "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
+            underwearSkin,
+            sCharacters[playerid][E_CHAR_DB_ID]);
+        mysql_tquery(gMySQL, sCharSqlBuffer);
+    }
+
+    if (notify)
+    {
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Гардероб]: Надетый комплект одежды снят. Вы остались в нижнем белье.");
+    }
+    return 1;
+}
+
+stock Character_FindPlayerByStorageSlot(storage_slot)
+{
+    if (storage_slot < 0 || storage_slot >= MAX_ACTIVE_STORAGES)
+    {
+        return INVALID_PLAYER_ID;
+    }
+    foreach (new p : Player)
+    {
+        if (sCharacters[p][E_CHAR_LOADED])
+        {
+            if (sCharacters[p][E_CHAR_LAYER1_SLOT] == storage_slot ||
+                sCharacters[p][E_CHAR_LAYER2_SLOT] == storage_slot)
+            {
+                return p;
+            }
+        }
+    }
+    return INVALID_PLAYER_ID;
+}
+
+forward OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot);
+public OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot)
+{
+    #pragma unused item_slot
+    new const srcPlayer = Character_FindPlayerByStorageSlot(src_slot);
+    new const dstPlayer = Character_FindPlayerByStorageSlot(dst_slot);
+
+    if (srcPlayer != INVALID_PLAYER_ID && srcPlayer == dstPlayer)
+    {
+        return 0;
+    }
+
+    if (srcPlayer != INVALID_PLAYER_ID && IsPlayerConnected(srcPlayer))
+    {
+        Character_UndressToUnderwear(srcPlayer, true);
+    }
+    return 1;
+}
+
+stock Character_WearOutfitItem(playerid, item_slot)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+    if (!Storage_IsValidItemSlot(item_slot) || Storage_GetItemDefId(item_slot) != ITEM_ID_CLOTHING_OUTFIT)
+    {
+        return 0;
+    }
+
+    new const currentEquipped = Storage_GetItemMetaInt2(item_slot);
+    if (currentEquipped == CLOTHING_STATE_EQUIPPED)
+    {
+        Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_BAG);
+        Character_UndressToUnderwear(playerid, true);
+        return 1;
+    }
+
+    new const l1 = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
+    new const l2 = sCharacters[playerid][E_CHAR_LAYER2_SLOT];
+    new storagesToCheck[2];
+    storagesToCheck[0] = l1;
+    storagesToCheck[1] = l2;
+
+    for (new s = 0; s < 2; s++)
+    {
+        new const curStorage = storagesToCheck[s];
+        if (!Storage_IsValidSlot(curStorage)) continue;
+
+        new it = Storage_GetFirstItemSlot(curStorage);
+        while (it != INVALID_STORAGE_ITEM_SLOT)
+        {
+            if (Storage_GetItemDefId(it) == ITEM_ID_CLOTHING_OUTFIT && it != item_slot)
+            {
+                if (Storage_GetItemMetaInt2(it) == CLOTHING_STATE_EQUIPPED)
+                {
+                    Storage_SetItemMetaInt2(it, CLOTHING_STATE_BAG);
+                }
+            }
+            it = Storage_GetNextItemSlot(it);
+        }
+    }
+
+    Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_EQUIPPED);
+
+    new skinId = Storage_GetItemMetaInt1(item_slot);
+    if (skinId < 1 || skinId > 311 || skinId == 74)
+    {
+        skinId = Character_GetUnderwearSkin(playerid);
+    }
+
+    sCharacters[playerid][E_CHAR_SKIN_ID] = skinId;
+    SetPlayerSkin(playerid, skinId);
+
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
+            "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
+            skinId,
+            sCharacters[playerid][E_CHAR_DB_ID]);
+        mysql_tquery(gMySQL, sCharSqlBuffer);
+    }
+
+    SendClientMessage(playerid, COLOR_UI_SUCCESS,
+        "[Гардероб]: Вы переоделись в выбранный комплект одежды.");
+    return 1;
+}
+
+stock Character_SyncInventorySkin(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid) || !sCharacters[playerid][E_CHAR_LOADED])
+    {
+        return 0;
+    }
+
+    new const l1 = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
+    new const l2 = sCharacters[playerid][E_CHAR_LAYER2_SLOT];
+    new storagesToCheck[2];
+    storagesToCheck[0] = l1;
+    storagesToCheck[1] = l2;
+
+    new equippedSkin = -1;
+    for (new s = 0; s < 2; s++)
+    {
+        new const curStorage = storagesToCheck[s];
+        if (!Storage_IsValidSlot(curStorage)) continue;
+
+        new it = Storage_GetFirstItemSlot(curStorage);
+        while (it != INVALID_STORAGE_ITEM_SLOT)
+        {
+            if (Storage_GetItemDefId(it) == ITEM_ID_CLOTHING_OUTFIT &&
+                Storage_GetItemMetaInt2(it) == CLOTHING_STATE_EQUIPPED)
+            {
+                equippedSkin = Storage_GetItemMetaInt1(it);
+                break;
+            }
+            it = Storage_GetNextItemSlot(it);
+        }
+        if (equippedSkin != -1) break;
+    }
+
+    if (equippedSkin > 0 && equippedSkin <= 311 && equippedSkin != 74)
+    {
+        sCharacters[playerid][E_CHAR_SKIN_ID] = equippedSkin;
+    }
+    else
+    {
+        new const underwearSkin = Character_GetUnderwearSkin(playerid);
+        sCharacters[playerid][E_CHAR_SKIN_ID] = underwearSkin;
+        if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+        {
+            mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
+                "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
+                underwearSkin,
+                sCharacters[playerid][E_CHAR_DB_ID]);
+            mysql_tquery(gMySQL, sCharSqlBuffer);
+        }
+    }
+    return sCharacters[playerid][E_CHAR_SKIN_ID];
 }
 
 // Формула максимальной грузоподъемности из раздела 4.1 ROADMAP:
@@ -1294,6 +1490,8 @@ stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
     sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
     sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = false;
 
+    Character_SyncInventorySkin(playerid);
+
     // Обновляем максимальный вес Слоя 1 по текущей формуле мускулатуры и роли
     new const layer1Slot = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
     if (Storage_IsValidSlot(layer1Slot))
@@ -1522,6 +1720,7 @@ hook OnPlayerRequestClass(playerid, classid)
     #pragma unused classid
     if (sCharacters[playerid][E_CHAR_LOADED])
     {
+        Character_SyncInventorySkin(playerid);
         SetSpawnInfo(
             playerid,
             NO_TEAM,
@@ -1550,6 +1749,7 @@ hook OnPlayerSpawn(playerid)
         sCharacters[playerid][E_CHAR_HP] = 100.0;
     }
 
+    Character_SyncInventorySkin(playerid);
     SetPlayerSkin(playerid, sCharacters[playerid][E_CHAR_SKIN_ID]);
     SetPlayerInterior(playerid, sCharacters[playerid][E_CHAR_INTERIOR]);
     SetPlayerVirtualWorld(playerid, sCharacters[playerid][E_CHAR_VW]);
