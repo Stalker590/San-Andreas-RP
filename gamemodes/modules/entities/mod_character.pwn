@@ -32,6 +32,7 @@
 #define DIALOG_CHAR_SELECT_ROLE_LIST            (1033)
 #define DIALOG_CHAR_CONFIRM_ROLE                (1034)
 #define DIALOG_CHAR_STATS_VIEW                  (1035)
+#define DIALOG_CHAR_ROLE_INFO                   (1036)
 
 enum E_CHAR_GENDER
 {
@@ -100,6 +101,10 @@ enum E_CHARACTER_DATA
     E_CHAR_LAYER2_DB_ID,
     E_CHAR_LAYER1_SLOT,
     E_CHAR_LAYER2_SLOT,
+
+    // Гардероб: активный (надетый) комплект одежды и счетчик незавершенных загрузок
+    E_CHAR_EQUIPPED_OUTFIT_DB_ID,
+    E_CHAR_INVENTORY_PENDING_LOADS,
 
     // Финансы и организация
     E_CHAR_ORG_ID,
@@ -193,6 +198,8 @@ static stock Internal_ResetCharacterSlot(playerid)
     sCharacters[playerid][E_CHAR_LAYER2_DB_ID] = 0;
     sCharacters[playerid][E_CHAR_LAYER1_SLOT] = INVALID_STORAGE_SLOT;
     sCharacters[playerid][E_CHAR_LAYER2_SLOT] = INVALID_STORAGE_SLOT;
+    sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+    sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] = 0;
 
     sCharacters[playerid][E_CHAR_ORG_ID] = 0;
     sCharacters[playerid][E_CHAR_ORG_RANK_ID] = 0;
@@ -801,10 +808,24 @@ public OnCharacterQueryLoaded(playerid, sessionToken)
         sCharacters[playerid][E_CHAR_ROLE_ID],
         layer1MaxW, layer1MaxV, layer2MaxW, layer2MaxV);
 
+    sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] = 0;
+
     if (layer1DbId > 0)
     {
-        Storage_Load(layer1DbId);
-        sCharacters[playerid][E_CHAR_LAYER1_SLOT] = Storage_FindByDbId(layer1DbId);
+        new const loadedLayer1 = Storage_Load(
+            layer1DbId,
+            STORAGE_PLAYER_LAYER1,
+            charDbId,
+            layer1MaxW,
+            layer1MaxV);
+        if (loadedLayer1 != INVALID_STORAGE_SLOT)
+        {
+            sCharacters[playerid][E_CHAR_LAYER1_SLOT] = loadedLayer1;
+            if (!Storage_AreItemsReady(loadedLayer1))
+            {
+                sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS]++;
+            }
+        }
     }
     if (sCharacters[playerid][E_CHAR_LAYER1_SLOT] == INVALID_STORAGE_SLOT)
     {
@@ -814,8 +835,20 @@ public OnCharacterQueryLoaded(playerid, sessionToken)
 
     if (layer2DbId > 0)
     {
-        Storage_Load(layer2DbId);
-        sCharacters[playerid][E_CHAR_LAYER2_SLOT] = Storage_FindByDbId(layer2DbId);
+        new const loadedLayer2 = Storage_Load(
+            layer2DbId,
+            STORAGE_PLAYER_LAYER2,
+            charDbId,
+            layer2MaxW,
+            layer2MaxV);
+        if (loadedLayer2 != INVALID_STORAGE_SLOT)
+        {
+            sCharacters[playerid][E_CHAR_LAYER2_SLOT] = loadedLayer2;
+            if (!Storage_AreItemsReady(loadedLayer2))
+            {
+                sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS]++;
+            }
+        }
     }
     if (sCharacters[playerid][E_CHAR_LAYER2_SLOT] == INVALID_STORAGE_SLOT)
     {
@@ -1026,133 +1059,85 @@ stock Character_GetLayer2Slot(playerid)
 
 stock Character_GetUnderwearSkin(playerid)
 {
-    if (playerid < 0 || playerid >= MAX_PLAYERS) return SKIN_UNDERWEAR_MALE;
-    return (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? SKIN_UNDERWEAR_FEMALE : SKIN_UNDERWEAR_MALE;
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return SKIN_UNDERWEAR_MALE;
+    }
+    return (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE)
+        ? SKIN_UNDERWEAR_FEMALE
+        : SKIN_UNDERWEAR_MALE;
 }
 
-stock Character_UndressToUnderwear(playerid, bool:notify = true)
+static stock bool:Internal_IsValidOutfitSkin(skinId)
 {
-    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    return (skinId >= 1 && skinId <= 311 && skinId != 74);
+}
+
+// Проверяет, входит ли хранилище (включая вложенные сумки) во владение игрока.
+static stock bool:Internal_DoesStorageBelongToPlayer(playerid, storage_slot)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Storage_IsValidSlot(storage_slot))
     {
-        return 0;
+        return false;
     }
 
-    new const underwearSkin = Character_GetUnderwearSkin(playerid);
-    sCharacters[playerid][E_CHAR_SKIN_ID] = underwearSkin;
-    SetPlayerSkin(playerid, underwearSkin);
-
-    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    new currentSlot = storage_slot;
+    new hops = 0;
+    while (Storage_IsValidSlot(currentSlot) && hops <= MAX_NESTING_DEPTH + 1)
     {
-        mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
-            "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
-            underwearSkin,
-            sCharacters[playerid][E_CHAR_DB_ID]);
-        mysql_tquery(gMySQL, sCharSqlBuffer);
+        if (currentSlot == sCharacters[playerid][E_CHAR_LAYER1_SLOT] ||
+            currentSlot == sCharacters[playerid][E_CHAR_LAYER2_SLOT])
+        {
+            return true;
+        }
+        currentSlot = Storage_GetParentSlot(currentSlot);
+        hops++;
     }
-
-    if (notify)
-    {
-        SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Гардероб]: Надетый комплект одежды снят. Вы остались в нижнем белье.");
-    }
-    return 1;
+    return false;
 }
 
 stock Character_FindPlayerByStorageSlot(storage_slot)
 {
-    if (storage_slot < 0 || storage_slot >= MAX_ACTIVE_STORAGES)
+    if (!Storage_IsValidSlot(storage_slot))
     {
         return INVALID_PLAYER_ID;
     }
+
     foreach (new p : Player)
     {
-        if (sCharacters[p][E_CHAR_LOADED])
+        if (sCharacters[p][E_CHAR_LOADED] &&
+            Internal_DoesStorageBelongToPlayer(p, storage_slot))
         {
-            if (sCharacters[p][E_CHAR_LAYER1_SLOT] == storage_slot ||
-                sCharacters[p][E_CHAR_LAYER2_SLOT] == storage_slot)
-            {
-                return p;
-            }
+            return p;
         }
     }
     return INVALID_PLAYER_ID;
 }
 
-forward OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot);
-public OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot)
+// Единая точка применения скина: RAM, модель игрока и сохранение в characters.skin_id.
+static stock Internal_ApplyPlayerSkin(playerid, skinId, bool:persist)
 {
-    #pragma unused item_slot
-    new const srcPlayer = Character_FindPlayerByStorageSlot(src_slot);
-    new const dstPlayer = Character_FindPlayerByStorageSlot(dst_slot);
-
-    if (srcPlayer != INVALID_PLAYER_ID && srcPlayer == dstPlayer)
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return 0;
     }
 
-    if (srcPlayer != INVALID_PLAYER_ID && IsPlayerConnected(srcPlayer))
-    {
-        Character_UndressToUnderwear(srcPlayer, true);
-    }
-    return 1;
-}
-
-stock Character_WearOutfitItem(playerid, item_slot)
-{
-    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
-    {
-        return 0;
-    }
-    if (!Storage_IsValidItemSlot(item_slot) || Storage_GetItemDefId(item_slot) != ITEM_ID_CLOTHING_OUTFIT)
-    {
-        return 0;
-    }
-
-    new const currentEquipped = Storage_GetItemMetaInt2(item_slot);
-    if (currentEquipped == CLOTHING_STATE_EQUIPPED)
-    {
-        Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_BAG);
-        Character_UndressToUnderwear(playerid, true);
-        return 1;
-    }
-
-    new const l1 = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
-    new const l2 = sCharacters[playerid][E_CHAR_LAYER2_SLOT];
-    new storagesToCheck[2];
-    storagesToCheck[0] = l1;
-    storagesToCheck[1] = l2;
-
-    for (new s = 0; s < 2; s++)
-    {
-        new const curStorage = storagesToCheck[s];
-        if (!Storage_IsValidSlot(curStorage)) continue;
-
-        new it = Storage_GetFirstItemSlot(curStorage);
-        while (it != INVALID_STORAGE_ITEM_SLOT)
-        {
-            if (Storage_GetItemDefId(it) == ITEM_ID_CLOTHING_OUTFIT && it != item_slot)
-            {
-                if (Storage_GetItemMetaInt2(it) == CLOTHING_STATE_EQUIPPED)
-                {
-                    Storage_SetItemMetaInt2(it, CLOTHING_STATE_BAG);
-                }
-            }
-            it = Storage_GetNextItemSlot(it);
-        }
-    }
-
-    Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_EQUIPPED);
-
-    new skinId = Storage_GetItemMetaInt1(item_slot);
-    if (skinId < 1 || skinId > 311 || skinId == 74)
+    if (!Internal_IsValidOutfitSkin(skinId))
     {
         skinId = Character_GetUnderwearSkin(playerid);
     }
 
+    new const bool:skinChanged = (sCharacters[playerid][E_CHAR_SKIN_ID] != skinId);
     sCharacters[playerid][E_CHAR_SKIN_ID] = skinId;
-    SetPlayerSkin(playerid, skinId);
 
-    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    if (IsPlayerConnected(playerid))
+    {
+        SetPlayerSkin(playerid, skinId);
+    }
+
+    if (persist && skinChanged &&
+        DB_IsConnected() &&
+        sCharacters[playerid][E_CHAR_DB_ID] > 0)
     {
         mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
             "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
@@ -1160,64 +1145,343 @@ stock Character_WearOutfitItem(playerid, item_slot)
             sCharacters[playerid][E_CHAR_DB_ID]);
         mysql_tquery(gMySQL, sCharSqlBuffer);
     }
-
-    SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "[Гардероб]: Вы переоделись в выбранный комплект одежды.");
-    return 1;
+    return skinId;
 }
 
-stock Character_SyncInventorySkin(playerid)
+// Рекурсивный поиск надетого комплекта одежды во всех хранилищах игрока.
+static stock Internal_ScanEquippedOutfits(
+    playerid,
+    storage_slot,
+    depth,
+    &selectedSlot,
+    &selectedDbId)
 {
-    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid) || !sCharacters[playerid][E_CHAR_LOADED])
+    if (!Storage_IsValidSlot(storage_slot) || depth > (MAX_NESTING_DEPTH + 1))
     {
         return 0;
     }
 
-    new const l1 = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
-    new const l2 = sCharacters[playerid][E_CHAR_LAYER2_SLOT];
-    new storagesToCheck[2];
-    storagesToCheck[0] = l1;
-    storagesToCheck[1] = l2;
-
-    new equippedSkin = -1;
-    for (new s = 0; s < 2; s++)
+    new itemSlot = Storage_GetFirstItemSlot(storage_slot);
+    while (itemSlot != INVALID_STORAGE_ITEM_SLOT)
     {
-        new const curStorage = storagesToCheck[s];
-        if (!Storage_IsValidSlot(curStorage)) continue;
+        new const defId = Storage_GetItemDefId(itemSlot);
 
-        new it = Storage_GetFirstItemSlot(curStorage);
-        while (it != INVALID_STORAGE_ITEM_SLOT)
+        if (defId == ITEM_ID_CLOTHING_OUTFIT &&
+            Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED)
         {
-            if (Storage_GetItemDefId(it) == ITEM_ID_CLOTHING_OUTFIT &&
-                Storage_GetItemMetaInt2(it) == CLOTHING_STATE_EQUIPPED)
+            new const itemDbId = Storage_GetItemDbId(itemSlot);
+            new const bool:isTracked = (
+                sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] > 0 &&
+                itemDbId == sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID]);
+
+            if (isTracked)
             {
-                equippedSkin = Storage_GetItemMetaInt1(it);
-                break;
+                // Отслеживаемый предмет имеет приоритет над любыми дублями.
+                selectedSlot = itemSlot;
+                selectedDbId = itemDbId;
             }
-            it = Storage_GetNextItemSlot(it);
+            else if (selectedSlot == INVALID_STORAGE_ITEM_SLOT)
+            {
+                selectedSlot = itemSlot;
+                selectedDbId = itemDbId;
+            }
         }
-        if (equippedSkin != -1) break;
+
+        new const nestedSlot = Storage_GetItemNestedSlot(itemSlot);
+        if (Storage_IsValidSlot(nestedSlot))
+        {
+            Internal_ScanEquippedOutfits(playerid, nestedSlot, depth + 1, selectedSlot, selectedDbId);
+        }
+
+        itemSlot = Storage_GetNextItemSlot(itemSlot);
+    }
+    return 1;
+}
+
+// Сбрасывает флаг «надето» у всех комплектов, кроме выбранного (repair duplicates).
+static stock Internal_ClearDuplicateOutfits(storage_slot, keep_item_slot, depth)
+{
+    if (!Storage_IsValidSlot(storage_slot) || depth > (MAX_NESTING_DEPTH + 1))
+    {
+        return 0;
     }
 
-    if (equippedSkin > 0 && equippedSkin <= 311 && equippedSkin != 74)
+    new itemSlot = Storage_GetFirstItemSlot(storage_slot);
+    while (itemSlot != INVALID_STORAGE_ITEM_SLOT)
     {
-        sCharacters[playerid][E_CHAR_SKIN_ID] = equippedSkin;
-    }
-    else
-    {
-        new const underwearSkin = Character_GetUnderwearSkin(playerid);
-        sCharacters[playerid][E_CHAR_SKIN_ID] = underwearSkin;
-        if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+        if (Storage_GetItemDefId(itemSlot) == ITEM_ID_CLOTHING_OUTFIT &&
+            Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED &&
+            itemSlot != keep_item_slot)
         {
-            mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
-                "UPDATE `characters` SET `skin_id` = %d WHERE `id` = %d;",
-                underwearSkin,
-                sCharacters[playerid][E_CHAR_DB_ID]);
-            mysql_tquery(gMySQL, sCharSqlBuffer);
+            Storage_SetItemMetaInt2(itemSlot, CLOTHING_STATE_BAG);
+        }
+
+        new const nestedSlot = Storage_GetItemNestedSlot(itemSlot);
+        if (Storage_IsValidSlot(nestedSlot))
+        {
+            Internal_ClearDuplicateOutfits(nestedSlot, keep_item_slot, depth + 1);
+        }
+
+        itemSlot = Storage_GetNextItemSlot(itemSlot);
+    }
+    return 1;
+}
+
+static stock Internal_ClearAllEquippedOutfits(playerid)
+{
+    Internal_ClearDuplicateOutfits(
+        sCharacters[playerid][E_CHAR_LAYER1_SLOT],
+        INVALID_STORAGE_ITEM_SLOT,
+        0);
+    Internal_ClearDuplicateOutfits(
+        sCharacters[playerid][E_CHAR_LAYER2_SLOT],
+        INVALID_STORAGE_ITEM_SLOT,
+        0);
+    return 1;
+}
+
+stock bool:Character_IsOutfitItemEquipped(playerid, item_slot)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS ||
+        !Storage_IsValidItemSlot(item_slot) ||
+        Storage_GetItemDefId(item_slot) != ITEM_ID_CLOTHING_OUTFIT)
+    {
+        return false;
+    }
+
+    if (sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] > 0)
+    {
+        return (Storage_GetItemDbId(item_slot) == sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID]);
+    }
+    return (Storage_GetItemMetaInt2(item_slot) == CLOTHING_STATE_EQUIPPED);
+}
+
+stock Character_UndressToUnderwear(playerid, bool:notify = true)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return 0;
+    }
+
+    Internal_ClearAllEquippedOutfits(playerid);
+    sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+    Internal_ApplyPlayerSkin(playerid, Character_GetUnderwearSkin(playerid), true);
+
+    if (notify && IsPlayerConnected(playerid))
+    {
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Гардероб]: Надетый комплект одежды снят. Вы остались в нижнем белье.");
+    }
+    return 1;
+}
+
+// Перенаправление скина при уходе надетого предмета из владения игрока.
+forward OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot);
+public OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+
+    new const itemDbId = Storage_GetItemDbId(item_slot);
+    new srcPlayer = INVALID_PLAYER_ID;
+
+    // 1. Надежный поиск по ID предмета (работает даже для вложенных сумок).
+    foreach (new p : Player)
+    {
+        if (sCharacters[p][E_CHAR_LOADED] &&
+            sCharacters[p][E_CHAR_EQUIPPED_OUTFIT_DB_ID] > 0 &&
+            sCharacters[p][E_CHAR_EQUIPPED_OUTFIT_DB_ID] == itemDbId)
+        {
+            srcPlayer = p;
+            break;
         }
     }
-    return sCharacters[playerid][E_CHAR_SKIN_ID];
+
+    // 2. Резервный поиск по хранилищу-источнику.
+    if (srcPlayer == INVALID_PLAYER_ID)
+    {
+        srcPlayer = Character_FindPlayerByStorageSlot(src_slot);
+    }
+
+    if (srcPlayer == INVALID_PLAYER_ID)
+    {
+        return 1;
+    }
+
+    // Перемещение между собственными слоями/сумками не снимает одежду.
+    new const dstPlayer = Character_FindPlayerByStorageSlot(dst_slot);
+    if (dstPlayer == srcPlayer && Storage_IsValidSlot(dst_slot))
+    {
+        return 0;
+    }
+
+    sCharacters[srcPlayer][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+    Internal_ApplyPlayerSkin(srcPlayer, Character_GetUnderwearSkin(srcPlayer), true);
+
+    if (IsPlayerConnected(srcPlayer))
+    {
+        SendClientMessage(srcPlayer, COLOR_UI_WARNING,
+            "[Гардероб]: Комплект одежды покинул ваш инвентарь. Вы остались в нижнем белье.");
+    }
+    return 1;
 }
+
+// Пересчитывает надетую одежду по фактическому содержимому инвентаря.
+// Пока слои не загружены из БД (pending > 0), скин из БД не перезаписывается.
+stock Character_SyncInventorySkin(playerid, bool:force = false)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS ||
+        !IsPlayerConnected(playerid) ||
+        !sCharacters[playerid][E_CHAR_LOADED])
+    {
+        return 0;
+    }
+
+    if (!force && sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] > 0)
+    {
+        return sCharacters[playerid][E_CHAR_SKIN_ID];
+    }
+
+    // Если отслеживаемый комплект уехал вместе с сумкой/контейнером в чужое владение,
+    // снимаем с него флаг «Надето», чтобы новый владелец не надел одежду автоматически.
+    if (sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] > 0)
+    {
+        new const trackedSlot = Storage_FindItemSlotByDbId(
+            sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID]);
+        if (trackedSlot != INVALID_STORAGE_ITEM_SLOT &&
+            !Internal_DoesStorageBelongToPlayer(
+                playerid,
+                Storage_GetItemStorageSlot(trackedSlot)))
+        {
+            if (Storage_GetItemDefId(trackedSlot) == ITEM_ID_CLOTHING_OUTFIT &&
+                Storage_GetItemMetaInt2(trackedSlot) == CLOTHING_STATE_EQUIPPED)
+            {
+                Storage_SetItemMetaInt2(trackedSlot, CLOTHING_STATE_BAG);
+            }
+            sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+        }
+    }
+
+    new selectedSlot = INVALID_STORAGE_ITEM_SLOT;
+    new selectedDbId = 0;
+
+    Internal_ScanEquippedOutfits(
+        playerid,
+        sCharacters[playerid][E_CHAR_LAYER1_SLOT],
+        0,
+        selectedSlot,
+        selectedDbId);
+    Internal_ScanEquippedOutfits(
+        playerid,
+        sCharacters[playerid][E_CHAR_LAYER2_SLOT],
+        0,
+        selectedSlot,
+        selectedDbId);
+
+    if (selectedSlot != INVALID_STORAGE_ITEM_SLOT)
+    {
+        // Надетым считается ровно один комплект; остальные дубли переводятся в сумку.
+        Internal_ClearDuplicateOutfits(
+            sCharacters[playerid][E_CHAR_LAYER1_SLOT],
+            selectedSlot,
+            0);
+        Internal_ClearDuplicateOutfits(
+            sCharacters[playerid][E_CHAR_LAYER2_SLOT],
+            selectedSlot,
+            0);
+
+        sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = selectedDbId;
+
+        new skinId = Storage_GetItemMetaInt1(selectedSlot);
+        if (!Internal_IsValidOutfitSkin(skinId))
+        {
+            skinId = Character_GetUnderwearSkin(playerid);
+        }
+        return Internal_ApplyPlayerSkin(playerid, skinId, true);
+    }
+
+    // Нет надетой одежды: базовый скин нижнего белья по полу персонажа.
+    sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+    return Internal_ApplyPlayerSkin(playerid, Character_GetUnderwearSkin(playerid), true);
+}
+
+// Надеть / снять выбранный комплект одежды (вызывается из /inv -> «Использовать»).
+stock Character_WearOutfitItem(playerid, item_slot)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS ||
+        !IsPlayerConnected(playerid) ||
+        !sCharacters[playerid][E_CHAR_LOADED])
+    {
+        return 0;
+    }
+
+    if (!Storage_IsValidItemSlot(item_slot) ||
+        Storage_GetItemDefId(item_slot) != ITEM_ID_CLOTHING_OUTFIT)
+    {
+        return 0;
+    }
+
+    if (!Internal_DoesStorageBelongToPlayer(playerid, Storage_GetItemStorageSlot(item_slot)))
+    {
+        SendClientMessage(playerid, COLOR_UI_ERROR,
+            "[Гардероб]: Этот комплект одежды находится не в вашем инвентаре.");
+        return 0;
+    }
+
+    new const itemDbId = Storage_GetItemDbId(item_slot);
+
+    if (Character_IsOutfitItemEquipped(playerid, item_slot))
+    {
+        Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_BAG);
+        sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
+        Internal_ApplyPlayerSkin(playerid, Character_GetUnderwearSkin(playerid), true);
+        SendClientMessage(playerid, COLOR_UI_INFO,
+            "[Гардероб]: Вы сняли комплект одежды и убрали его в сумку.");
+        return 1;
+    }
+
+    // Активным может быть только один комплект: снимаем все остальные.
+    Internal_ClearAllEquippedOutfits(playerid);
+
+    Storage_SetItemMetaInt2(item_slot, CLOTHING_STATE_EQUIPPED);
+    sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = itemDbId;
+
+    new skinId = Storage_GetItemMetaInt1(item_slot);
+    if (!Internal_IsValidOutfitSkin(skinId))
+    {
+        skinId = Character_GetUnderwearSkin(playerid);
+    }
+    Internal_ApplyPlayerSkin(playerid, skinId, true);
+
+    SendClientMessage(playerid, COLOR_UI_SUCCESS,
+        "[Гардероб]: Вы надели выбранный комплект одежды. Он отмечен статусом «Надето».");
+    return 1;
+}
+
+// Уведомление от модуля хранилищ о завершении загрузки конкретного слоя.
+forward OnCharacterInventoryStorageReady(storage_slot);
+public OnCharacterInventoryStorageReady(storage_slot)
+{
+    new const playerid = Character_FindPlayerByStorageSlot(storage_slot);
+    if (playerid == INVALID_PLAYER_ID)
+    {
+        return 0;
+    }
+
+    if (sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] > 0)
+    {
+        sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS]--;
+    }
+
+    if (sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] == 0)
+    {
+        Character_SyncInventorySkin(playerid, true);
+    }
+    return 1;
+}
+
 
 // Формула максимальной грузоподъемности из раздела 4.1 ROADMAP:
 // W_max = 25000 + (Skill_MUSCLE * 35) + Delta_role
@@ -1490,6 +1754,7 @@ stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
     sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
     sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = false;
 
+    // Если инвентарь еще грузится, остаемся на скине из БД и применим одежду после загрузки.
     Character_SyncInventorySkin(playerid);
 
     // Обновляем максимальный вес Слоя 1 по текущей формуле мускулатуры и роли
@@ -1749,6 +2014,7 @@ hook OnPlayerSpawn(playerid)
         sCharacters[playerid][E_CHAR_HP] = 100.0;
     }
 
+    // При каждом респавне применяется актуальный надетый скин, а не стартовый.
     Character_SyncInventorySkin(playerid);
     SetPlayerSkin(playerid, sCharacters[playerid][E_CHAR_SKIN_ID]);
     SetPlayerInterior(playerid, sCharacters[playerid][E_CHAR_INTERIOR]);
@@ -1966,7 +2232,7 @@ CMD:roleinfo(playerid, params[])
     Roles_FormatDetailedCardRu(sCharacters[playerid][E_CHAR_ROLE_ID], card);
     ShowPlayerDialog(
         playerid,
-        DIALOG_SKILLS_OVERVIEW,
+        DIALOG_CHAR_ROLE_INFO,
         DIALOG_STYLE_MSGBOX,
         "{FFC800}SAN ANDREAS RP {FFFFFF}| Описание вашей стартовой роли",
         card,

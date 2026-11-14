@@ -14,6 +14,9 @@
 
 #include <YSI_Coding\y_hooks>
 
+// Модуль персонажа подключается после модуля навыков: объявляем публичный API заранее.
+forward bool:Character_IsLoaded(playerid);
+
 // =============================================================================
 //  1. КОНСТАНТЫ И ПЕРЕЧИСЛЕНИЕ 41 НАВЫКА ПЕРСОНАЖА (E_SKILL_TYPE)
 // =============================================================================
@@ -25,6 +28,7 @@
 #define SKILL_DISPLAY_NAME_LEN                  (48)
 #define SKILL_CATEGORY_NAME_LEN                 (28)
 #define SKILL_SQL_BUFFER_LEN                    (2048)
+#define SKILLS_DIALOG_BUFFER_LEN                (8192)
 
 #define DIALOG_SKILLS_OVERVIEW                  (1020)
 
@@ -157,6 +161,7 @@ static stock sPlayerSkillCaps[MAX_PLAYERS][TOTAL_SKILL_TYPES];
 static stock FIGHT_STYLE:sPlayerFightingStyle[MAX_PLAYERS];
 static stock sPlayerSkillCharDbId[MAX_PLAYERS];
 static stock sSkillsSqlBuffer[SKILL_SQL_BUFFER_LEN];
+static stock sSkillsDialogBuffer[SKILLS_DIALOG_BUFFER_LEN];
 
 // =============================================================================
 //  3. ВНУТРЕННИЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (static stock)
@@ -637,26 +642,26 @@ stock Skills_SaveAllAsync(playerid)
     return 1;
 }
 
-stock Skills_ShowDialog(playerid)
+// Формирует полное тело диалога из 41 строки навыков.
+// Возвращает количество добавленных строк (обязано быть равно TOTAL_SKILL_TYPES).
+stock Skills_BuildDialogBody(playerid, output[], len = sizeof(output))
 {
-    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    if (len <= 0)
+    {
+        return 0;
+    }
+    output[0] = EOS;
+
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return 0;
     }
 
-    static dialogBody[4096];
-    dialogBody[0] = EOS;
-
-    new fightStyleName[40];
-    Internal_FormatFightingStyleRu(sPlayerFightingStyle[playerid], fightStyleName);
-
-    strcat(dialogBody, "Навык персонажа\tКатегория\tУровень / Потолок\n", sizeof(dialogBody));
+    new used = format(output, len,
+        "Навык персонажа\tКатегория\tУровень / Потолок\n");
 
     new rowLine[192];
-    format(rowLine, sizeof(rowLine),
-        "{FFC800}Стиль рукопашного боя{FFFFFF}\t{AFAFAF}Боевое искусство{FFFFFF}\t{66CC66}%s{FFFFFF}\n",
-        fightStyleName);
-    strcat(dialogBody, rowLine, sizeof(dialogBody));
+    new addedRows = 0;
 
     for (new i = 0; i < _:MAX_SKILL_TYPES; i++)
     {
@@ -688,15 +693,43 @@ stock Skills_ShowDialog(playerid)
             colorHex,
             val,
             cap);
-        strcat(dialogBody, rowLine, sizeof(dialogBody));
+
+        new const rowLen = strlen(rowLine);
+        if (rowLen <= 0 || (used + rowLen) >= len)
+        {
+            break;
+        }
+
+        strcat(output, rowLine, len);
+        used += rowLen;
+        addedRows++;
+    }
+    return addedRows;
+}
+
+stock Skills_ShowDialog(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+
+    new const rows = Skills_BuildDialogBody(playerid, sSkillsDialogBuffer, sizeof(sSkillsDialogBuffer));
+    if (rows != TOTAL_SKILL_TYPES)
+    {
+        printf("%s [Entities/Skills] [ERROR] Диалог /skills сформирован не полностью: %d из %d строк.",
+            SERVER_LOG_PREFIX, rows, TOTAL_SKILL_TYPES);
+        SendClientMessage(playerid, COLOR_UI_ERROR,
+            "Не удалось сформировать полный список навыков. Сообщите администрации.");
+        return 0;
     }
 
     ShowPlayerDialog(
         playerid,
         DIALOG_SKILLS_OVERVIEW,
         DIALOG_STYLE_TABLIST_HEADERS,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Матрица навыков персонажа (41 навык)",
-        dialogBody,
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Навыки персонажа",
+        sSkillsDialogBuffer,
         "Закрыть",
         "");
     return 1;
@@ -721,12 +754,24 @@ hook OnGameModeInit()
     new const lockCheck = Skills_Get(0, SKILL_LOCKPICKING);
     Skills_ResetDefaults(0);
 
+    // Самопроверка формирования полного тела диалога /skills (все 41 строка).
+    new const dialogRows = Skills_BuildDialogBody(0, sSkillsDialogBuffer, sizeof(sSkillsDialogBuffer));
+    new const bool:dialogTailOk = (
+        strfind(sSkillsDialogBuffer,
+            sSkillMetaTable[_:SKILL_CHARISMA_BARTER][E_SMETA_NAME_RU], true) != -1);
+
     printf("%s [Entities/Skills] Матрица %d навыков инициализирована (тест AK47=%d, LOCKPICKING=%d: %s).",
         SERVER_LOG_PREFIX,
         _:MAX_SKILL_TYPES,
         akCheck,
         lockCheck,
         (akCheck == 950 && lockCheck == 750) ? ("УСПЕШНО") : ("ОШИБКА"));
+    printf("%s [Entities/Skills] Диалог /skills: строк %d из %d, длина %d символов, последний навык: %s.",
+        SERVER_LOG_PREFIX,
+        dialogRows,
+        TOTAL_SKILL_TYPES,
+        strlen(sSkillsDialogBuffer),
+        (dialogRows == TOTAL_SKILL_TYPES && dialogTailOk) ? ("ОК") : ("ОШИБКА"));
     return 1;
 }
 
@@ -760,6 +805,12 @@ CMD:skills(playerid, params[])
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
             "Для просмотра матрицы навыков необходимо авторизоваться на сервере.");
+        return 1;
+    }
+    if (!Character_IsLoaded(playerid))
+    {
+        SendClientMessage(playerid, COLOR_UI_ERROR,
+            "Сначала завершите создание и загрузку персонажа.");
         return 1;
     }
     Skills_ShowDialog(playerid);

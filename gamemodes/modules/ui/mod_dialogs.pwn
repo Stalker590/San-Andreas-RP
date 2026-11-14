@@ -306,18 +306,24 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
 
         new itemName[ITEM_DISPLAY_NAME_LEN];
         Item_GetName(defId, itemName, sizeof(itemName));
+
+        new statusStr[32];
         if (defId == ITEM_ID_CLOTHING_OUTFIT)
         {
             new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-            new const isEquipped = (Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED);
-            if (isEquipped)
+            format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
+            if (Character_IsOutfitItemEquipped(playerid, itemSlot))
             {
-                format(itemName, sizeof(itemName), "Одежда (Скин %d) {66CC66}[Надето]{FFFFFF}", outfitSkin);
+                format(statusStr, sizeof(statusStr), "{66CC66}Надето{FFFFFF}");
             }
             else
             {
-                format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
+                format(statusStr, sizeof(statusStr), "{AFAFAF}В сумке{FFFFFF}");
             }
+        }
+        else
+        {
+            format(statusStr, sizeof(statusStr), "%d%%", floatround(dura, floatround_round));
         }
 
         new totalWeightG = Item_CalculateInstanceWeight(defId, amount, ammo);
@@ -345,10 +351,10 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             rowLine,
             sizeof(rowLine),
-            "%s\t%s\t%d%%\t%d.%02d\t%d.%02d\n",
+            "%s\t%s\t%s\t%d.%02d\t%d.%02d\n",
             itemName,
             qtyStr,
-            floatround(dura, floatround_round),
+            statusStr,
             totalWeightG / 1000, (totalWeightG % 1000) / 10,
             totalVolumeMl / 1000, (totalVolumeMl % 1000) / 10
         );
@@ -434,10 +440,17 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
 
         new itemName[ITEM_DISPLAY_NAME_LEN];
         Item_GetName(defId, itemName, sizeof(itemName));
+
+        new statusStr[32];
         if (defId == ITEM_ID_CLOTHING_OUTFIT)
         {
             new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-            format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
+            format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
+            format(statusStr, sizeof(statusStr), "{AFAFAF}В сумке{FFFFFF}");
+        }
+        else
+        {
+            format(statusStr, sizeof(statusStr), "%d%%", floatround(dura, floatround_round));
         }
 
         new totalW = Item_CalculateInstanceWeight(defId, amount, ammo);
@@ -461,10 +474,10 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
         format(
             line,
             sizeof(line),
-            "%s\t%s\t%d%%\t%d.%02d\t%d.%02d\n",
+            "%s\t%s\t%s\t%d.%02d\t%d.%02d\n",
             itemName,
             qtyStr,
-            floatround(dura, floatround_round),
+            statusStr,
             totalW / 1000, (totalW % 1000) / 10,
             totalV / 1000, (totalV % 1000) / 10
         );
@@ -540,20 +553,23 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
             if (defId == ITEM_ID_CLOTHING_OUTFIT)
             {
                 new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-                new const isEquipped = (Storage_GetItemMetaInt2(itemSlot) == CLOTHING_STATE_EQUIPPED);
-                if (isEquipped)
-                {
-                    format(itemName, sizeof(itemName), "Одежда (Скин %d) {66CC66}[Надето]{FFFFFF}", outfitSkin);
-                }
-                else
-                {
-                    format(itemName, sizeof(itemName), "Одежда (Скин %d)", outfitSkin);
-                }
+                format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
             }
 
             new metaStr[ITEM_META_STR_LEN];
             Storage_GetItemMetaStr(itemSlot, metaStr, sizeof(metaStr));
-            if (metaStr[0] == '\0')
+            if (defId == ITEM_ID_CLOTHING_OUTFIT)
+            {
+                if (Character_IsOutfitItemEquipped(targetid, itemSlot))
+                {
+                    format(metaStr, sizeof(metaStr), "{66CC66}Надето{FFFFFF}");
+                }
+                else
+                {
+                    format(metaStr, sizeof(metaStr), "{AFAFAF}В сумке{FFFFFF}");
+                }
+            }
+            else if (metaStr[0] == '\0')
             {
                 format(metaStr, sizeof(metaStr), "-");
             }
@@ -749,11 +765,11 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
     {
         if (Storage_GetItemMetaInt2(item_slot) == CLOTHING_STATE_EQUIPPED)
         {
-            strcat(actions, "1. {FFC800}Снять одежду (Остаться в белье){FFFFFF}\n", sizeof(actions));
+            strcat(actions, "1. {FFC800}Снять и убрать в сумку{FFFFFF}\n", sizeof(actions));
         }
         else
         {
-            strcat(actions, "1. {66CC66}Надеть комплект одежды{FFFFFF}\n", sizeof(actions));
+            strcat(actions, "1. {66CC66}Надеть на себя{FFFFFF}\n", sizeof(actions));
         }
     }
     else
@@ -803,6 +819,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
         {
             Storage_DestroyExpiredOrEmpty(extSlot);
             Character_SyncLayer1Weapons(playerid);
+            Character_SyncInventorySkin(playerid);
             Survival_RecalculateEncumbrance(playerid);
             SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет перемещен в ваш внешний инвентарь (Слой 1).");
         }
@@ -876,6 +893,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             if (res == STORAGE_RES_OK)
             {
                 Character_SyncLayer1Weapons(playerid);
+                Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
                 SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет успешно переложен в другой слой инвентаря.");
             }
@@ -915,6 +933,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             if (res == STORAGE_RES_OK)
             {
                 Character_SyncLayer1Weapons(playerid);
+                Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
                 SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет переложен во внешнее хранилище.");
             }
@@ -953,6 +972,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             {
                 ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.1, false, false, false, false, 0, SYNC_ALL);
                 Character_SyncLayer1Weapons(playerid);
+                Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
                 SendClientMessage(playerid, COLOR_INFO, "[Инвентарь]: Вы положили предмет на землю.");
             }
@@ -1222,6 +1242,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         Character_SyncLayer1Weapons(playerid);
                         Character_SyncLayer1Weapons(nearestId);
+                        Character_SyncInventorySkin(playerid);
+                        Character_SyncInventorySkin(nearestId);
                         Survival_RecalculateEncumbrance(playerid);
                         Survival_RecalculateEncumbrance(nearestId);
 
@@ -1366,6 +1388,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 Character_SyncLayer1Weapons(targetid);
                 Character_SyncLayer1Weapons(playerid);
+                Character_SyncInventorySkin(targetid);
+                Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(targetid);
                 Survival_RecalculateEncumbrance(playerid);
 

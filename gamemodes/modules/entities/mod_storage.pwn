@@ -102,6 +102,10 @@ static stock bool:sStorageMutex[MAX_ACTIVE_STORAGES];
 static stock sStorageMutexOwner[MAX_ACTIVE_STORAGES];
 static stock sStorageMutexTick[MAX_ACTIVE_STORAGES];
 
+// Флаги асинхронной загрузки содержимого хранилищ из MySQL
+static stock bool:sStorageItemsLoadStarted[MAX_ACTIVE_STORAGES];
+static stock bool:sStorageItemsReady[MAX_ACTIVE_STORAGES];
+
 // Временный буфер для формирования атомарных SQL-пакетов
 static stock sStorageSqlTxBuffer[STORAGE_SQL_TX_BUFFER_LEN];
 static stock sSyntheticStorageDbIdSeq = 100000;
@@ -138,6 +142,9 @@ static stock Internal_ResetStorageSlot(slot_id)
     sStorageMutex[slot_id] = false;
     sStorageMutexOwner[slot_id] = INVALID_PLAYER_ID;
     sStorageMutexTick[slot_id] = 0;
+
+    sStorageItemsLoadStarted[slot_id] = false;
+    sStorageItemsReady[slot_id] = false;
 }
 
 static stock Internal_ResetStorageItemSlot(item_slot)
@@ -535,6 +542,60 @@ stock Storage_GetItemMetaInt2(item_slot)
     return sStorageItems[item_slot][E_SITEM_META_INT2];
 }
 
+stock Storage_GetItemDbId(item_slot)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+    return sStorageItems[item_slot][E_SITEM_DB_ID];
+}
+
+stock Storage_GetItemStorageSlot(item_slot)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return INVALID_STORAGE_SLOT;
+    }
+    return sStorageItems[item_slot][E_SITEM_STORAGE_SLOT];
+}
+
+stock Storage_FindItemSlotByDbId(db_id)
+{
+    if (db_id <= 0)
+    {
+        return INVALID_STORAGE_ITEM_SLOT;
+    }
+
+    foreach (new itemSlot : StorageItemIter)
+    {
+        if (sStorageItems[itemSlot][E_SITEM_VALID] &&
+            sStorageItems[itemSlot][E_SITEM_DB_ID] == db_id)
+        {
+            return itemSlot;
+        }
+    }
+    return INVALID_STORAGE_ITEM_SLOT;
+}
+
+stock Storage_GetParentSlot(slot_id)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return INVALID_STORAGE_SLOT;
+    }
+    return sStorages[slot_id][E_STORAGE_PARENT_SLOT];
+}
+
+stock bool:Storage_AreItemsReady(slot_id)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return false;
+    }
+    return sStorageItemsReady[slot_id];
+}
+
 stock Storage_SetItemMetaInt2(item_slot, value)
 {
     if (!Storage_IsValidItemSlot(item_slot))
@@ -821,6 +882,8 @@ stock Storage_Create(
     sStorages[slot_id][E_STORAGE_INTERIOR] = interior;
     sStorages[slot_id][E_STORAGE_VW] = virtual_world;
     sStorages[slot_id][E_STORAGE_EXPIRES_AT] = (ttl_seconds > 0) ? (gettime() + ttl_seconds) : 0;
+    // Новое хранилище не требует чтения из БД: его содержимое формируется синхронно.
+    sStorageItemsReady[slot_id] = (existing_db_id <= 0);
 
     if (existing_db_id <= 0 && DB_IsConnected())
     {
@@ -838,7 +901,8 @@ stock Storage_Create(
         }
 
         mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
-            "INSERT INTO `storages` (`storage_type`, `owner_id`, `max_weight_g`, `max_volume_ml`, `is_locked`, `lock_level`, `pos_x`, `pos_y`, `pos_z`, `interior`, `virtual_world`, `expires_at`) VALUES ('%e', %d, %d, %d, %d, %d, %.3f, %.3f, %.3f, %d, %d, %s);",
+            "INSERT INTO `storages` (`id`, `storage_type`, `owner_id`, `max_weight_g`, `max_volume_ml`, `is_locked`, `lock_level`, `pos_x`, `pos_y`, `pos_z`, `interior`, `virtual_world`, `expires_at`) VALUES (%d, '%e', %d, %d, %d, %d, %d, %.3f, %.3f, %.3f, %d, %d, %s);",
+            sStorages[slot_id][E_STORAGE_DB_ID],
             typeStr,
             owner_id,
             max_weight_g,
@@ -852,7 +916,8 @@ stock Storage_Create(
             virtual_world,
             expiresSql);
 
-        mysql_tquery(gMySQL, sStorageSqlTxBuffer, "OnStorageCreatedInDb", "d", slot_id);
+        // ID выделен заранее: последующие INSERT предметов и персонажа уже видят эту строку.
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
     }
 
     return slot_id;
@@ -1007,7 +1072,8 @@ stock E_STORAGE_RESULT:Storage_AddItem(
         }
 
         mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
-            "INSERT INTO `storage_items` (`storage_id`, `item_def_id`, `amount`, `durability`, `ammo_count`, `nested_storage_id`, `meta_int1`, `meta_int2`, `meta_str`) VALUES (%d, %d, %d, %.2f, %d, %s, %d, %d, '%e');",
+            "INSERT INTO `storage_items` (`id`, `storage_id`, `item_def_id`, `amount`, `durability`, `ammo_count`, `nested_storage_id`, `meta_int1`, `meta_int2`, `meta_str`) VALUES (%d, %d, %d, %d, %.2f, %d, %s, %d, %d, '%e');",
+            sStorageItems[itemSlot][E_SITEM_DB_ID],
             sStorages[storage_slot][E_STORAGE_DB_ID],
             def_id,
             amount,
@@ -1018,7 +1084,8 @@ stock E_STORAGE_RESULT:Storage_AddItem(
             meta_int2,
             meta_str);
 
-        mysql_tquery(gMySQL, sStorageSqlTxBuffer, "OnStorageItemInsertedInDb", "d", itemSlot);
+        // ID предмета выделен заранее; коллбек не нужен и не может перезаписать его чужим ID.
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
     }
 
     return STORAGE_RES_OK;
@@ -1617,29 +1684,58 @@ stock bool:Storage_DestroyExpiredOrEmpty(slot_id)
 // =============================================================================
 
 // Загрузка конкретного хранилища из БД по его db_storage_id (асинхронно во время игры)
-stock bool:Storage_Load(db_storage_id)
+// Асинхронная загрузка хранилища: слот в RAM создается сразу, чтобы вызывающий
+// код получил валидный идентификатор, а заголовок и предметы догружаются из БД.
+// Возвращает слот RAM либо INVALID_STORAGE_SLOT.
+stock Storage_Load(
+    db_storage_id,
+    E_STORAGE_TYPE:expected_type = STORAGE_NONE,
+    owner_id = 0,
+    max_weight_g = 0,
+    max_volume_ml = 0)
 {
     if (db_storage_id <= 0)
     {
-        return false;
+        return INVALID_STORAGE_SLOT;
     }
 
     new const existingSlot = Storage_FindByDbId(db_storage_id);
     if (existingSlot != INVALID_STORAGE_SLOT)
     {
-        return true;
+        return existingSlot;
     }
 
     if (!DB_IsConnected())
     {
-        return false;
+        return INVALID_STORAGE_SLOT;
     }
+
+    new const slot_id = Storage_Create(
+        expected_type,
+        owner_id,
+        max_weight_g,
+        max_volume_ml,
+        false,
+        0,
+        0.0, 0.0, 0.0,
+        0,
+        0,
+        0,
+        db_storage_id);
+
+    if (slot_id == INVALID_STORAGE_SLOT)
+    {
+        return INVALID_STORAGE_SLOT;
+    }
+
+    // Сразу помечаем слот как «загружается», чтобы повторный вызов не создал дубль.
+    sStorageItemsReady[slot_id] = false;
 
     mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
         "SELECT `id`, `storage_type`, `owner_id`, `max_weight_g`, `max_volume_ml`, `is_locked`, `lock_level`, IFNULL(`pos_x`, 0.0) AS `px`, IFNULL(`pos_y`, 0.0) AS `py`, IFNULL(`pos_z`, 0.0) AS `pz`, `interior`, `virtual_world`, IFNULL(UNIX_TIMESTAMP(`expires_at`), 0) AS `exp_ts` FROM `storages` WHERE `id` = %d LIMIT 1;",
         db_storage_id);
     mysql_tquery(gMySQL, sStorageSqlTxBuffer, "OnStorageHeaderLoaded", "d", db_storage_id);
-    return true;
+    return slot_id;
 }
 
 static stock Internal_LoadPersistentStoragesOnInitSync()
@@ -1647,6 +1743,27 @@ static stock Internal_LoadPersistentStoragesOnInitSync()
     if (!DB_IsConnected())
     {
         return 0;
+    }
+
+    // Синхронно поднимаем счетчики синтетических ID выше реальных MAX(id),
+    // чтобы после перезапуска сервера новые строки не конфликтовали по PRIMARY KEY.
+    new const Cache:maxIdCache = mysql_query(gMySQL,
+        "SELECT (SELECT IFNULL(MAX(`id`), 0) FROM `storages`) AS `max_storage`, (SELECT IFNULL(MAX(`id`), 0) FROM `storage_items`) AS `max_item`;",
+        true);
+    if (cache_is_valid(maxIdCache))
+    {
+        new maxStorageId = 0, maxItemId = 0;
+        cache_get_value_name_int(0, "max_storage", maxStorageId);
+        cache_get_value_name_int(0, "max_item", maxItemId);
+        if (maxStorageId > sSyntheticStorageDbIdSeq)
+        {
+            sSyntheticStorageDbIdSeq = maxStorageId;
+        }
+        if (maxItemId > sSyntheticItemDbIdSeq)
+        {
+            sSyntheticItemDbIdSeq = maxItemId;
+        }
+        cache_delete(maxIdCache);
     }
 
     // Разрешенный синхронный запрос строго внутри OnGameModeInit (загрузка казн фракций и складов предприятий)
@@ -1762,6 +1879,16 @@ static stock Internal_LoadPersistentStoragesOnInitSync()
         cache_delete(itemCache);
     }
 
+    // Все постоянные хранилища, загруженные синхронно на старте, уже готовы.
+    foreach (new storageSlot : StorageIter)
+    {
+        if (sStorages[storageSlot][E_STORAGE_VALID] &&
+            sStorages[storageSlot][E_STORAGE_DB_ID] > 0)
+        {
+            sStorageItemsReady[storageSlot] = true;
+        }
+    }
+
     return loadedStorages;
 }
 
@@ -1803,6 +1930,13 @@ public OnStorageHeaderLoaded(requested_db_id)
     cache_get_row_count(rows);
     if (rows <= 0)
     {
+        // Заголовок отсутствует: слот мог быть создан по локальным данным.
+        new const orphanSlot = Storage_FindByDbId(requested_db_id);
+        if (orphanSlot != INVALID_STORAGE_SLOT)
+        {
+            sStorageItemsReady[orphanSlot] = true;
+            CallLocalFunction("OnCharacterInventoryStorageReady", "d", orphanSlot);
+        }
         return 0;
     }
 
@@ -1811,11 +1945,6 @@ public OnStorageHeaderLoaded(requested_db_id)
     new typeStr[32];
 
     cache_get_value_name_int(0, "id", dbId);
-    if (Storage_FindByDbId(dbId) != INVALID_STORAGE_SLOT)
-    {
-        return 1;
-    }
-
     cache_get_value_name(0, "storage_type", typeStr, sizeof(typeStr));
     cache_get_value_name_int(0, "owner_id", ownerId);
     cache_get_value_name_int(0, "max_weight_g", maxWeightG);
@@ -1829,26 +1958,49 @@ public OnStorageHeaderLoaded(requested_db_id)
     cache_get_value_name_int(0, "virtual_world", vw);
     cache_get_value_name_int(0, "exp_ts", expTs);
 
-    new const slot = Storage_Create(
-        Config_ParseStorageType(typeStr),
-        ownerId,
-        maxWeightG,
-        maxVolumeMl,
-        (isLockedInt != 0),
-        lockLevel,
-        px, py, pz,
-        interior,
-        vw,
-        0,
-        dbId
-    );
+    new slot = Storage_FindByDbId(dbId);
+    if (slot == INVALID_STORAGE_SLOT)
+    {
+        slot = Storage_Create(
+            Config_ParseStorageType(typeStr),
+            ownerId,
+            maxWeightG,
+            maxVolumeMl,
+            (isLockedInt != 0),
+            lockLevel,
+            px, py, pz,
+            interior,
+            vw,
+            0,
+            dbId
+        );
+    }
 
     if (slot == INVALID_STORAGE_SLOT)
     {
         return 0;
     }
 
+    // Авторитетные данные заголовка из БД применяются к уже созданному слоту.
+    sStorages[slot][E_STORAGE_KIND] = Config_ParseStorageType(typeStr);
+    sStorages[slot][E_STORAGE_OWNER_ID] = ownerId;
+    sStorages[slot][E_STORAGE_MAX_WEIGHT_G] = maxWeightG;
+    sStorages[slot][E_STORAGE_MAX_VOLUME_ML] = maxVolumeMl;
+    sStorages[slot][E_STORAGE_IS_LOCKED] = (isLockedInt != 0);
+    sStorages[slot][E_STORAGE_LOCK_LEVEL] = lockLevel;
+    sStorages[slot][E_STORAGE_POS_X] = px;
+    sStorages[slot][E_STORAGE_POS_Y] = py;
+    sStorages[slot][E_STORAGE_POS_Z] = pz;
+    sStorages[slot][E_STORAGE_INTERIOR] = interior;
+    sStorages[slot][E_STORAGE_VW] = vw;
     sStorages[slot][E_STORAGE_EXPIRES_AT] = expTs;
+
+    // Запрос предметов отправляется строго один раз на слот.
+    if (sStorageItemsLoadStarted[slot])
+    {
+        return 1;
+    }
+    sStorageItemsLoadStarted[slot] = true;
 
     mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
         "SELECT `id`, `item_def_id`, `amount`, `durability`, `ammo_count`, IFNULL(`nested_storage_id`, 0) AS `nested_id`, `meta_int1`, `meta_int2`, IFNULL(`meta_str`, '') AS `mstr` FROM `storage_items` WHERE `storage_id` = %d ORDER BY `id` ASC;",
@@ -1863,6 +2015,11 @@ public OnStorageItemsLoaded(storage_slot, expected_db_id)
     if (!Storage_IsValidSlot(storage_slot) || sStorages[storage_slot][E_STORAGE_DB_ID] != expected_db_id)
     {
         return 0;
+    }
+
+    if (sStorageItemsReady[storage_slot])
+    {
+        return 1;
     }
 
     new rows = 0;
@@ -1899,6 +2056,11 @@ public OnStorageItemsLoaded(storage_slot, expected_db_id)
             nestedDbId
         );
     }
+
+    sStorageItemsReady[storage_slot] = true;
+
+    // Модуль персонажа пересчитывает надетую одежду после загрузки слоя.
+    CallLocalFunction("OnCharacterInventoryStorageReady", "d", storage_slot);
     return 1;
 }
 
