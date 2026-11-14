@@ -756,9 +756,9 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     #pragma unused playerid, response, listitem, inputtext
     if (dialogid == DIALOG_SKILLS_OVERVIEW)
     {
-        return 1;
+        return Y_HOOKS_BREAK_RETURN_1;
     }
-    return 0;
+    return Y_HOOKS_CONTINUE_RETURN_0;
 }
 
 CMD:skills(playerid, params[])

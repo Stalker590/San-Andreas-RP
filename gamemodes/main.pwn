@@ -164,6 +164,9 @@ static stock Internal_ConfigureWorldRules()
     ShowNameTags(true);
     SetNameTagDrawDistance(15.0);
     ShowPlayerMarkers(PLAYER_MARKERS_MODE_OFF);
+
+    // Регистрация базового системного класса спавна для корректного перехвата OnPlayerRequestClass
+    AddPlayerClass(26, 1742.90, -1862.40, 13.57, 0.0, WEAPON_FIST, 0, WEAPON_FIST, 0, WEAPON_FIST, 0);
 }
 
 static stock Internal_VerifyComponentsAndLibs()
@@ -227,9 +230,9 @@ static stock Internal_VerifyComponentsAndLibs()
         SERVER_LOG_PREFIX,
         sServerBootState[E_BOOT_PAWNREGEX_OK] ? ("загружен") : ("ОШИБКА"));
 
-    // 6. Инициализация и проверка bcrypt (cost = 12)
+    // 6. Инициализация и проверка bcrypt (cost = 12) + проверка ABI передачи аргументов (playerid, token)
     bcrypt_set_thread_limit(4);
-    bcrypt_hash(0, "OnStartupBcryptHashPing", "SARP_Bcrypt_Init_Check", BCRYPT_WORK_FACTOR);
+    bcrypt_hash(0, "OnStartupBcryptHashPing", "SARP_Bcrypt_Init_Check", BCRYPT_WORK_FACTOR, "d", 777);
     printf("%s [6/6] Компонент bcrypt: пул потоков = 4, запущен тест хеширования (cost = %d)...",
         SERVER_LOG_PREFIX, BCRYPT_WORK_FACTOR);
 
@@ -274,34 +277,35 @@ static stock Internal_FlushAllDirtyBeforeExit()
 //  8. АСИНХРОННЫЕ КОЛБЕКИ САМОТЕСТИРОВАНИЯ (forward / public)
 // =============================================================================
 
-forward OnStartupBcryptHashPing(playerid, hashid);
-public OnStartupBcryptHashPing(playerid, hashid)
+forward OnStartupBcryptHashPing(playerid, testToken);
+public OnStartupBcryptHashPing(playerid, testToken)
 {
-    #pragma unused playerid, hashid
+    #pragma unused playerid
     new hashBuffer[BCRYPT_HASH_LENGTH];
     bcrypt_get_hash(hashBuffer, sizeof(hashBuffer));
 
-    if (strlen(hashBuffer) == 60)
+    if (strlen(hashBuffer) == 60 && testToken == 777)
     {
-        bcrypt_verify(0, "OnStartupBcryptVerifyPing", "SARP_Bcrypt_Init_Check", hashBuffer);
+        bcrypt_verify(0, "OnStartupBcryptVerifyPing", "SARP_Bcrypt_Init_Check", hashBuffer, "d", 777);
     }
     else
     {
-        printf("%s [FATAL] Ошибка генерации хеша bcrypt (длина = %d).",
-            SERVER_LOG_PREFIX, strlen(hashBuffer));
+        printf("%s [FATAL] Ошибка генерации хеша bcrypt (длина = %d, token = %d).",
+            SERVER_LOG_PREFIX, strlen(hashBuffer), testToken);
     }
     return 1;
 }
 
-forward OnStartupBcryptVerifyPing(playerid, bool:success);
-public OnStartupBcryptVerifyPing(playerid, bool:success)
+forward OnStartupBcryptVerifyPing(playerid, bool:success, testToken);
+public OnStartupBcryptVerifyPing(playerid, bool:success, testToken)
 {
     #pragma unused playerid
-    sServerBootState[E_BOOT_BCRYPT_OK] = success;
-    printf("%s [6/6] Компонент bcrypt: верификация хеша (cost = %d) %s.",
+    sServerBootState[E_BOOT_BCRYPT_OK] = (success && testToken == 777);
+    printf("%s [6/6] Компонент bcrypt: верификация хеша (cost = %d, token = %d) %s.",
         SERVER_LOG_PREFIX,
         BCRYPT_WORK_FACTOR,
-        success ? ("УСПЕШНО ПРОЙДЕНА") : ("ЗАВЕРШИЛАСЬ ОШИБКОЙ"));
+        testToken,
+        sServerBootState[E_BOOT_BCRYPT_OK] ? ("УСПЕШНО ПРОЙДЕНА") : ("ЗАВЕРШИЛАСЬ ОШИБКОЙ"));
     return 1;
 }
 

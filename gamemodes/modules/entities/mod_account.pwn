@@ -32,8 +32,13 @@
 #define DIALOG_ACC_REGISTER_EMAIL               (1003)
 #define DIALOG_ACC_LOGIN_PASSWORD               (1004)
 
+#define MAX_RAM_CACHED_ACCOUNTS                 (128)
+
 // Событие успешной авторизации или завершения регистрации аккаунта
 forward OnAccountAuthenticated(playerid, bool:isNewRegistration);
+
+// Событие повторного отображения активного шага создания персонажа после входа в режим наблюдения
+forward OnLobbyReshowCharacterWizard(playerid);
 
 // =============================================================================
 //  2. СТРУКТУРЫ ДАННЫХ И ИНКАПСУЛИРОВАННОЕ СОСТОЯНИЕ СЕССИЙ (static stock)
@@ -72,7 +77,18 @@ enum E_PLAYER_ACCOUNT
     E_ACC_CONNECTED_UNIX
 };
 
+enum E_RAM_ACCOUNT_CACHE
+{
+    bool:E_RAM_ACC_USED,
+    E_RAM_ACC_DB_ID,
+    E_RAM_ACC_USERNAME[MAX_PLAYER_NAME + 1],
+    E_RAM_ACC_PASSWORD_HASH[BCRYPT_HASH_LENGTH],
+    E_RAM_ACC_EMAIL[ACCOUNT_EMAIL_MAX_LEN],
+    E_RAM_ACC_ADMIN_LEVEL
+};
+
 static stock sPlayerAccounts[MAX_PLAYERS][E_PLAYER_ACCOUNT];
+static stock sRamAccountCache[MAX_RAM_CACHED_ACCOUNTS][E_RAM_ACCOUNT_CACHE];
 static stock sSyntheticAccountIdSeq = 0;
 static stock sSyntheticSessionIdSeq = 0;
 static stock sAccountSqlBuffer[1024];
@@ -310,6 +326,107 @@ static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = ""
         "Выход");
 }
 
+static stock Internal_FindRamAccountSlot(const username[])
+{
+    if (username[0] == EOS)
+    {
+        return -1;
+    }
+
+    for (new i = 0; i < MAX_RAM_CACHED_ACCOUNTS; i++)
+    {
+        if (sRamAccountCache[i][E_RAM_ACC_USED] &&
+            strcmp(sRamAccountCache[i][E_RAM_ACC_USERNAME], username, true) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static stock Internal_SaveRamAccountCache(playerid)
+{
+    new slot = Internal_FindRamAccountSlot(sPlayerAccounts[playerid][E_ACC_USERNAME]);
+    if (slot == -1)
+    {
+        for (new i = 0; i < MAX_RAM_CACHED_ACCOUNTS; i++)
+        {
+            if (!sRamAccountCache[i][E_RAM_ACC_USED])
+            {
+                slot = i;
+                break;
+            }
+        }
+    }
+    if (slot == -1)
+    {
+        slot = 0;
+    }
+
+    sRamAccountCache[slot][E_RAM_ACC_USED] = true;
+    sRamAccountCache[slot][E_RAM_ACC_DB_ID] = sPlayerAccounts[playerid][E_ACC_DB_ID];
+    format(sRamAccountCache[slot][E_RAM_ACC_USERNAME], MAX_PLAYER_NAME + 1, "%s", sPlayerAccounts[playerid][E_ACC_USERNAME]);
+    format(sRamAccountCache[slot][E_RAM_ACC_PASSWORD_HASH], BCRYPT_HASH_LENGTH, "%s", sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH]);
+    format(sRamAccountCache[slot][E_RAM_ACC_EMAIL], ACCOUNT_EMAIL_MAX_LEN, "%s", sPlayerAccounts[playerid][E_ACC_EMAIL]);
+    sRamAccountCache[slot][E_RAM_ACC_ADMIN_LEVEL] = sPlayerAccounts[playerid][E_ACC_ADMIN_LEVEL];
+}
+
+static stock Internal_ReshowActiveAuthOrWizardDialog(playerid)
+{
+    switch (sPlayerAccounts[playerid][E_ACC_STATE])
+    {
+        case ACC_STATE_AWAITING_REGISTER:
+        {
+            Internal_ShowRegisterPasswordDialog(playerid);
+        }
+        case ACC_STATE_AWAITING_EMAIL:
+        {
+            Internal_ShowRegisterEmailDialog(playerid);
+        }
+        case ACC_STATE_AWAITING_LOGIN:
+        {
+            Internal_ShowLoginPasswordDialog(playerid);
+        }
+        case ACC_STATE_AUTHENTICATED:
+        {
+            if (sPlayerAccounts[playerid][E_ACC_BOUND_CHAR_DB_ID] <= 0)
+            {
+                CallLocalFunction("OnLobbyReshowCharacterWizard", "d", playerid);
+            }
+        }
+        default:
+        {
+        }
+    }
+}
+
+timer Account_SyncLobbyCameraAndDialog[150](playerid, expectedToken)
+{
+    if (!Config_ValidatePlayerToken(playerid, expectedToken))
+    {
+        return;
+    }
+
+    if (sPlayerAccounts[playerid][E_ACC_STATE] == ACC_STATE_KICK_PENDING)
+    {
+        return;
+    }
+
+    // Если персонаж уже создан/загружен и привязан к сессии — камера передается игроку
+    if (sPlayerAccounts[playerid][E_ACC_STATE] == ACC_STATE_AUTHENTICATED &&
+        sPlayerAccounts[playerid][E_ACC_BOUND_CHAR_DB_ID] > 0)
+    {
+        return;
+    }
+
+    SetPlayerInterior(playerid, 0);
+    SetPlayerVirtualWorld(playerid, 0);
+    InterpolateCameraPos(playerid, 1480.0, -1790.0, 58.0, 1480.0, -1715.0, 42.0, 25000, CAMERA_MOVE);
+    InterpolateCameraLookAt(playerid, 1480.0, -1768.0, 18.0, 1480.0, -1660.0, 16.0, 25000, CAMERA_MOVE);
+
+    Internal_ReshowActiveAuthOrWizardDialog(playerid);
+}
+
 static stock Internal_StartSessionRecord(playerid, bool:isNewRegistration)
 {
     sPlayerAccounts[playerid][E_ACC_STATE] = ACC_STATE_AUTHENTICATED;
@@ -487,10 +604,9 @@ public OnAccountLookupCompleted(playerid, sessionToken)
     return 1;
 }
 
-forward OnAccountPasswordHashed(playerid, hashid, sessionToken);
-public OnAccountPasswordHashed(playerid, hashid, sessionToken)
+forward OnAccountPasswordHashed(playerid, sessionToken);
+public OnAccountPasswordHashed(playerid, sessionToken)
 {
-    #pragma unused hashid
     if (!Config_ValidatePlayerToken(playerid, sessionToken))
     {
         return 1;
@@ -537,6 +653,7 @@ public OnAccountPasswordHashed(playerid, hashid, sessionToken)
     else
     {
         sPlayerAccounts[playerid][E_ACC_DB_ID] = ++sSyntheticAccountIdSeq;
+        Internal_SaveRamAccountCache(playerid);
         SendClientMessage(playerid, COLOR_UI_SUCCESS,
             "Ваш аккаунт успешно зарегистрирован! Переходим к созданию персонажа...");
         Internal_StartSessionRecord(playerid, true);
@@ -554,6 +671,7 @@ public OnAccountRegisteredInDb(playerid, sessionToken)
 
     new const insertedId = cache_insert_id();
     sPlayerAccounts[playerid][E_ACC_DB_ID] = (insertedId > 0) ? insertedId : (++sSyntheticAccountIdSeq);
+    Internal_SaveRamAccountCache(playerid);
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
         "Ваш аккаунт успешно зарегистрирован в базе данных штата! Переходим к созданию персонажа...");
@@ -762,6 +880,16 @@ hook OnGameModeInit()
         Internal_ResetAccountSlot(i);
     }
 
+    for (new r = 0; r < MAX_RAM_CACHED_ACCOUNTS; r++)
+    {
+        sRamAccountCache[r][E_RAM_ACC_USED] = false;
+        sRamAccountCache[r][E_RAM_ACC_DB_ID] = 0;
+        sRamAccountCache[r][E_RAM_ACC_USERNAME][0] = EOS;
+        sRamAccountCache[r][E_RAM_ACC_PASSWORD_HASH][0] = EOS;
+        sRamAccountCache[r][E_RAM_ACC_EMAIL][0] = EOS;
+        sRamAccountCache[r][E_RAM_ACC_ADMIN_LEVEL] = 0;
+    }
+
     new const bool:validSample = Internal_ValidateRpNickFormat("Donald_Trump");
     new const bool:invalidSample = !Internal_ValidateRpNickFormat("bad_nick_123");
 
@@ -780,6 +908,9 @@ hook OnPlayerConnect(playerid)
     GetPlayerIp(playerid, sPlayerAccounts[playerid][E_ACC_IP], ACCOUNT_IP_MAX_LEN);
     GPCI(playerid, sPlayerAccounts[playerid][E_ACC_HWID], ACCOUNT_HWID_MAX_LEN);
     sPlayerAccounts[playerid][E_ACC_CONNECTED_UNIX] = gettime();
+
+    // Базовый профиль спавна на случай перехода из режима наблюдения
+    SetSpawnInfo(playerid, NO_TEAM, 26, 1742.90, -1862.40, 13.57, 0.0);
 
     // Очистка чата при входе и вывод приветственного заголовка
     for (new line = 0; line < 15; line++)
@@ -809,7 +940,7 @@ hook OnPlayerConnect(playerid)
         return 1;
     }
 
-    // 2. Асинхронная проверка аккаунта и бана по нику, IP и HWID
+    // 2. Асинхронная проверка аккаунта и бана по нику, IP и HWID (или поиск в RAM-кеше)
     sPlayerAccounts[playerid][E_ACC_STATE] = ACC_STATE_CHECKING_DB;
 
     if (DB_IsConnected())
@@ -826,7 +957,51 @@ hook OnPlayerConnect(playerid)
     }
     else
     {
-        Internal_ShowRegisterPasswordDialog(playerid);
+        new const ramSlot = Internal_FindRamAccountSlot(sPlayerAccounts[playerid][E_ACC_USERNAME]);
+        if (ramSlot != -1)
+        {
+            sPlayerAccounts[playerid][E_ACC_DB_ID] = sRamAccountCache[ramSlot][E_RAM_ACC_DB_ID];
+            format(sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH], BCRYPT_HASH_LENGTH, "%s", sRamAccountCache[ramSlot][E_RAM_ACC_PASSWORD_HASH]);
+            format(sPlayerAccounts[playerid][E_ACC_EMAIL], ACCOUNT_EMAIL_MAX_LEN, "%s", sRamAccountCache[ramSlot][E_RAM_ACC_EMAIL]);
+            sPlayerAccounts[playerid][E_ACC_ADMIN_LEVEL] = sRamAccountCache[ramSlot][E_RAM_ACC_ADMIN_LEVEL];
+            Internal_ShowLoginPasswordDialog(playerid);
+        }
+        else
+        {
+            Internal_ShowRegisterPasswordDialog(playerid);
+        }
+    }
+    return 1;
+}
+
+hook OnPlayerRequestClass(playerid, classid)
+{
+    #pragma unused classid
+    if (sPlayerAccounts[playerid][E_ACC_STATE] == ACC_STATE_KICK_PENDING)
+    {
+        TogglePlayerSpectating(playerid, true);
+        return 0;
+    }
+
+    // Пока персонаж не создан / не загружен, переводим игрока в режим наблюдения (скрываем << >> Spawn)
+    if (sPlayerAccounts[playerid][E_ACC_STATE] != ACC_STATE_AUTHENTICATED ||
+        sPlayerAccounts[playerid][E_ACC_BOUND_CHAR_DB_ID] <= 0)
+    {
+        TogglePlayerSpectating(playerid, true);
+        defer Account_SyncLobbyCameraAndDialog(playerid, Config_GetPlayerSessionToken(playerid));
+        return 0;
+    }
+    return 1;
+}
+
+hook OnPlayerRequestSpawn(playerid)
+{
+    if (sPlayerAccounts[playerid][E_ACC_STATE] != ACC_STATE_AUTHENTICATED ||
+        sPlayerAccounts[playerid][E_ACC_BOUND_CHAR_DB_ID] <= 0)
+    {
+        TogglePlayerSpectating(playerid, true);
+        defer Account_SyncLobbyCameraAndDialog(playerid, Config_GetPlayerSessionToken(playerid));
+        return Y_HOOKS_BREAK_RETURN_0;
     }
     return 1;
 }
@@ -868,7 +1043,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         case DIALOG_ACC_BAN_NOTICE, DIALOG_ACC_NONRP_NICK:
         {
             Kick(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_ACC_REGISTER_PASSWORD:
@@ -878,7 +1053,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 SendClientMessage(playerid, COLOR_UI_WARNING,
                     "Вы отказались от регистрации аккаунта. До встречи в штате Сан-Андреас!");
                 defer Account_DelayedKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new const passLen = strlen(inputtext);
@@ -887,7 +1062,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 Internal_ShowRegisterPasswordDialog(
                     playerid,
                     "Длина пароля должна составлять от 6 до 32 символов!");
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             for (new i = 0; i < passLen; i++)
@@ -897,13 +1072,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Internal_ShowRegisterPasswordDialog(
                         playerid,
                         "Пароль не должен содержать пробелов или управляющих символов!");
-                    return 1;
+                    return Y_HOOKS_BREAK_RETURN_1;
                 }
             }
 
             format(sPlayerAccounts[playerid][E_ACC_TEMP_PASSWORD], ACCOUNT_PASSWORD_MAX_LEN + 1, "%s", inputtext);
             Internal_ShowRegisterEmailDialog(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_ACC_REGISTER_EMAIL:
@@ -913,14 +1088,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 // Игрок нажал «Пропустить» — регистрируем без E-Mail
                 sPlayerAccounts[playerid][E_ACC_EMAIL][0] = EOS;
                 Internal_BeginPasswordHashing(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (inputtext[0] == EOS)
             {
                 sPlayerAccounts[playerid][E_ACC_EMAIL][0] = EOS;
                 Internal_BeginPasswordHashing(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (!Internal_ValidateEmailFormat(inputtext))
@@ -928,12 +1103,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 Internal_ShowRegisterEmailDialog(
                     playerid,
                     "Указан некорректный формат электронной почты!");
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             format(sPlayerAccounts[playerid][E_ACC_EMAIL], ACCOUNT_EMAIL_MAX_LEN, "%s", inputtext);
             Internal_BeginPasswordHashing(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_ACC_LOGIN_PASSWORD:
@@ -943,13 +1118,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 SendClientMessage(playerid, COLOR_UI_WARNING,
                     "Вы прервали процедуру авторизации. Соединение закрыто.");
                 defer Account_DelayedKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (strlen(inputtext) < 1)
             {
                 Internal_ShowLoginPasswordDialog(playerid, "Поле ввода пароля не может быть пустым!");
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             sPlayerAccounts[playerid][E_ACC_STATE] = ACC_STATE_VERIFYING_PASSWORD;
@@ -960,8 +1135,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH],
                 "d",
                 Config_GetPlayerSessionToken(playerid));
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
     }
-    return 0;
+    return Y_HOOKS_CONTINUE_RETURN_0;
 }

@@ -930,7 +930,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     {
         case DIALOG_INV_CONTEXT_MENU_Y:
         {
-            if (!response) return 1;
+            if (!response) return Y_HOOKS_BREAK_RETURN_1;
             switch (listitem)
             {
                 case 0: Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
@@ -950,7 +950,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 3: Character_ShowStatsDialog(playerid);
                 case 4: Skills_ShowDialog(playerid);
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_MAIN_LIST:
         {
@@ -961,24 +961,24 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Storage_CloseForPlayer(playerid, sPlayerNestedBagSlot[playerid]);
                     sPlayerNestedBagSlot[playerid] = INVALID_STORAGE_SLOT;
                 }
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (listitem < 0 || listitem >= sPlayerDialogRowCount[playerid])
             {
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new mappedCode = sPlayerDialogRowMap[playerid][listitem];
             if (mappedCode == INV_ROW_SWITCH_LAYER_2)
             {
                 Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_2);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             if (mappedCode == INV_ROW_SWITCH_LAYER_1)
             {
                 Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             if (mappedCode == INV_ROW_OPEN_EXTERNAL)
             {
@@ -992,21 +992,21 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     SendClientMessage(playerid, COLOR_WARNING, "[Инвентарь]: Контейнер рядом больше недоступен.");
                     Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 }
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (Storage_IsValidItemSlot(mappedCode))
             {
                 Internal_ShowItemActionMenu(playerid, mappedCode);
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_ITEM_ACTIONS:
         {
             if (!response)
             {
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new itemSlot = sPlayerSelectedItemSlot[playerid];
@@ -1014,7 +1014,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!Storage_IsValidSlot(srcSlot) || !Storage_IsValidItemSlot(itemSlot))
             {
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new defId = Storage_GetItemDefId(itemSlot);
@@ -1033,14 +1033,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Этот предмет не является сумкой, рюкзаком или контейнером.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                        return 1;
+                        return Y_HOOKS_BREAK_RETURN_1;
                     }
                     new nestedSlot = Storage_GetItemNestedSlot(itemSlot);
                     if (!Storage_IsValidSlot(nestedSlot))
                     {
                         SendClientMessage(playerid, COLOR_WARNING, "[Инвентарь]: Внутреннее отделение этой сумки пусто или еще не инициализировано.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                        return 1;
+                        return Y_HOOKS_BREAK_RETURN_1;
                     }
                     sPlayerNestedBagSlot[playerid] = nestedSlot;
                     Storage_OpenForPlayer(playerid, nestedSlot);
@@ -1052,20 +1052,20 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Этот предмет не складывается в пачки.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                        return 1;
+                        return Y_HOOKS_BREAK_RETURN_1;
                     }
                     new merged = Internal_MergeSimilarStacks(srcSlot, itemSlot);
                     if (merged > 0)
                     {
                         SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Однотипные пачки предмета объединены.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                        return 1;
+                        return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (amount <= 1)
                     {
                         SendClientMessage(playerid, COLOR_GRAY, "[Инвентарь]: В пачке всего 1 шт., разделение невозможно.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                        return 1;
+                        return Y_HOOKS_BREAK_RETURN_1;
                     }
                     sPlayerPendingOp[playerid] = INV_OP_SPLIT_STACK;
                     ShowPlayerDialog(
@@ -1142,7 +1142,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     }
                 }
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_INPUT_AMOUNT:
         {
@@ -1150,17 +1150,17 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 sPlayerPendingOp[playerid] = INV_OP_NONE;
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             new qty = strval(inputtext);
             if (qty <= 0)
             {
                 SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Введите корректное положительное число.");
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             Internal_ExecutePendingItemOp(playerid, qty);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_EXTERNAL_CONTAINER:
         {
@@ -1172,19 +1172,19 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Storage_CloseForPlayer(playerid, extSlot);
                 }
                 sPlayerExternalStorageSlot[playerid] = INVALID_STORAGE_SLOT;
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (listitem < 0 || listitem >= sPlayerDialogRowCount[playerid])
             {
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new mapped = sPlayerDialogRowMap[playerid][listitem];
             if (mapped == INV_ROW_SWITCH_LAYER_1)
             {
                 Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (Storage_IsValidSlot(extSlot) && Storage_IsValidItemSlot(mapped))
@@ -1210,29 +1210,29 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Internal_ExecutePendingItemOp(playerid, 1);
                 }
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_SEARCH_INSPECT:
         {
             if (!response || !sPlayerSearchAllowConfiscate[playerid])
             {
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new targetid = sPlayerSearchTarget[playerid];
             if (targetid == INVALID_PLAYER_ID || !Character_IsLoaded(targetid))
             {
                 SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: Обыскиваемый игрок покинул сервер.");
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > 3.5)
             {
                 SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: Игрок находится слишком далеко от вас.");
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             if (listitem < 0 || listitem >= sPlayerDialogRowCount[playerid])
             {
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new itemSlot = sPlayerDialogRowMap[playerid][listitem];
@@ -1241,7 +1241,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
             if (!Storage_IsValidSlot(srcStorage) || !Storage_IsValidItemSlot(itemSlot) || !Storage_IsValidSlot(actorLayer1))
             {
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new defId = Storage_GetItemDefId(itemSlot);
@@ -1270,8 +1270,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: В вашем инвентаре (Слой 1) недостаточно места для изъятия предмета.");
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
     }
-    return 0;
+    return Y_HOOKS_CONTINUE_RETURN_0;
 }

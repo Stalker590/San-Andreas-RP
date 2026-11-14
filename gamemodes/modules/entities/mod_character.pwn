@@ -118,7 +118,9 @@ enum E_CHARACTER_DATA
     E_CHAR_VW,
 
     // Временный выбор скина на этапе конструктора (0 = каноничный скин роли)
-    E_CHAR_WIZARD_CUSTOM_SKIN
+    E_CHAR_WIZARD_CUSTOM_SKIN,
+    E_CHAR_WIZARD_STEP,
+    bool:E_CHAR_SPAWN_APPLIED
 };
 
 static stock sCharacters[MAX_PLAYERS][E_CHARACTER_DATA];
@@ -201,6 +203,8 @@ static stock Internal_ResetCharacterSlot(playerid)
     sCharacters[playerid][E_CHAR_INTERIOR] = 0;
     sCharacters[playerid][E_CHAR_VW] = 0;
     sCharacters[playerid][E_CHAR_WIZARD_CUSTOM_SKIN] = 0;
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
+    sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = false;
 }
 
 static stock Internal_GetRaceTitleRu(E_CHAR_RACE:race, output[], len = sizeof(output))
@@ -321,6 +325,7 @@ static stock Internal_BuildCharDirtyUpdateQuery(playerid, output[], len = sizeof
 
 static stock Internal_ShowWizardStep1Gender(playerid)
 {
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 1;
     ShowPlayerDialog(
         playerid,
         DIALOG_CHAR_SELECT_GENDER,
@@ -334,6 +339,7 @@ static stock Internal_ShowWizardStep1Gender(playerid)
 
 static stock Internal_ShowWizardStep2Race(playerid)
 {
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 2;
     ShowPlayerDialog(
         playerid,
         DIALOG_CHAR_SELECT_RACE,
@@ -349,6 +355,7 @@ static stock Internal_ShowWizardStep2Race(playerid)
 
 static stock Internal_ShowWizardStep3Skin(playerid)
 {
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 3;
     new const genderIdx = (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? 1 : 0;
     new raceIdx = _:sCharacters[playerid][E_CHAR_RACE_VAL] - 1;
     if (raceIdx < 0 || raceIdx > 3)
@@ -378,6 +385,7 @@ static stock Internal_ShowWizardStep3Skin(playerid)
 
 static stock Internal_ShowWizardStep4RoleList(playerid)
 {
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 4;
     new dialogBody[3584];
     new pos = format(dialogBody, sizeof(dialogBody),
         "№ и название роли\tСтатус гражданства\tСтартовый капитал\n");
@@ -428,6 +436,7 @@ static stock Internal_ShowWizardStep4RoleList(playerid)
 
 static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
 {
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 5;
     sCharacters[playerid][E_CHAR_ROLE_ID] = role_id;
 
     new roleCard[1280];
@@ -596,7 +605,12 @@ static stock Internal_FinalizeCharacterCreation(playerid)
         sCharacters[playerid][E_CHAR_BANK_ACC_DB_ID],
         sCharacters[playerid][E_CHAR_SKIN_ID]);
 
-    // 5. Сохранение нового персонажа в БД в единой связке
+    // 5. Немедленная привязка идентификатора сессии и сохранение нового персонажа в БД в единой связке
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
+    sCharacters[playerid][E_CHAR_DB_ID] = ++sSyntheticCharDbIdSeq;
+    Account_BindSessionCharId(playerid, sCharacters[playerid][E_CHAR_DB_ID]);
+    Skills_BindCharacterId(playerid, sCharacters[playerid][E_CHAR_DB_ID]);
+
     if (DB_IsConnected())
     {
         new ssnSql[32];
@@ -639,12 +653,6 @@ static stock Internal_FinalizeCharacterCreation(playerid)
         mysql_tquery(gMySQL, sCharSqlBuffer, "OnCharacterCreatedInDb", "dd",
             playerid, Config_GetPlayerSessionToken(playerid));
     }
-    else
-    {
-        sCharacters[playerid][E_CHAR_DB_ID] = ++sSyntheticCharDbIdSeq;
-        Account_BindSessionCharId(playerid, sCharacters[playerid][E_CHAR_DB_ID]);
-        Skills_BindCharacterId(playerid, sCharacters[playerid][E_CHAR_DB_ID]);
-    }
 
     sCharacters[playerid][E_CHAR_LOADED] = true;
     Character_SpawnPlayerInWorld(playerid, true);
@@ -654,15 +662,36 @@ static stock Internal_FinalizeCharacterCreation(playerid)
 //  6. АСИНХРОННЫЕ КОЛБЕКИ ЗАГРУЗКИ И СОЗДАНИЯ ПЕРСОНАЖА (forward / public)
 // =============================================================================
 
+public OnLobbyReshowCharacterWizard(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+    if (sCharacters[playerid][E_CHAR_LOADED] || !Account_IsLogged(playerid))
+    {
+        return 0;
+    }
+
+    switch (sCharacters[playerid][E_CHAR_WIZARD_STEP])
+    {
+        case 2: Internal_ShowWizardStep2Race(playerid);
+        case 3: Internal_ShowWizardStep3Skin(playerid);
+        case 4: Internal_ShowWizardStep4RoleList(playerid);
+        case 5: Internal_ShowWizardStep5ConfirmRole(playerid, sCharacters[playerid][E_CHAR_ROLE_ID]);
+        default: Internal_ShowWizardStep1Gender(playerid);
+    }
+    return 1;
+}
+
 public OnAccountAuthenticated(playerid, bool:isNewRegistration)
 {
-    #pragma unused isNewRegistration
     Internal_ResetCharacterSlot(playerid);
 
     sCharacters[playerid][E_CHAR_ACCOUNT_ID] = Account_GetId(playerid);
     Account_GetUsername(playerid, sCharacters[playerid][E_CHAR_RP_NAME], MAX_PLAYER_NAME + 1);
 
-    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_ACCOUNT_ID] > 0)
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_ACCOUNT_ID] > 0 && !isNewRegistration)
     {
         mysql_format(gMySQL, sCharSqlBuffer, sizeof(sCharSqlBuffer),
             "SELECT `id`, `gender`, `race`, `role_id`, `level`, `exp_seconds`, `citizenship`, IFNULL(`ssn`, '') AS `ssn`, `skin_id`, `fighting_style`, `hp`, `armour`, `hunger`, `thirst`, `stamina`, `stress`, `addiction_level`, `last_drug_at`, `wanted_level`, `active_play_seconds`, `jail_seconds_left`, `jail_type`, `weapon_license_banned`, `layer1_storage_id`, `layer2_storage_id`, IFNULL(`org_id`, 0) AS `org_id`, IFNULL(`org_rank_id`, 0) AS `org_rank_id`, `bank_debt_usd`, `pos_x`, `pos_y`, `pos_z`, `pos_a`, `interior`, `virtual_world` FROM `characters` WHERE `account_id` = %d AND `is_ck_dead` = 0 ORDER BY `id` DESC LIMIT 1;",
@@ -673,6 +702,8 @@ public OnAccountAuthenticated(playerid, bool:isNewRegistration)
     }
     else
     {
+        SendClientMessage(playerid, COLOR_UI_INFO,
+            "Выберите пол, происхождение, внешность и одну из 25 стартовых ролей вашего персонажа.");
         Internal_ShowWizardStep1Gender(playerid);
     }
     return 1;
@@ -1240,12 +1271,40 @@ stock Character_SyncLayer1Weapons(playerid)
     return 1;
 }
 
+timer Character_FinalizeSpawnTimer[120](playerid, expectedToken)
+{
+    if (!Config_ValidatePlayerToken(playerid, expectedToken) || !sCharacters[playerid][E_CHAR_LOADED])
+    {
+        return;
+    }
+
+    if (!sCharacters[playerid][E_CHAR_SPAWN_APPLIED])
+    {
+        SetSpawnInfo(
+            playerid,
+            NO_TEAM,
+            sCharacters[playerid][E_CHAR_SKIN_ID],
+            sCharacters[playerid][E_CHAR_POS_X],
+            sCharacters[playerid][E_CHAR_POS_Y],
+            sCharacters[playerid][E_CHAR_POS_Z],
+            sCharacters[playerid][E_CHAR_POS_A]);
+        SpawnPlayer(playerid);
+    }
+    else
+    {
+        SetCameraBehindPlayer(playerid);
+    }
+}
+
 stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
 {
     if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
     {
         return 0;
     }
+
+    sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
+    sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = false;
 
     // Обновляем максимальный вес Слоя 1 по текущей формуле мускулатуры и роли
     new const layer1Slot = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
@@ -1266,8 +1325,16 @@ stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
         sCharacters[playerid][E_CHAR_POS_Z],
         sCharacters[playerid][E_CHAR_POS_A]);
 
-    TogglePlayerSpectating(playerid, false);
-    SpawnPlayer(playerid);
+    if (GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
+    {
+        TogglePlayerSpectating(playerid, false);
+        defer Character_FinalizeSpawnTimer(playerid, Config_GetPlayerSessionToken(playerid));
+    }
+    else
+    {
+        SpawnPlayer(playerid);
+        defer Character_FinalizeSpawnTimer(playerid, Config_GetPlayerSessionToken(playerid));
+    }
 
     if (isFirstCreation)
     {
@@ -1462,11 +1529,37 @@ hook OnPlayerDisconnect(playerid, reason)
     return 1;
 }
 
+hook OnPlayerRequestClass(playerid, classid)
+{
+    #pragma unused classid
+    if (sCharacters[playerid][E_CHAR_LOADED])
+    {
+        SetSpawnInfo(
+            playerid,
+            NO_TEAM,
+            sCharacters[playerid][E_CHAR_SKIN_ID],
+            sCharacters[playerid][E_CHAR_POS_X],
+            sCharacters[playerid][E_CHAR_POS_Y],
+            sCharacters[playerid][E_CHAR_POS_Z],
+            sCharacters[playerid][E_CHAR_POS_A]);
+        SpawnPlayer(playerid);
+        return 1;
+    }
+    return 0;
+}
+
 hook OnPlayerSpawn(playerid)
 {
     if (!sCharacters[playerid][E_CHAR_LOADED])
     {
+        TogglePlayerSpectating(playerid, true);
         return 1;
+    }
+
+    sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = true;
+    if (sCharacters[playerid][E_CHAR_HP] < 10.0)
+    {
+        sCharacters[playerid][E_CHAR_HP] = 100.0;
     }
 
     SetPlayerSkin(playerid, sCharacters[playerid][E_CHAR_SKIN_ID]);
@@ -1559,13 +1652,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 Internal_ShowWizardStep1Gender(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             sCharacters[playerid][E_CHAR_GENDER_VAL] = (listitem == 1)
                 ? CHAR_GENDER_FEMALE
                 : CHAR_GENDER_MALE;
             Internal_ShowWizardStep2Race(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_CHAR_SELECT_RACE:
@@ -1573,12 +1666,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 Internal_ShowWizardStep1Gender(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
             new const E_CHAR_RACE:selectedRace = E_CHAR_RACE:(listitem + 1);
             sCharacters[playerid][E_CHAR_RACE_VAL] = selectedRace;
             Internal_ShowWizardStep3Skin(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_CHAR_SELECT_SKIN:
@@ -1586,7 +1679,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 Internal_ShowWizardStep2Race(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (listitem == 0)
@@ -1605,7 +1698,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
 
             Internal_ShowWizardStep4RoleList(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_CHAR_SELECT_ROLE_LIST:
@@ -1613,18 +1706,18 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 Internal_ShowWizardStep3Skin(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new const chosenRoleId = listitem + 1;
             if (!Roles_IsValidId(chosenRoleId))
             {
                 Internal_ShowWizardStep4RoleList(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             Internal_ShowWizardStep5ConfirmRole(playerid, chosenRoleId);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_CHAR_CONFIRM_ROLE:
@@ -1632,11 +1725,11 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 Internal_ShowWizardStep4RoleList(playerid);
-                return 1;
+                return Y_HOOKS_BREAK_RETURN_1;
             }
 
             Internal_FinalizeCharacterCreation(playerid);
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
 
         case DIALOG_CHAR_STATS_VIEW:
@@ -1645,10 +1738,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 Skills_ShowDialog(playerid);
             }
-            return 1;
+            return Y_HOOKS_BREAK_RETURN_1;
         }
     }
-    return 0;
+    return Y_HOOKS_CONTINUE_RETURN_0;
 }
 
 CMD:stats(playerid, params[])
