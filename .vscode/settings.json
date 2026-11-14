@@ -1,0 +1,12 @@
+{
+    "[pawn]": {
+        "files.encoding": "windows1251",
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "files.associations": {
+        "*.pwn": "pawn",
+        "*.inc": "pawn"
+    },
+    "files.autoGuessEncoding": false
+}

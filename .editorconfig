@@ -1,0 +1,21 @@
+# SAN ANDREAS RP — стиль исходников.
+# ВНИМАНИЕ: EditorConfig не поддерживает charset=cp1251, поэтому кодировка
+# Windows-1251 для *.pwn / *.inc задаётся в .vscode/settings.json
+# и принудительно проверяется скриптом build.sh.
+root = true
+
+[*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{pwn,inc}]
+indent_style = space
+indent_size = 4
+
+[*.{json,md,sql,sh}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.sh]
+end_of_line = lf

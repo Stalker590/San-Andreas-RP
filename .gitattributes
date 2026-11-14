@@ -1,0 +1,8 @@
+# Исходники Pawn хранятся в Windows-1251. diff=cp1251 позволяет git показывать
+# кириллицу в читаемом виде (см. git config diff.cp1251.textconv).
+gamemodes/**/*.pwn  text diff=cp1251
+gamemodes/**/*.inc  text diff=cp1251
+*.sh                text eol=lf
+*.amx               binary
+*.so                binary
+*.zip               binary
