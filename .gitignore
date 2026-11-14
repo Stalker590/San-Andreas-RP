@@ -3,5 +3,12 @@ gamemodes/main.amx
 *.lst
 *.asm
 
-# Рантайм-логи сервера
+# Рантайм-логи сервера и компонентов
 log.txt
+logs/
+
+# Локальные конфигурации окружения и секреты БД
+.env
+.env.*
+!.env.example
+scriptfiles/mysql.ini

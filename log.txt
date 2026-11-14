@@ -22,6 +22,8 @@ Loading component Vehicles.so
 	Successfully loaded component Vehicles (1.6.7.3218) with UID 3f1f62ee9e22ab19
 Loading component Pawn.so
 	Successfully loaded component Pawn (1.6.7.3218) with UID 78906cd9f19c36a6
+Loading component pawncmd.so
+	Successfully loaded component Pawn.CMD (0.3.4.0) with UID a03b47c907a96c29
 Loading component Pickups.so
 	Successfully loaded component Pickups (1.6.7.3218) with UID cf304faa363dd971
 Loading component Menus.so
@@ -40,17 +42,148 @@ Loading component Actors.so
 	Successfully loaded component Actors (1.6.7.3218) with UID c81ca021eae2ad5c
 Loading component Variables.so
 	Successfully loaded component Variables (1.6.7.3218) with UID 75e121848bc01fa2
+Loading component pawnraknet.so
+	Successfully loaded component Pawn.RakNet (0.1.6.0) with UID 4a8b15c16d23e42f
 Loading component Objects.so
 	Successfully loaded component Objects (1.6.7.3218) with UID 59f8415f72da6160
 Loading component TextDraws.so
 	Successfully loaded component TextDraws (1.6.7.3218) with UID 9b5dc2b1d15c992a
-Loaded 22 component(s) from /home/oleksandr/IT/Projects/samp/Server/components
-[2026-11-11T18:06:26+0200] [Info] 
-----------------------------------
-[2026-11-11T18:06:26+0200] [Info]  gungame is a gun game mode released as
-[2026-11-11T18:06:26+0200] [Info]  an example mode for open.mp
-[2026-11-11T18:06:26+0200] [Info]  
-[2026-11-11T18:06:26+0200] [Info]  Author: NotUnlikeTheWaves (github)
-[2026-11-11T18:06:26+0200] [Info] ----------------------------------
+Loaded 24 component(s) from /home/oleksandr/IT/Projects/samp/Server/components
+[2026-11-14T15:02:38+0200] [Info] [Pawn.RakNet] plugin v1.6.0 loading...
+[2026-11-14T15:02:38+0200] [Info] [Pawn.RakNet] 
 
-[2026-11-11T18:06:26+0200] [Error] Unable to start legacy network on 0.0.0.0:7777. Port in use?
+    | Pawn.RakNet 1.6.0 | open.mp | 2016 - 2023
+    |--------------------------------------------
+    | Author and maintainer: katursis
+
+
+    | Compiled: Feb 12 2023 at 16:47:37
+    |--------------------------------------------------------------
+    | Repository: https://github.com/katursis/Pawn.RakNet/tree/omp
+    |--------------------------------------------------------------
+    | Wiki: https://github.com/katursis/Pawn.RakNet/wiki
+
+[2026-11-14T15:02:38+0200] [Info] [Pawn.CMD] plugin v3.4.0 loading...
+[2026-11-14T15:02:38+0200] [Info] [Pawn.CMD] 
+
+    | Pawn.CMD 3.4.0 | open.mp | 2016 - 2023
+    |-----------------------------------------
+    | Author and maintainer: katursis
+
+
+    | Compiled: Feb 12 2023 at 17:23:16
+    |----------------------------------------------------------
+    | Repository: https://github.com/katursis/Pawn.CMD/tree/omp
+
+[2026-11-14T15:02:38+0200] [Info] Loading plugin: mysql
+[2026-11-14T15:02:38+0200] [Info]  >> plugin.mysql: R41-4 successfully loaded.
+[2026-11-14T15:02:38+0200] [Info] Loading plugin: streamer
+[2026-11-14T15:02:38+0200] [Info] 
+
+*** Streamer Plugin v2.9.6 by Incognito loaded ***
+
+[2026-11-14T15:02:38+0200] [Info] Loading plugin: pawnregex
+[2026-11-14T15:02:38+0200] [Info] [Pawn.Regex] plugin v1.2.3 loading...
+[2026-11-14T15:02:38+0200] [Info] [Pawn.Regex] 
+
+    | Pawn.Regex 1.2.3 | 2016 - 2022
+    |--------------------------------
+    | Author and maintainer: katursis
+
+
+    | Compiled: Apr 24 2022 at 11:42:00
+    |--------------------------------------------------------------
+    | Repository: https://github.com/katursis/Pawn.Regex
+
+[2026-11-14T15:02:38+0200] [Info] Loading plugin: bcrypt
+[2026-11-14T15:02:38+0200] [Info] [SampBcrypt] [info]: Version: 0.4.1
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info]          ==============================================================
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          |    YYYYYYY       YYYYYYY    SSSSSSSSSSSSSSS  IIIIIIIIII    |
+[2026-11-14T15:02:38+0200] [Info]          |    Y:::::Y       Y:::::Y  SS:::::::::::::::S I::::::::I    |
+[2026-11-14T15:02:38+0200] [Info]          |    Y:::::Y       Y:::::Y S:::::SSSSSS::::::S I::::::::I    |
+[2026-11-14T15:02:38+0200] [Info]          |    Y::::::Y     Y::::::Y S:::::S     SSSSSSS II::::::II    |
+[2026-11-14T15:02:38+0200] [Info]          |    YYY:::::Y   Y:::::YYY S:::::S               I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |       Y:::::Y Y:::::Y    S:::::S               I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |        Y:::::Y:::::Y      S::::SSSS            I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |         Y:::::::::Y        SS::::::SSSSS       I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |          Y:::::::Y           SSS::::::::SS     I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |           Y:::::Y               SSSSSS::::S    I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |           Y:::::Y                    S:::::S   I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |           Y:::::Y                    S:::::S   I::::I      |
+[2026-11-14T15:02:38+0200] [Info]          |           Y:::::Y        SSSSSSS     S:::::S II::::::II    |
+[2026-11-14T15:02:38+0200] [Info]          |        YYYY:::::YYYY     S::::::SSSSSS:::::S I::::::::I    |
+[2026-11-14T15:02:38+0200] [Info]          |        Y:::::::::::Y     S:::::::::::::::SS  I::::::::I    |
+[2026-11-14T15:02:38+0200] [Info]          |        YYYYYYYYYYYYY      SSSSSSSSSSSSSSS    IIIIIIIIII    |
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          |                      (c) 2021 MPL v1.1                     |
+[2026-11-14T15:02:38+0200] [Info]          |            Alex "Y_Less" Cole and contributors.            |
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          |                                                            |
+[2026-11-14T15:02:38+0200] [Info]          ==============================================================
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info]  ========================================== 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  |   Generating code, this may take a     | 
+[2026-11-14T15:02:38+0200] [Info]  |  little bit of time.  Note that this   | 
+[2026-11-14T15:02:38+0200] [Info]  |  code generation works best with the   | 
+[2026-11-14T15:02:38+0200] [Info]  |     JIT plugin, which you are not      | 
+[2026-11-14T15:02:38+0200] [Info]  |     currently using.  Get it here:     | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  |       https://git.io/jit-plugin        | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  |             Please wait...             | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  |             Done in 32ms!              | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  ========================================== 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  | Server:      open.mp 1.6.7.3218 (L)    | 
+[2026-11-14T15:02:38+0200] [Info]  | Started:     14 Nov 2026 - 15:02:38    | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  | Compiler:    3.10.11 (Linux)           | 
+[2026-11-14T15:02:38+0200] [Info]  | Includes:    open.mp v037030           | 
+[2026-11-14T15:02:38+0200] [Info]  | Codepage:    <none>                    | 
+[2026-11-14T15:02:38+0200] [Info]  | Built:       14 Nov 2026 - 14:54:53    | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  | YSI:         v05.10.0006               | 
+[2026-11-14T15:02:38+0200] [Info]  | Master:      -1                        | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  | JIT:         <none>                    | 
+[2026-11-14T15:02:38+0200] [Info]  | Crashdetect: <none>                    | 
+[2026-11-14T15:02:38+0200] [Info]  |                                        | 
+[2026-11-14T15:02:38+0200] [Info]  ========================================== 
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info]  
+[2026-11-14T15:02:38+0200] [Info] ======================================================================
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] Запуск самодиагностики C++ компонентов и библиотек YSI (v1.0.0-phase0)...
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [1/6] Компонент MySQL (R41-4): загружен (пул потоков = 12, кодировка сессии = cp1251).
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [2/6] Компонент Streamer: загружен (TickRate = 50 мс, лимит объектов = 1000).
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [3/6] Компонент Pawn.CMD: загружен (версия 3.4.0).
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [4/6] Компонент Pawn.RakNet: загружен (версия 1.6.0).
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [5/6] Компонент Pawn.Regex: загружен (тест RP-маски First_Last пройден).
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [6/6] Компонент bcrypt: пул потоков = 4, запущен тест хеширования (cost = 12)...
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [YSI] Подсистемы y_hooks, y_iterate (контрольная сумма = 10), y_va активны.
+[2026-11-14T15:02:38+0200] [Info] ======================================================================
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] Игровой режим инициализирован. Доступно слотов игроков: 500.
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] Точка входа игрового режима загружена (main.amx, сборка 1.0.0-phase0).
+[2026-11-14T15:02:38+0200] [Info] Legacy Network started on 0.0.0.0:7788.
+[2026-11-14T15:02:38+0200] [Info] [SA:RP] [YSI] Таймерная подсистема y_timers успешно запущена и синхронизирована.
+[2026-11-14T15:02:39+0200] [Info] [SA:RP] [6/6] Компонент bcrypt: верификация хеша (cost = 12) УСПЕШНО ПРОЙДЕНА.
+[2026-11-14T15:02:40+0200] [Info] [Pawn.RakNet] plugin unloaded
+[2026-11-14T15:02:40+0200] [Info] [Pawn.CMD] plugin unloaded
+[2026-11-14T15:02:40+0200] [Info] [SA:RP] Подготовка к остановке сервера: принудительное сохранение всех измененных сущностей (is_dirty)...
+[2026-11-14T15:02:40+0200] [Info] [SA:RP] Все буферы состояния успешно синхронизированы.
+[2026-11-14T15:02:40+0200] [Info] [SA:RP] Работа игрового режима корректно завершена (аптайм: 1 сек).
+[2026-11-14T15:02:40+0200] [Info] 
+
+*** Streamer Plugin v2.9.6 by Incognito unloaded ***
+
+[2026-11-14T15:02:40+0200] [Info] plugin.mysql: Unloading plugin...
+[2026-11-14T15:02:40+0200] [Info] plugin.mysql: Plugin unloaded.
+[2026-11-14T15:02:40+0200] [Info] [Pawn.Regex] plugin unloaded
