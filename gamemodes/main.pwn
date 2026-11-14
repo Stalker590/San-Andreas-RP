@@ -27,6 +27,8 @@
 #endif
 
 // Подавление информационных сообщений YSI при сборке
+// YSI CGen buffer: required for large y_hooks callback chains (Phase 5+)
+#define CGEN_MEMORY (50000)
 #define YSI_NO_OPTIMISATION_MESSAGE
 #define YSI_NO_VERSION_CHECK
 

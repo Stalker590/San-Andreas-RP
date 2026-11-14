@@ -191,6 +191,13 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         return 0;
     }
 
+    if (!Storage_AreItemsReady(targetStorage))
+    {
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Инвентарь]: Инвентарь еще загружается. Повторите команду через мгновение.");
+        return 0;
+    }
+
     // Синхронизируем лимит веса Слоя 1 перед показом
     Survival_RecalculateEncumbrance(playerid);
 

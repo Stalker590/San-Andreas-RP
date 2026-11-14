@@ -1141,7 +1141,10 @@ static stock Internal_ApplyPlayerSkin(playerid, skinId, bool:persist)
     new const bool:skinChanged = (sCharacters[playerid][E_CHAR_SKIN_ID] != skinId);
     sCharacters[playerid][E_CHAR_SKIN_ID] = skinId;
 
-    if (IsPlayerConnected(playerid))
+    // SetPlayerSkin пересоздает модель и сбрасывает клиентскую интерполяцию.
+    // Вызываем его только при фактической смене скина; OnPlayerSpawn отдельно
+    // применяет актуальную модель после респавна.
+    if (IsPlayerConnected(playerid) && skinChanged)
     {
         SetPlayerSkin(playerid, skinId);
     }
@@ -1489,6 +1492,8 @@ public OnCharacterInventoryStorageReady(storage_slot)
     if (sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] == 0)
     {
         Character_SyncInventorySkin(playerid, true);
+        Character_SyncLayer1Weapons(playerid);
+        CallLocalFunction("OnPlayerHudNeedsUpdate", "d", playerid);
     }
     return 1;
 }
@@ -1780,10 +1785,37 @@ timer Character_FinalizeSpawnTimer[120](playerid, expectedToken)
             sCharacters[playerid][E_CHAR_POS_A]);
         SpawnPlayer(playerid);
     }
-    else
+    // Камера уже выставлена в OnPlayerSpawn. Повторный SetCameraBehindPlayer
+    // через 120 мс сбрасывал клиентскую интерполяцию поворота.
+}
+
+// Пятисекундный сторож загрузки инвентаря: не позволяет навсегда остаться
+// в нижнем белье и без оружия, если асинхронный ответ MySQL задержался.
+timer Character_InventorySyncTimer[500](playerid, expectedToken, attempt)
+{
+    if (!Config_ValidatePlayerToken(playerid, expectedToken) || !sCharacters[playerid][E_CHAR_LOADED])
     {
-        SetCameraBehindPlayer(playerid);
+        return;
     }
+
+    if (sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] <= 0)
+    {
+        Character_SyncInventorySkin(playerid, true);
+        Character_SyncLayer1Weapons(playerid);
+        return;
+    }
+
+    if (attempt >= 10)
+    {
+        sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] = 0;
+        Character_SyncInventorySkin(playerid, true);
+        Character_SyncLayer1Weapons(playerid);
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Инвентарь]: Загрузка заняла слишком много времени. Проверьте соединение и повторите вход.");
+        return;
+    }
+
+    defer Character_InventorySyncTimer(playerid, expectedToken, attempt + 1);
 }
 
 stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
@@ -2075,6 +2107,11 @@ hook OnPlayerSpawn(playerid)
     Skills_SyncNative(playerid);
     Character_SyncLayer1Weapons(playerid);
     Character_SetWantedLevel(playerid, sCharacters[playerid][E_CHAR_WANTED_LEVEL]);
+
+    if (sCharacters[playerid][E_CHAR_INVENTORY_PENDING_LOADS] > 0)
+    {
+        defer Character_InventorySyncTimer(playerid, Config_GetPlayerSessionToken(playerid), 0);
+    }
     return 1;
 }
 

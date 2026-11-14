@@ -951,8 +951,9 @@ stock Storage_Create(
             virtual_world,
             expiresSql);
 
-        // ID выделен заранее: последующие INSERT предметов и персонажа уже видят эту строку.
-        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+        // pquery гарантирует порядок: заголовок хранилища попадет в MySQL раньше
+        // предметов, иначе INSERT storage_items может нарушить FOREIGN KEY.
+        mysql_pquery(gMySQL, sStorageSqlTxBuffer);
     }
 
     return slot_id;
@@ -1119,8 +1120,8 @@ stock E_STORAGE_RESULT:Storage_AddItem(
             meta_int2,
             meta_str);
 
-        // ID предмета выделен заранее; коллбек не нужен и не может перезаписать его чужим ID.
-        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+        // ID предмета выделен заранее; pquery сохраняет порядок после INSERT storages.
+        mysql_pquery(gMySQL, sStorageSqlTxBuffer);
     }
 
     return STORAGE_RES_OK;
