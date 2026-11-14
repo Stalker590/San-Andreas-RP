@@ -196,7 +196,8 @@ enum E_DIRTY_ENTITY_TYPE
     DIRTY_ENTITY_CHARACTER,
     DIRTY_ENTITY_VEHICLE,
     DIRTY_ENTITY_ENTERPRISE,
-    DIRTY_ENTITY_STORAGE
+    DIRTY_ENTITY_STORAGE,
+    DIRTY_ENTITY_INJURY
 };
 
 // =============================================================================

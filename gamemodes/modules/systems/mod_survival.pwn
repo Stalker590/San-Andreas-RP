@@ -295,6 +295,12 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
         return false;
     }
 
+    // Медицинский модуль проверяет совместимость предмета с текущей травмой
+    if (CallLocalFunction("Medical_CanUseMedicalItem", "dd", playerid, defId) == 0)
+    {
+        return false;
+    }
+
     new roleId = Character_GetRoleId(playerid);
     new Float:hp = 100.0;
     new Float:armour = 0.0;
@@ -382,6 +388,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             {
                 return false;
             }
+            CallLocalFunction("Medical_OnItemUsed", "dd", playerid, defId);
             sPlayerBleeding[playerid] = false;
             new Float:healAmount = (defId == ITEM_ID_TOURNIQUET) ? 20.0 : 15.0;
             if (Roles_HasPerk(roleId, PERK_CHEM_YIELD_40))
@@ -402,6 +409,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             {
                 return false;
             }
+            CallLocalFunction("Medical_OnItemUsed", "dd", playerid, defId);
             sPlayerBleeding[playerid] = false;
             new Float:healAmount = (defId == ITEM_ID_SURGICAL_KIT) ? 65.0 : 45.0;
             if (Roles_HasPerk(roleId, PERK_FAST_REVIVE) || Roles_HasPerk(roleId, PERK_CHEM_YIELD_40))
@@ -423,6 +431,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             {
                 return false;
             }
+            CallLocalFunction("Medical_OnItemUsed", "dd", playerid, defId);
             sMinutesSinceLastDose[playerid] = 0;
             sPlayerInWithdrawal[playerid] = false;
             SetPlayerDrunkLevel(playerid, 0);
@@ -444,6 +453,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             {
                 return false;
             }
+            CallLocalFunction("Medical_OnItemUsed", "dd", playerid, defId);
             sMinutesSinceLastDose[playerid] = 0;
             sPlayerInWithdrawal[playerid] = false;
             SetPlayerDrunkLevel(playerid, 0);
@@ -790,47 +800,8 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 }
 
 /*
- * Обработка огнестрельных и режущих ранений (вызов кровотечения) и перков урона.
+ * Серверный расчет урона, кровотечений, переломов и болевого шока полностью
+ * перенесен в mod_medical.pwn (ROADMAP 5.2). Модуль выживания больше не
+ * перехватывает OnPlayerTakeDamage, чтобы исключить двойной урон и двойное
+ * начисление кровотечения.
  */
-hook OnPlayerTakeDamage(playerid, issuerid, Float:amount, WEAPON:weaponid, bodypart)
-{
-    #pragma unused bodypart
-    if (!Character_IsLoaded(playerid))
-    {
-        return 1;
-    }
-
-    new roleId = Character_GetRoleId(playerid);
-
-    // Роль №23 (Беглый Сектант): -50% урона от огня (огнемет и коктейль Молотова)
-    if (Roles_HasPerk(roleId, PERK_FIRE_RESIST_50) && ( _:weaponid == 18 || _:weaponid == 37 ))
-    {
-        new Float:hp = 100.0;
-        GetPlayerHealth(playerid, hp);
-        SetPlayerHealth(playerid, hp + (amount * 0.50));
-    }
-
-    // Роль №21 (Качок-Вышибала): в рукопашной сбивает с ног 1 ударом
-    if (issuerid != INVALID_PLAYER_ID && Character_IsLoaded(issuerid) && _:weaponid == 0)
-    {
-        new attackerRole = Character_GetRoleId(issuerid);
-        if (Roles_HasPerk(attackerRole, PERK_HIGH_METABOLISM))
-        {
-            ApplyAnimation(playerid, "PED", "FALL_back", 4.1, false, true, true, false, 1200, SYNC_ALL);
-        }
-    }
-
-    // Огнестрельные (22..34) и ножевые/режущие (4, 8, 9) ранения при уроне >= 15 вызывают кровотечение
-    new wId = _:weaponid;
-    if (amount >= 15.0 && ((wId >= 22 && wId <= 34) || wId == 4 || wId == 8 || wId == 9))
-    {
-        if (!sPlayerBleeding[playerid])
-        {
-            sPlayerBleeding[playerid] = true;
-            SendClientMessage(playerid, COLOR_ERROR, "[Ранение]: У вас открылось кровотечение! Перевяжите рану бинтом или жгутом.");
-        }
-    }
-
-    Internal_NotifyHudRefresh(playerid);
-    return 1;
-}

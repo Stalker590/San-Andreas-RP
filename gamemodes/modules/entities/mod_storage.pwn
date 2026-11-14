@@ -614,6 +614,41 @@ stock Storage_SetItemMetaInt2(item_slot, value)
     return 1;
 }
 
+// Атомарное обновление боезапаса и износа ствола (одна SQL-запись на вызов)
+stock Storage_UpdateWeaponState(item_slot, ammo_count, Float:durability, bool:persist = false)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+    if (ammo_count < 0)
+    {
+        ammo_count = 0;
+    }
+    if (durability < 0.0)
+    {
+        durability = 0.0;
+    }
+    if (durability > 100.0)
+    {
+        durability = 100.0;
+    }
+
+    sStorageItems[item_slot][E_SITEM_AMMO_COUNT] = ammo_count;
+    sStorageItems[item_slot][E_SITEM_DURABILITY] = durability;
+
+    if (persist && DB_IsConnected() && sStorageItems[item_slot][E_SITEM_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+            "UPDATE `storage_items` SET `ammo_count` = %d, `durability` = %.2f WHERE `id` = %d;",
+            ammo_count,
+            durability,
+            sStorageItems[item_slot][E_SITEM_DB_ID]);
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+    }
+    return 1;
+}
+
 stock Storage_GetItemMetaStr(item_slot, output[], len = sizeof(output))
 {
     if (!Storage_IsValidItemSlot(item_slot))

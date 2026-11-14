@@ -89,7 +89,7 @@ static stock Internal_BuildStatusFlags(playerid, output[], len = sizeof(output))
         strcat(output, "~r~оепецпсг", len);
         count++;
     }
-    if (Survival_IsBleeding(playerid))
+    if (Medical_IsBleeding(playerid))
     {
         if (count > 0) strcat(output, " ~w~| ", len);
         strcat(output, "~r~йпнбнревемхе", len);

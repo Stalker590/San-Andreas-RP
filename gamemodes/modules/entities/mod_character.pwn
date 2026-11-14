@@ -1039,6 +1039,17 @@ stock Character_GetSSN(playerid, output[], len = sizeof(output))
     return 1;
 }
 
+stock Character_GetRpName(playerid, output[], len = sizeof(output))
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        output[0] = EOS;
+        return 0;
+    }
+    format(output, len, "%s", sCharacters[playerid][E_CHAR_RP_NAME]);
+    return 1;
+}
+
 stock Character_GetLayer1Slot(playerid)
 {
     if (playerid < 0 || playerid >= MAX_PLAYERS)
@@ -1591,6 +1602,26 @@ stock Character_SetWantedLevel(playerid, wanted_level)
     return 1;
 }
 
+stock Character_SetCkDead(playerid, bool:ck_dead)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return 0;
+    }
+
+    sCharacters[playerid][E_CHAR_IS_CK_DEAD] = ck_dead;
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        new query[160];
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `characters` SET `is_ck_dead` = %d WHERE `id` = %d;",
+            ck_dead ? 1 : 0,
+            sCharacters[playerid][E_CHAR_DB_ID]);
+        mysql_tquery(gMySQL, query);
+    }
+    return 1;
+}
+
 stock Float:Character_GetHunger(playerid)
 {
     if (playerid < 0 || playerid >= MAX_PLAYERS) return 100.0;
@@ -1698,13 +1729,24 @@ stock Character_SyncLayer1Weapons(playerid)
 
         if (gtaWeaponId > 0)
         {
-            new ammo = Storage_GetItemAmmo(currItem);
-            if (ammo <= 0)
+            if (Item_GetCategory(defId) == ITEM_CAT_FIREARM)
             {
-                ammo = Storage_GetItemAmount(currItem);
-                if (ammo <= 0) ammo = 1;
+                // Пустой ствол остается физическим предметом в инвентаре ("0 M4"),
+                // но не выдается клиенту до объединения боезапаса (/unload, /combine).
+                new ammo = Storage_GetItemAmmo(currItem);
+                if (ammo <= 0)
+                {
+                    currItem = Storage_GetNextItemSlot(currItem);
+                    continue;
+                }
+                GivePlayerWeapon(playerid, WEAPON:gtaWeaponId, ammo);
             }
-            GivePlayerWeapon(playerid, WEAPON:gtaWeaponId, ammo);
+            else
+            {
+                new ammo = Storage_GetItemAmount(currItem);
+                if (ammo <= 0) ammo = 1;
+                GivePlayerWeapon(playerid, WEAPON:gtaWeaponId, ammo);
+            }
         }
         else if (defId == 40 && sCharacters[playerid][E_CHAR_ARMOUR] < 10.0)
         {
