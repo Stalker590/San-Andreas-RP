@@ -343,6 +343,10 @@ stock Item_GetMaxStack(def_id)
     {
         return 1;
     }
+    if (def_id == ITEM_ID_CASH_BUNDLE)
+    {
+        return 100000000;
+    }
     return sItemDefs[def_id][E_ITEM_MAX_STACK];
 }
 
@@ -403,11 +407,17 @@ stock Item_GetGtaWeaponId(def_id)
 
 // Расчет массы одного экземпляра с учетом боезапаса (в граммах, строго INT):
 // W_instance = N_amount * W_base + N_ammo * W_round
+// Для наличных банкнот (ITEM_ID_CASH_BUNDLE) 1 пачка ($1,000) весит 500 г (0.5 кг)
 stock Item_CalculateInstanceWeight(def_id, amount, ammo_count = 0)
 {
     if (!Item_IsValid(def_id) || amount <= 0)
     {
         return 0;
+    }
+    if (def_id == ITEM_ID_CASH_BUNDLE)
+    {
+        new const bundles = (amount + 999) / 1000;
+        return (bundles * sItemDefs[def_id][E_ITEM_BASE_WEIGHT_G]);
     }
     new const safeAmmo = (ammo_count > 0) ? ammo_count : 0;
     new const baseWeight = sItemDefs[def_id][E_ITEM_BASE_WEIGHT_G] * amount;
@@ -421,6 +431,11 @@ stock Item_CalculateInstanceVolume(def_id, amount)
     if (!Item_IsValid(def_id) || amount <= 0)
     {
         return 0;
+    }
+    if (def_id == ITEM_ID_CASH_BUNDLE)
+    {
+        new const bundles = (amount + 999) / 1000;
+        return (bundles * sItemDefs[def_id][E_ITEM_BASE_VOLUME_ML]);
     }
     return (sItemDefs[def_id][E_ITEM_BASE_VOLUME_ML] * amount);
 }
