@@ -22,8 +22,9 @@
 #define MAX_ROLE_SKILL_BONUSES                  (5)
 #define MAX_ROLE_STARTER_ITEMS                  (6)
 #define ROLE_TITLE_MAX_LEN                      (44)
-#define ROLE_SUBTITLE_MAX_LEN                   (36)
+#define ROLE_SUBTITLE_MAX_LEN                   (48)
 #define ROLE_DESC_MAX_LEN                       (256)
+#define ROLE_SELECTION_DIALOG_BUFFER_SIZE       (4096)
 
 enum E_CITIZENSHIP_TYPE
 {
@@ -74,7 +75,7 @@ enum E_ROLE_TEMPLATE
 {
     E_ROLE_ID,                                  // 1..25
     E_ROLE_NAME_RU[ROLE_TITLE_MAX_LEN],         // Русское название роли
-    E_ROLE_SUBTITLE[ROLE_SUBTITLE_MAX_LEN],     // Английский подзаголовок из GDD
+    E_ROLE_SUBTITLE[ROLE_SUBTITLE_MAX_LEN],     // Русский ролевой архетип / подзаголовок для UI
     E_ROLE_DESC_RU[ROLE_DESC_MAX_LEN],          // Краткое описание бонусов и минусов для UI
     E_CITIZENSHIP_TYPE:E_ROLE_CITIZENSHIP,      // CITIZEN или IMMIGRANT
     E_ROLE_START_CASH_USD,                      // Стартовые наличные USD в Слое 1
@@ -116,12 +117,14 @@ enum E_ROLE_TEMPLATE
     E_ROLE_ITEM_ID_6, E_ROLE_ITEM_AMT_6, E_ROLE_ITEM_AMMO_6
 };
 
+static stock sRoleInitCheckBuffer[ROLE_SELECTION_DIALOG_BUFFER_SIZE];
+
 // Полная константная таблица всех 25 стартовых ролей из раздела 9 GDD
 stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
 {
-    // 1. Бомж-Выживальщик (The Gutter Rat)
+    // 1. Бомж-Выживальщик
     {
-        1, "Бомж-Выживальщик", "The Gutter Rat",
+        1, "Бомж-Выживальщик", "Обитатель подворотен",
         "Выносливость 700, Выживание 850, Скрытность 600. Расход еды и воды снижен на 60%, иммунитет к отравлениям. Минус: оружейные навыки заблокированы (0).",
         CITIZENSHIP_CITIZEN, 10, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 78, 77,
         true, false, MAX_SKILL_TYPES, 1000,
@@ -131,9 +134,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         61, 1, 0,   64, 1, 0,   65, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 2. Наркоман (The Tweaker)
+    // 2. Наркоман
     {
-        2, "Наркоман", "The Tweaker",
+        2, "Наркоман", "Уличный торчок",
         "Выносливость 800, Скрытность 500. Препараты действуют в 2.5 раза дольше и восстанавливают +35 HP, снимая болевой шок. Минус: тяжелая ломка каждые 40 минут.",
         CITIZENSHIP_CITIZEN, 45, 0, 0, 0, 100.0, 0.0, 65.0, 0, FIGHT_STYLE_NORMAL, 137, 64,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -143,9 +146,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         66, 3, 0,   67, 2, 0,   4, 1, 0,    0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 3. Уличная Проститутка (Streetwalker)
+    // 3. Уличная Проститутка
     {
-        3, "Уличная Проститутка", "Streetwalker",
+        3, "Уличная Проститутка", "Ночная бабочка",
         "Харизма 750, Карманные кражи 500. Пистолет 9mm (15 патр.). Потайной Слой 2 увеличен в 2 раза (не виден при обычном досмотре). Минус: Мускулатура не выше 300.",
         CITIZENSHIP_CITIZEN, 350, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 249, 244,
         false, false, SKILL_MUSCLE, 300,
@@ -155,9 +158,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         50, 1, 0,   65, 1, 0,   13, 1, 15,  52, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 4. Конченый Психопат (The Unhinged Psycho)
+    // 4. Конченый Психопат
     {
-        4, "Конченый Психопат", "The Unhinged Psycho",
+        4, "Конченый Психопат", "Отмороженный маньяк",
         "Мускулатура 1000, Скрытность 700, стиль боя Колено в голову. Полный иммунитет к болевому шоку и контузии. Минус: пожизненный запрет на лицензию на оружие.",
         CITIZENSHIP_CITIZEN, 150, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_KNEEHEAD, 160, 198,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -167,9 +170,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         6, 1, 0,    1, 1, 0,    43, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 5. Обычный Гражданский (Average Joe)
+    // 5. Обычный Гражданский
     {
-        5, "Обычный Гражданский", "Average Joe",
+        5, "Обычный Гражданский", "Законопослушный житель",
         "Харизма 500, Вождение 500. Стартовый рюкзак, смартфон, карта и $1,500. Скидка 20% на налоги и +20% к зарплате на госработах. Минус: криминальные навыки = 0.",
         CITIZENSHIP_CITIZEN, 1500, 500, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 26, 93,
         false, true, MAX_SKILL_TYPES, 1000,
@@ -179,9 +182,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         50, 1, 0,   41, 1, 0,   63, 2, 0,   61, 1, 0,   52, 1, 0,   0, 0, 0
     },
 
-    // 6. Боевой Ветеран (The Shell-Shocked Veteran)
+    // 6. Боевой Ветеран
     {
-        6, "Боевой Ветеран", "The Shell-Shocked Veteran",
+        6, "Боевой Ветеран", "Ветеран горячих точек",
         "Винтовка M4 (200 патр.) с лицензией, нож, сухпаек. Навыки: M4 900, Пистолет 700, Выносливость 850, Выживание 600. Износ винтовок -30%. Минус: долгая контузия.",
         CITIZENSHIP_CITIZEN, 400, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_KUNGFU, 287, 191,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -191,9 +194,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         23, 1, 200, 69, 1, 0,   4, 1, 0,    62, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 7. Джихадист-Подрывник (The Desert Radical)
+    // 7. Джихадист-Подрывник
     {
-        7, "Джихадист-Подрывник", "The Desert Radical",
+        7, "Джихадист-Подрывник", "Радикальный подрывник",
         "Автомат AK-47 (150 патр. без лицензии), взрывпакет с детонатором, болторез, балаклава. Навыки: AK-47 950, Подрывное дело 1000, Оружейник 650. Минус: старт с 5 уровнем розыска.",
         CITIZENSHIP_IMMIGRANT, 100, 0, 0, 5, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 220, 190,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -203,9 +206,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         22, 1, 150, 43, 1, 0,   29, 1, 1,   49, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 8. Подпольный Автомеханик (The Grease Monkey)
+    // 8. Подпольный Автомеханик
     {
-        8, "Подпольный Автомеханик", "The Grease Monkey",
+        8, "Подпольный Автомеханик", "Гаражный мастер",
         "Автомеханика 1000, Вождение 1000, Угон (скрутка проводов) 800. Ящик с ключами и канистра 20 л. Бонус +10 км/ч к скорости авто и быстрый ремонт. Минус: Выносливость макс. 400.",
         CITIZENSHIP_CITIZEN, 650, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 50, 69,
         false, false, SKILL_STAMINA, 400,
@@ -215,9 +218,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         46, 1, 0,   48, 1, 0,   6, 1, 0,    0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 9. Уличный Хулиган (The Hoodlum)
+    // 9. Уличный Хулиган
     {
-        9, "Уличный Хулиган", "The Hoodlum",
+        9, "Уличный Хулиган", "Районный громила",
         "Взлом замков 750, Угон 650, Пистолет 450, стиль боя Бокс. Бита, нож, отмычки и марихуана. Шанс взлома замков выше на +35%. Минус: начальная наркозависимость.",
         CITIZENSHIP_CITIZEN, 120, 0, 0, 0, 100.0, 0.0, 25.0, 0, FIGHT_STYLE_BOXING, 105, 195,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -227,9 +230,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         5, 1, 0,    4, 1, 0,    45, 2, 0,   67, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 10. Олигарх-Эмигрант (The Oligarch Exile)
+    // 10. Олигарх-Эмигрант
     {
-        10, "Олигарх-Эмигрант", "The Oligarch Exile",
+        10, "Олигарх-Эмигрант", "Беглый магнат",
         "Стартовый капитал $20,000 наличными, деловой костюм, смартфон, сумка-портфель. Харизма 950. Скидка 25% на регистрацию корпораций и покупку бизнеса. Минус: статус негражданина.",
         CITIZENSHIP_IMMIGRANT, 20000, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 147, 150,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -239,9 +242,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         50, 1, 0,   68, 1, 0,   42, 1, 0,   52, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 11. Отставной Коп (The Burned Detective)
+    // 11. Отставной Коп
     {
-        11, "Отставной Коп", "The Burned Detective",
+        11, "Отставной Коп", "Опальный детектив",
         "Пистолет 9mm (60 патр.) с лицензией, стальные наручники, рация. Навыки: Пистолет 850, Дробовик 700, Криминалистика 850. Видит улики без спецприборов. Минус: +30% цены на черном рынке.",
         CITIZENSHIP_CITIZEN, 1200, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_BOXING, 165, 141,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -251,9 +254,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         13, 1, 60,  69, 1, 0,   44, 1, 0,   53, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 12. Полевой Мясник-Хирург (The Disbarred Surgeon)
+    // 12. Полевой Мясник-Хирург
     {
-        12, "Полевой Мясник-Хирург", "The Disbarred Surgeon",
+        12, "Полевой Мясник-Хирург", "Лишенный лицензии хирург",
         "Хирургия 1000, Первая помощь 1000. Хирургический набор, аптечки, бинты, жгуты, морфин и $3,000. Реанимирует в 2 раза быстрее и сразу с 50 HP. Минус: Мускулатура 150 (-10 кг веса).",
         CITIZENSHIP_CITIZEN, 3000, 0, 0, 0, 100.0, 0.0, 0.0, -10000, FIGHT_STYLE_NORMAL, 70, 91,
         false, false, SKILL_MUSCLE, 150,
@@ -263,9 +266,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         57, 1, 0,   56, 2, 0,   58, 5, 0,   59, 3, 0,   60, 3, 0,   4, 1, 0
     },
 
-    // 13. Грузчик-Контрабандист (The Dock Rat)
+    // 13. Грузчик-Контрабандист
     {
-        13, "Грузчик-Контрабандист", "The Dock Rat",
+        13, "Грузчик-Контрабандист", "Портовый докер",
         "Мускулатура 750, Скрытность 600, Взлом замков 500. На +20% выше шанс обнаружить редкий товар или оружие в портовых контейнерах. Минус: частые проверки таможни.",
         CITIZENSHIP_CITIZEN, 250, 0, 0, 0, 100.0, 0.0, 0.0, 5000, FIGHT_STYLE_NORMAL, 16, 131,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -275,9 +278,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         2, 1, 0,    61, 2, 0,   45, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 14. Король Трассы (The Long-Haul Trucker)
+    // 14. Король Трассы
     {
-        14, "Король Трассы", "The Long-Haul Trucker",
+        14, "Король Трассы", "Дальнобойщик-магистральщик",
         "Вождение 950, Автомеханика 500. Рация, канистра 20 л, сухпаек и $2,000. Бонус +20% к оплате за контракты грузоперевозок и -15% расхода топлива. Минус: оружейные скиллы = 0.",
         CITIZENSHIP_CITIZEN, 2000, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 202, 198,
         true, false, MAX_SKILL_TYPES, 1000,
@@ -287,9 +290,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         53, 1, 0,   48, 1, 0,   65, 2, 0,   62, 2, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 15. Варщик-Амфетаминщик (The Trailer Park Chemist)
+    // 15. Варщик-Амфетаминщик
     {
-        15, "Варщик-Амфетаминщик", "The Trailer Park Chemist",
+        15, "Варщик-Амфетаминщик", "Подпольный химик",
         "Химия 1000, Обрез 500. Обрез двустволки (14 патр.), прекурсоры, 2 дозы метамфетамина и $1,800. Выход готовых препаратов и наркотиков +40%. Минус: двойной урон при взрыве лабы.",
         CITIZENSHIP_CITIZEN, 1800, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 144, 157,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -299,9 +302,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         81, 3, 0,   66, 2, 0,   17, 1, 14,  0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 16. Подпольный Оружейник (The Gunrunner)
+    // 16. Подпольный Оружейник
     {
-        16, "Подпольный Оружейник", "The Gunrunner",
+        16, "Подпольный Оружейник", "Торговец оружием",
         "Оружейное дело 1000, Пистолет с глушителем 800, Металлургия 600. Пистолет с глушителем (45 патр.), набор оружейника, балаклава и $3,500. Экономия 25% металла при сборке.",
         CITIZENSHIP_CITIZEN, 3500, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 29, 192,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -311,9 +314,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         14, 1, 45,  47, 1, 0,   43, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 17. Однопроцентник на Харлее (The 1% Outlaw Biker)
+    // 17. Однопроцентник на Харлее
     {
-        17, "Однопроцентник на Харлее", "The 1% Outlaw Biker",
+        17, "Однопроцентник на Харлее", "Кочевник мотоклуба",
         "Мотоциклы 1000, Обрез 750, Автомеханика 550, стиль боя Захват и удар ногой. Обрез (20 патр.), кастет, виски. Повышенная устойчивость на байке. Минус: Вождение авто макс. 400.",
         CITIZENSHIP_CITIZEN, 350, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_GRABKICK, 100, 246,
         false, false, SKILL_DRIVING, 400,
@@ -323,9 +326,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         17, 1, 20,  64, 2, 0,   1, 1, 0,    0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 18. Опальный Пилот Картеля (The Smuggler Pilot)
+    // 18. Опальный Пилот Картеля
     {
-        18, "Опальный Пилот Картеля", "The Smuggler Pilot",
+        18, "Опальный Пилот Картеля", "Контрабандный летчик",
         "Пилотирование 1000, Выживание 650. Парашют, рация, 2 брикета марихуаны и $1,500. Радары ПВО/полиции засекают на 50% ближе. Минус: банковский долг $10,000.",
         CITIZENSHIP_IMMIGRANT, 1500, 0, 10000, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 61, 141,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -335,9 +338,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         39, 1, 1,   53, 1, 0,   67, 2, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 19. Реднек-Браконьер (The Swamp Redneck)
+    // 19. Реднек-Браконьер
     {
-        19, "Реднек-Браконьер", "The Swamp Redneck",
+        19, "Реднек-Браконьер", "Болотный охотник",
         "Помповый дробовик (30 патр.), нож, канистра 20 л. Навыки: Дробовик 850, Снайперские винтовки 650, Выживание 900, Скрытность 750. Экономия стамины в лесах. Минус: стресс в городах.",
         CITIZENSHIP_CITIZEN, 600, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 158, 157,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -347,9 +350,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         16, 1, 30,  4, 1, 0,    48, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 20. Шахтер-Стахановец (The Coal Miner)
+    // 20. Шахтер-Стахановец
     {
-        20, "Шахтер-Стахановец", "The Coal Miner",
+        20, "Шахтер-Стахановец", "Горнорабочий забоя",
         "Горное дело и лесоповал 1000, Мускулатура 900, Металлургия 500. Шахтерская кирка, лопата, сухпаек. Выработка руды и дерева +35%, лимит переносимого веса +15 кг.",
         CITIZENSHIP_CITIZEN, 400, 0, 0, 0, 100.0, 0.0, 0.0, 15000, FIGHT_STYLE_NORMAL, 27, 131,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -359,9 +362,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         54, 1, 0,   6, 1, 0,    62, 2, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 21. Качок-Вышибала (The Steroid Gym-Bro)
+    // 21. Качок-Вышибала
     {
-        21, "Качок-Вышибала", "The Steroid Gym-Bro",
+        21, "Качок-Вышибала", "Стероидный громила",
         "Мускулатура 1000, стиль боя Бокс. Кастет, бейсбольная бита, 3 бутылки воды. Бонус +25 кг к максимальному переносимому весу, сокрушительный удар. Минус: расход еды и воды в 1.5 раза выше.",
         CITIZENSHIP_CITIZEN, 500, 0, 0, 0, 100.0, 0.0, 0.0, 25000, FIGHT_STYLE_BOXING, 18, 92,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -371,9 +374,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         1, 1, 0,    5, 1, 0,    61, 3, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 22. Беспризорный Карманник (The Street Urchin)
+    // 22. Беспризорный Карманник
     {
-        22, "Беспризорный Карманник", "The Street Urchin",
+        22, "Беспризорный Карманник", "Уличный щипач",
         "Карманные кражи 950, Взлом замков 800, Велосипеды 1000, Выносливость 950. Отмычки и перцовый баллончик. Незаметная кража из Слоя 1. Минус: хрупкое телосложение (65 HP).",
         CITIZENSHIP_CITIZEN, 80, 0, 0, 0, 65.0, 0.0, 0.0, -3000, FIGHT_STYLE_ELBOW, 22, 56,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -383,9 +386,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         45, 3, 0,   34, 1, 500, 0, 0, 0,    0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 23. Сектант-Фанатик (The Doomsday Cultist)
+    // 23. Сектант-Фанатик
     {
-        23, "Сектант-Фанатик", "The Doomsday Cultist",
+        23, "Сектант-Фанатик", "Проповедник культа",
         "Выживание 850, Подрывное дело 600, Метательное 750. 2 коктейля Молотова, лопата, балаклава. Защита -50% от урона огнем. Минус: полный религиозный запрет на банковские счета.",
         CITIZENSHIP_CITIZEN, 200, 0, 0, 0, 100.0, 0.0, 0.0, 0, FIGHT_STYLE_NORMAL, 68, 197,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -395,9 +398,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         28, 1, 2,   6, 1, 0,    43, 1, 0,   0, 0, 0,    0, 0, 0,    0, 0, 0
     },
 
-    // 24. Бывший Спецназовец SWAT (The Ex-SWAT Breacher)
+    // 24. Бывший Спецназовец SWAT
     {
-        24, "Бывший Спецназовец SWAT", "The Ex-SWAT Breacher",
+        24, "Бывший Спецназовец SWAT", "Штурмовик спецназа",
         "ПП MP5 (120 патр.) с лицензией, тяжелый бронежилет, балаклава. Навыки: MP5 950, Боевой дробовик 800, Первая помощь 600. Прочность брони +20%, выбивание дверей с 1 удара.",
         CITIZENSHIP_CITIZEN, 900, 0, 0, 0, 100.0, 100.0, 0.0, 0, FIGHT_STYLE_KUNGFU, 285, 191,
         false, false, MAX_SKILL_TYPES, 1000,
@@ -407,9 +410,9 @@ stock const gRoleConfigs[MAX_STARTER_ROLES][E_ROLE_TEMPLATE] =
         21, 1, 120, 69, 1, 0,   40, 1, 0,   43, 1, 0,   0, 0, 0,    0, 0, 0
     },
 
-    // 25. Сын Депутата (The Spoiled Trust-Fund Kid)
+    // 25. Сын Депутата
     {
-        25, "Сын Депутата", "The Spoiled Trust-Fund Kid",
+        25, "Сын Депутата", "Золотая молодежь",
         "На банковской карте $12,000 + $500 наличными, смартфон, сигареты. Харизма 900, Вождение 700. Штрафы и розыск до 10 уровня режутся вдвое. Минус: Мускулатура 100, запрет грязных работ.",
         CITIZENSHIP_CITIZEN, 500, 12000, 0, 0, 100.0, 0.0, 0.0, -5000, FIGHT_STYLE_NORMAL, 299, 12,
         false, false, SKILL_MUSCLE, 100,
@@ -849,6 +852,68 @@ stock Roles_ApplyTemplate(
     return 1;
 }
 
+// Формирование полного табличного списка 25 ролей для DIALOG_STYLE_TABLIST_HEADERS (до 4096 символов)
+stock Roles_BuildSelectionTableRu(output[], len = sizeof(output))
+{
+    if (len <= 0)
+    {
+        return 0;
+    }
+
+    output[0] = EOS;
+    strcat(output, "№ и название роли\tСтатус гражданства\tСтартовый капитал\n", len);
+
+    new builtRows = 0;
+    new rowLine[192];
+    new cashStr[32];
+    new extraStr[32];
+    new moneySummary[64];
+
+    for (new i = 0; i < MAX_STARTER_ROLES; i++)
+    {
+        new const roleId = gRoleConfigs[i][E_ROLE_ID];
+        if (!Roles_IsValidId(roleId) || gRoleConfigs[i][E_ROLE_NAME_RU][0] == EOS)
+        {
+            continue;
+        }
+
+        new const E_CITIZENSHIP_TYPE:cit = gRoleConfigs[i][E_ROLE_CITIZENSHIP];
+        new const cash = gRoleConfigs[i][E_ROLE_START_CASH_USD];
+        new const bank = gRoleConfigs[i][E_ROLE_START_BANK_USD];
+        new const debt = gRoleConfigs[i][E_ROLE_START_DEBT_USD];
+
+        Utils_FormatMoney(cash, cashStr, sizeof(cashStr));
+
+        if (bank > 0)
+        {
+            Utils_FormatMoney(bank, extraStr, sizeof(extraStr));
+            format(moneySummary, sizeof(moneySummary), "%s нал. + %s банк", cashStr, extraStr);
+        }
+        else if (debt > 0)
+        {
+            Utils_FormatMoney(debt, extraStr, sizeof(extraStr));
+            format(moneySummary, sizeof(moneySummary), "%s нал. (долг %s)", cashStr, extraStr);
+        }
+        else
+        {
+            format(moneySummary, sizeof(moneySummary), "%s наличными", cashStr);
+        }
+
+        format(
+            rowLine,
+            sizeof(rowLine),
+            "{FFC800}#%02d{FFFFFF} %s\t%s\t{66CC66}%s{FFFFFF}\n",
+            roleId,
+            gRoleConfigs[i][E_ROLE_NAME_RU],
+            (cit == CITIZENSHIP_CITIZEN) ? ("{66CC66}Гражданин США{FFFFFF}") : ("{FFAA00}Иммигрант{FFFFFF}"),
+            moneySummary);
+
+        strcat(output, rowLine, len);
+        builtRows++;
+    }
+    return builtRows;
+}
+
 // Форматирование подробной карточки роли на русском языке для диалога выбора роли
 stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
 {
@@ -871,7 +936,7 @@ stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
         format(debtStr, sizeof(debtStr), "Отсутствует");
     }
 
-    new itemsLine[384];
+    new itemsLine[512];
     itemsLine[0] = EOS;
 
     new itemIds[6];
@@ -898,7 +963,7 @@ stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
     itemAmmos[4] = gRoleConfigs[idx][E_ROLE_ITEM_AMMO_5];
     itemAmmos[5] = gRoleConfigs[idx][E_ROLE_ITEM_AMMO_6];
 
-    new itemPos = 0;
+    new itemRow[128];
     for (new k = 0; k < 6; k++)
     {
         if (itemIds[k] > 0 && Item_IsValid(itemIds[k]))
@@ -907,34 +972,35 @@ stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
             Item_GetName(itemIds[k], itemName);
             if (itemAmmos[k] > 0)
             {
-                itemPos += format(
-                    itemsLine[itemPos],
-                    sizeof(itemsLine) - itemPos,
+                format(
+                    itemRow,
+                    sizeof(itemRow),
                     "  • %s (заряжено: %d патр.)\n",
                     itemName,
                     itemAmmos[k]);
             }
             else
             {
-                itemPos += format(
-                    itemsLine[itemPos],
-                    sizeof(itemsLine) - itemPos,
+                format(
+                    itemRow,
+                    sizeof(itemRow),
                     "  • %s (x%d)\n",
                     itemName,
                     itemAmts[k]);
             }
+            strcat(itemsLine, itemRow, sizeof(itemsLine));
         }
     }
 
     format(output, len,
-        "{FFC800}Роль №%d: %s (%s){FFFFFF}\n\n\
-        {88CCFF}Юридический статус:{FFFFFF} %s\n\
-        {88CCFF}Стартовые наличные:{FFFFFF} {66CC66}%s{FFFFFF} | {88CCFF}На банковском счете:{FFFFFF} {66CC66}%s{FFFFFF}\n\
-        {88CCFF}Банковский долг:{FFFFFF} %s | {88CCFF}Стартовый розыск:{FFFFFF} %d ур.\n\n\
-        {FFC800}Особенности, бонусы и ограничения роли:{FFFFFF}\n\
-        %s\n\n\
-        {FFC800}Стартовое снаряжение в инвентаре:{FFFFFF}\n\
-        %s",
+        "{FFC800}Роль №%d: %s (%s){FFFFFF}\n\n" \
+        "{88CCFF}Юридический статус:{FFFFFF} %s\n" \
+        "{88CCFF}Стартовые наличные:{FFFFFF} {66CC66}%s{FFFFFF} | {88CCFF}На банковском счете:{FFFFFF} {66CC66}%s{FFFFFF}\n" \
+        "{88CCFF}Банковский долг:{FFFFFF} %s | {88CCFF}Стартовый розыск:{FFFFFF} %d ур.\n\n" \
+        "{FFC800}Особенности, бонусы и ограничения роли:{FFFFFF}\n" \
+        "%s\n\n" \
+        "{FFC800}Стартовое снаряжение в инвентаре:{FFFFFF}\n" \
+        "%s",
         gRoleConfigs[idx][E_ROLE_ID],
         gRoleConfigs[idx][E_ROLE_NAME_RU],
         gRoleConfigs[idx][E_ROLE_SUBTITLE],
@@ -965,12 +1031,19 @@ hook OnGameModeInit()
         }
     }
 
-    printf("%s [Entities/Roles] Загружено %d из %d стартовых ролей (от '%s' до '%s') [%s].",
+    new const builtRows = Roles_BuildSelectionTableRu(
+        sRoleInitCheckBuffer,
+        sizeof(sRoleInitCheckBuffer));
+    new const tableLen = strlen(sRoleInitCheckBuffer);
+
+    printf("%s [Entities/Roles] Загружено %d из %d стартовых ролей (от '%s' до '%s', таблица диалога: %d строк, %d симв.) [%s].",
         SERVER_LOG_PREFIX,
         validRolesCount,
         MAX_STARTER_ROLES,
         gRoleConfigs[0][E_ROLE_NAME_RU],
         gRoleConfigs[MAX_STARTER_ROLES - 1][E_ROLE_NAME_RU],
-        (validRolesCount == MAX_STARTER_ROLES) ? ("УСПЕШНО") : ("ОШИБКА"));
+        builtRows,
+        tableLen,
+        (validRolesCount == MAX_STARTER_ROLES && builtRows == MAX_STARTER_ROLES && tableLen > 1000) ? ("УСПЕШНО") : ("ОШИБКА"));
     return 1;
 }

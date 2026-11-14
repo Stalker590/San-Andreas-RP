@@ -24,6 +24,7 @@
 #define LEVEL_UP_ACTIVE_SECONDS                 (36000) // 10 часов активного онлайна = +1 Level (+1 год возраста)
 #define WARRANT_DECAY_ACTIVE_SECONDS            (3600)  // 1 час активной игры = -1 уровень розыска
 #define AFK_INACTIVE_THRESHOLD_MS               (90000) // Порог неактивности (90 сек без сетевых пакетов)
+#define ROLE_SELECT_DIALOG_BUFFER_SIZE          (4096)  // Буфер ShowPlayerDialog для всех 25 ролей без обрезания
 
 #define DIALOG_CHAR_SELECT_GENDER               (1030)
 #define DIALOG_CHAR_SELECT_RACE                 (1031)
@@ -127,6 +128,11 @@ static stock sCharacters[MAX_PLAYERS][E_CHARACTER_DATA];
 static stock sSyntheticCharDbIdSeq = 0;
 static stock sSyntheticBankAccDbIdSeq = 0;
 static stock sCharSqlBuffer[2048];
+static stock sRoleListDialogBuffer[ROLE_SELECT_DIALOG_BUFFER_SIZE];
+
+// Серверный маппинг строк диалога выбора роли (защита от подмены listitem по разделу 7.1 AGENTS.md)
+static stock sWizardRoleRowMap[MAX_PLAYERS][MAX_STARTER_ROLES];
+static stock sWizardRoleRowCount[MAX_PLAYERS];
 
 // Подборка стартовых казуальных скинов по полу и расе [gender 0..1][race 0..3][3 варианта]
 static stock const sCasualSkins[2][4][3] =
@@ -205,6 +211,12 @@ static stock Internal_ResetCharacterSlot(playerid)
     sCharacters[playerid][E_CHAR_WIZARD_CUSTOM_SKIN] = 0;
     sCharacters[playerid][E_CHAR_WIZARD_STEP] = 0;
     sCharacters[playerid][E_CHAR_SPAWN_APPLIED] = false;
+
+    sWizardRoleRowCount[playerid] = 0;
+    for (new r = 0; r < MAX_STARTER_ROLES; r++)
+    {
+        sWizardRoleRowMap[playerid][r] = (r + 1);
+    }
 }
 
 static stock Internal_GetRaceTitleRu(E_CHAR_RACE:race, output[], len = sizeof(output))
@@ -331,8 +343,8 @@ static stock Internal_ShowWizardStep1Gender(playerid)
         DIALOG_CHAR_SELECT_GENDER,
         DIALOG_STYLE_LIST,
         "{FFC800}Создание персонажа (Шаг 1/4) {FFFFFF}| Выбор пола",
-        "{88CCFF}1.{FFFFFF} Мужской пол\n\
-        {FF88CC}2.{FFFFFF} Женский пол",
+        "{88CCFF}1.{FFFFFF} Мужской пол\n" \
+        "{FF88CC}2.{FFFFFF} Женский пол",
         "Далее",
         "Отмена");
 }
@@ -345,10 +357,10 @@ static stock Internal_ShowWizardStep2Race(playerid)
         DIALOG_CHAR_SELECT_RACE,
         DIALOG_STYLE_LIST,
         "{FFC800}Создание персонажа (Шаг 2/4) {FFFFFF}| Этническое происхождение",
-        "{FFFFFF}1. Европеоидная\n\
-        {FFFFFF}2. Афроамериканская\n\
-        {FFFFFF}3. Латиноамериканская\n\
-        {FFFFFF}4. Азиатская",
+        "{FFFFFF}1. Европеоидная\n" \
+        "{FFFFFF}2. Афроамериканская\n" \
+        "{FFFFFF}3. Латиноамериканская\n" \
+        "{FFFFFF}4. Азиатская",
         "Далее",
         "Назад");
 }
@@ -365,10 +377,10 @@ static stock Internal_ShowWizardStep3Skin(playerid)
 
     new body[512];
     format(body, sizeof(body),
-        "{FFC800}Автоматический каноничный образ выбранной роли{FFFFFF}\n\
-        Повседневный комплект одежды №1 (Скин ID %d)\n\
-        Повседневный комплект одежды №2 (Скин ID %d)\n\
-        Повседневный комплект одежды №3 (Скин ID %d)",
+        "{FFC800}Автоматический каноничный образ выбранной роли{FFFFFF}\n" \
+        "Повседневный комплект одежды №1 (Скин ID %d)\n" \
+        "Повседневный комплект одежды №2 (Скин ID %d)\n" \
+        "Повседневный комплект одежды №3 (Скин ID %d)",
         sCasualSkins[genderIdx][raceIdx][0],
         sCasualSkins[genderIdx][raceIdx][1],
         sCasualSkins[genderIdx][raceIdx][2]);
@@ -386,50 +398,26 @@ static stock Internal_ShowWizardStep3Skin(playerid)
 static stock Internal_ShowWizardStep4RoleList(playerid)
 {
     sCharacters[playerid][E_CHAR_WIZARD_STEP] = 4;
-    new dialogBody[3584];
-    new pos = format(dialogBody, sizeof(dialogBody),
-        "№ и название роли\tСтатус гражданства\tСтартовый капитал\n");
 
+    sWizardRoleRowCount[playerid] = 0;
     for (new r = 1; r <= MAX_STARTER_ROLES; r++)
     {
-        new roleName[48];
-        Roles_GetNameRu(r, roleName);
-
-        new const E_CITIZENSHIP_TYPE:cit = Roles_GetCitizenship(r);
-        new const cash = Roles_GetStartCashUsd(r);
-        new const bank = Roles_GetStartBankUsd(r);
-        new const debt = Roles_GetStartDebtUsd(r);
-
-        new moneySummary[48];
-        if (bank > 0)
+        if (Roles_IsValidId(r))
         {
-            format(moneySummary, sizeof(moneySummary), "$%d нал. + $%d банк", cash, bank);
+            sWizardRoleRowMap[playerid][sWizardRoleRowCount[playerid]++] = r;
         }
-        else if (debt > 0)
-        {
-            format(moneySummary, sizeof(moneySummary), "$%d нал. (долг $%d)", cash, debt);
-        }
-        else
-        {
-            format(moneySummary, sizeof(moneySummary), "$%d наличными", cash);
-        }
-
-        pos += format(
-            dialogBody[pos],
-            sizeof(dialogBody) - pos,
-            "{FFC800}#%02d{FFFFFF} %s\t%s\t{66CC66}%s{FFFFFF}\n",
-            r,
-            roleName,
-            (cit == CITIZENSHIP_CITIZEN) ? ("{66CC66}Гражданин США{FFFFFF}") : ("{FFAA00}Иммигрант{FFFFFF}"),
-            moneySummary);
     }
+
+    Roles_BuildSelectionTableRu(
+        sRoleListDialogBuffer,
+        sizeof(sRoleListDialogBuffer));
 
     ShowPlayerDialog(
         playerid,
         DIALOG_CHAR_SELECT_ROLE_LIST,
         DIALOG_STYLE_TABLIST_HEADERS,
         "{FFC800}Создание персонажа (Шаг 4/4) {FFFFFF}| Выберите одну из 25 стартовых ролей",
-        dialogBody,
+        sRoleListDialogBuffer,
         "Выбрать",
         "Назад");
 }
@@ -451,11 +439,11 @@ static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
 
     new fullDialog[1792];
     format(fullDialog, sizeof(fullDialog),
-        "{FFFFFF}Имя персонажа: {FFC800}%s{FFFFFF} | Пол: %s | Происхождение: %s\n\
-        Фиксированный стартовый уровень: {88CCFF}1 ур.{FFFFFF} | Возраст по формуле (17 + Level): {88CCFF}18 лет{FFFFFF} | Скин ID: {88CCFF}%d{FFFFFF}\n\
-        --------------------------------------------------------------------------------\n\
-        %s\n\
-        {AFAFAF}Подтвердите выбор роли для создания персонажа и спавна в игровом мире.{FFFFFF}",
+        "{FFFFFF}Имя персонажа: {FFC800}%s{FFFFFF} | Пол: %s | Происхождение: %s\n" \
+        "Фиксированный стартовый уровень: {88CCFF}1 ур.{FFFFFF} | Возраст по формуле (17 + Level): {88CCFF}18 лет{FFFFFF} | Скин ID: {88CCFF}%d{FFFFFF}\n" \
+        "--------------------------------------------------------------------------------\n" \
+        "%s\n" \
+        "{AFAFAF}Подтвердите выбор роли для создания персонажа и спавна в игровом мире.{FFFFFF}",
         sCharacters[playerid][E_CHAR_RP_NAME],
         (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? ("Женский") : ("Мужской"),
         raceName,
@@ -1407,19 +1395,19 @@ stock Character_ShowStatsDialog(playerid)
 
     new body[1280];
     format(body, sizeof(body),
-        "{FFC800}1. Юридический профиль и биография:{FFFFFF}\n\
-        • Имя и Фамилия: {88CCFF}%s{FFFFFF} (ID персонажа: %d)\n\
-        • Уровень в штате: {66CC66}%d ур.{FFFFFF} (Прогресс: %d / %d сек.) | Возраст: {66CC66}%d лет{FFFFFF}\n\
-        • Пол: %s | Происхождение: %s | Стартовая роль: {FFC800}%s (#%d){FFFFFF}\n\
-        • Гражданство: %s | Номер SSN: {88CCFF}%s{FFFFFF}\n\
-        • Уровень розыска: {FF4444}%d / 100{FFFFFF} (Снижение через: %d сек.)\n\n\
-        {FFC800}2. Финансы и банковское обслуживание:{FFFFFF}\n\
-        • Наличные в карманах (USD): {66CC66}%s{FFFFFF}\n\
-        • Банковский счет IBAN: {88CCFF}%s{FFFFFF} | Баланс: {66CC66}%s{FFFFFF}\n\
-        • Кредитная задолженность: {FFAA00}%s{FFFFFF}\n\n\
-        {FFC800}3. Физиология и двухслойное хранилище:{FFFFFF}\n\
-        • Здоровье: %.1f HP | Броня: %.1f%% | Голод: %.1f%% | Жажда: %.1f%% | Стресс: %.1f%%\n\
-        • Слой 1 (Внешний): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF} | Слой 2 (Потайной): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF}",
+        "{FFC800}1. Юридический профиль и биография:{FFFFFF}\n" \
+        "• Имя и Фамилия: {88CCFF}%s{FFFFFF} (ID персонажа: %d)\n" \
+        "• Уровень в штате: {66CC66}%d ур.{FFFFFF} (Прогресс: %d / %d сек.) | Возраст: {66CC66}%d лет{FFFFFF}\n" \
+        "• Пол: %s | Происхождение: %s | Стартовая роль: {FFC800}%s (#%d){FFFFFF}\n" \
+        "• Гражданство: %s | Номер SSN: {88CCFF}%s{FFFFFF}\n" \
+        "• Уровень розыска: {FF4444}%d / 100{FFFFFF} (Снижение через: %d сек.)\n\n" \
+        "{FFC800}2. Финансы и банковское обслуживание:{FFFFFF}\n" \
+        "• Наличные в карманах (USD): {66CC66}%s{FFFFFF}\n" \
+        "• Банковский счет IBAN: {88CCFF}%s{FFFFFF} | Баланс: {66CC66}%s{FFFFFF}\n" \
+        "• Кредитная задолженность: {FFAA00}%s{FFFFFF}\n\n" \
+        "{FFC800}3. Физиология и двухслойное хранилище:{FFFFFF}\n" \
+        "• Здоровье: %.1f HP | Броня: %.1f%% | Голод: %.1f%% | Жажда: %.1f%% | Стресс: %.1f%%\n" \
+        "• Слой 1 (Внешний): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF} | Слой 2 (Потайной): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF}",
         sCharacters[playerid][E_CHAR_RP_NAME],
         sCharacters[playerid][E_CHAR_DB_ID],
         sCharacters[playerid][E_CHAR_LEVEL],
@@ -1592,9 +1580,9 @@ task Character_SecondProgressionTask[1000]()
 
     new const nowTick = GetTickCount();
 
-    for (new playerid = 0; playerid < MAX_PLAYERS; playerid++)
+    foreach (new playerid : Player)
     {
-        if (!IsPlayerConnected(playerid) || !sCharacters[playerid][E_CHAR_LOADED])
+        if (!sCharacters[playerid][E_CHAR_LOADED])
         {
             continue;
         }
@@ -1709,7 +1697,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
-            new const chosenRoleId = listitem + 1;
+            if (listitem < 0 || listitem >= sWizardRoleRowCount[playerid])
+            {
+                Internal_ShowWizardStep4RoleList(playerid);
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+
+            new const chosenRoleId = sWizardRoleRowMap[playerid][listitem];
             if (!Roles_IsValidId(chosenRoleId))
             {
                 Internal_ShowWizardStep4RoleList(playerid);
