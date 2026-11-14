@@ -69,7 +69,38 @@
 #define COLOR_SERVER_SUCCESS                    (0x66CC66FF)
 
 // =============================================================================
-//  4. ПОДКЛЮЧЕНИЕ МОДУЛЕЙ СНИЗУ ВВЕРХ (core -> entities -> systems -> ui) [0.5]
+//  4. ПЕРЕЧИСЛЕНИЯ И БАЗОВЫЙ API ТОЧКИ ВХОДА (ДО ПОДКЛЮЧЕНИЯ МОДУЛЕЙ)
+// =============================================================================
+
+enum E_SERVER_BOOT_STATE
+{
+    bool:E_BOOT_MYSQL_OK,
+    bool:E_BOOT_STREAMER_OK,
+    bool:E_BOOT_PAWNCMD_OK,
+    bool:E_BOOT_PAWNRAKNET_OK,
+    bool:E_BOOT_PAWNREGEX_OK,
+    bool:E_BOOT_BCRYPT_OK,
+    bool:E_BOOT_YSI_ITERATE_OK,
+    bool:E_BOOT_YSI_TIMERS_OK,
+    bool:E_BOOT_IS_SHUTTING_DOWN,
+    E_BOOT_UPTIME_SECONDS
+};
+
+static stock sServerBootState[E_SERVER_BOOT_STATE];
+static stock Iterator:sStartupProbeIter<8>;
+
+stock bool:Main_IsServerShuttingDown()
+{
+    return sServerBootState[E_BOOT_IS_SHUTTING_DOWN];
+}
+
+stock Main_GetUptimeSeconds()
+{
+    return sServerBootState[E_BOOT_UPTIME_SECONDS];
+}
+
+// =============================================================================
+//  5. ПОДКЛЮЧЕНИЕ МОДУЛЕЙ СНИЗУ ВВЕРХ (core -> entities -> systems -> ui) [0.5]
 //     Используется #tryinclude для безусловной компиляции каркаса на Фазе 0
 //     и бесшовной активации каждого модуля по мере реализации Фаз 1..9.
 // =============================================================================
@@ -110,26 +141,7 @@
 #tryinclude "modules/ui/mod_dialogs.pwn"
 #tryinclude "modules/ui/mod_commands.pwn"
 
-// =============================================================================
-//  5. ПЕРЕЧИСЛЕНИЯ И ИНКАПСУЛИРОВАННЫЕ МАССИВЫ СОСТОЯНИЯ (static stock)
-// =============================================================================
-
-enum E_SERVER_BOOT_STATE
-{
-    bool:E_BOOT_MYSQL_OK,
-    bool:E_BOOT_STREAMER_OK,
-    bool:E_BOOT_PAWNCMD_OK,
-    bool:E_BOOT_PAWNRAKNET_OK,
-    bool:E_BOOT_PAWNREGEX_OK,
-    bool:E_BOOT_BCRYPT_OK,
-    bool:E_BOOT_YSI_ITERATE_OK,
-    bool:E_BOOT_YSI_TIMERS_OK,
-    bool:E_BOOT_IS_SHUTTING_DOWN,
-    E_BOOT_UPTIME_SECONDS
-};
-
-static stock sServerBootState[E_SERVER_BOOT_STATE];
-static stock Iterator:sStartupProbeIter<8>;
+#include <YSI_Coding\y_hooks>
 
 // =============================================================================
 //  6. ВНУТРЕННИЕ ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (static stock)
@@ -256,20 +268,6 @@ static stock Internal_FlushAllDirtyBeforeExit()
     #endif
 
     printf("%s Все буферы состояния успешно синхронизированы.", SERVER_LOG_PREFIX);
-}
-
-// =============================================================================
-//  7. ПУБЛИЧНЫЙ API ТОЧКИ ВХОДА (Main_*)
-// =============================================================================
-
-stock bool:Main_IsServerShuttingDown()
-{
-    return sServerBootState[E_BOOT_IS_SHUTTING_DOWN];
-}
-
-stock Main_GetUptimeSeconds()
-{
-    return sServerBootState[E_BOOT_UPTIME_SECONDS];
 }
 
 // =============================================================================
