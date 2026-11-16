@@ -1182,6 +1182,75 @@ stock bool:Storage_RemoveItem(storage_slot, item_slot, amount)
     return true;
 }
 
+// –екурсивный подсчет количества предметов заданного типа во всем дереве контейнеров
+stock Storage_CountItemInTree(storage_slot, def_id, depth = 0)
+{
+    if (!Storage_IsValidSlot(storage_slot) || !Item_IsValid(def_id) || depth > MAX_NESTING_DEPTH)
+    {
+        return 0;
+    }
+
+    new total = 0;
+    new curr = Storage_GetFirstItemSlot(storage_slot);
+    while (curr != INVALID_STORAGE_ITEM_SLOT)
+    {
+        if (Storage_GetItemDefId(curr) == def_id)
+        {
+            total += Storage_GetItemAmount(curr);
+        }
+        else
+        {
+            new const nestedSlot = Storage_GetItemNestedSlot(curr);
+            if (Storage_IsValidSlot(nestedSlot) && depth < MAX_NESTING_DEPTH)
+            {
+                total += Storage_CountItemInTree(nestedSlot, def_id, depth + 1);
+            }
+        }
+        curr = Storage_GetNextItemSlot(curr);
+    }
+    return total;
+}
+
+// –екурсивное изъ€тие количества предмета из дерева контейнеров.
+// ћьютексы захватывает вызывающий код на врем€ всей составной операции.
+stock Storage_RemoveItemInTree(storage_slot, def_id, amount, depth = 0)
+{
+    if (!Storage_IsValidSlot(storage_slot) || !Item_IsValid(def_id) || amount <= 0 || depth > MAX_NESTING_DEPTH)
+    {
+        return 0;
+    }
+
+    new remaining = amount;
+    new curr = Storage_GetFirstItemSlot(storage_slot);
+    while (curr != INVALID_STORAGE_ITEM_SLOT && remaining > 0)
+    {
+        new const nextItem = Storage_GetNextItemSlot(curr);
+        if (Storage_GetItemDefId(curr) == def_id)
+        {
+            new const haveAmount = Storage_GetItemAmount(curr);
+            new const takeAmount = (haveAmount < remaining) ? haveAmount : remaining;
+            if (takeAmount > 0 && Storage_RemoveItem(storage_slot, curr, takeAmount))
+            {
+                remaining -= takeAmount;
+            }
+        }
+        else
+        {
+            new const nestedSlot = Storage_GetItemNestedSlot(curr);
+            if (Storage_IsValidSlot(nestedSlot) && depth < MAX_NESTING_DEPTH)
+            {
+                new const takenAmount = Storage_RemoveItemInTree(nestedSlot, def_id, remaining, depth + 1);
+                if (takenAmount > 0)
+                {
+                    remaining -= takenAmount;
+                }
+            }
+        }
+        curr = nextItem;
+    }
+    return (amount - remaining);
+}
+
 // јтомарное перемещение предмета между двум€ хранилищами (DoD 2.3 + все 7 шагов TECH_CONTEXT.MD 3.1)
 stock E_STORAGE_RESULT:Storage_TransferItem(
     playerid,

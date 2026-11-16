@@ -983,6 +983,19 @@ stock bool:Character_IsLoaded(playerid)
     return sCharacters[playerid][E_CHAR_LOADED];
 }
 
+stock bool:Character_IsAlive(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return false;
+    }
+
+    new const PLAYER_STATE:playerState = GetPlayerState(playerid);
+    return (playerState != PLAYER_STATE_NONE &&
+            playerState != PLAYER_STATE_WASTED &&
+            playerState != PLAYER_STATE_SPECTATING);
+}
+
 stock Character_GetId(playerid)
 {
     if (playerid < 0 || playerid >= MAX_PLAYERS)
@@ -1550,6 +1563,124 @@ stock Character_GetPhysicalCashUsd(playerid)
         }
     }
     return totalCashUsd;
+}
+
+// Выдача физических наличных USD в Слой 1 персонажа (пачки банкнот ITEM_ID_CASH_BUNDLE)
+stock bool:Character_AddPhysicalCashUsd(playerid, amount_usd, cash_flag = CASH_FLAG_CLEAN)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || amount_usd <= 0 || !Character_IsLoaded(playerid))
+    {
+        return false;
+    }
+
+    new const layer1Slot = Character_GetLayer1Slot(playerid);
+    if (!Storage_IsValidSlot(layer1Slot))
+    {
+        return false;
+    }
+
+    new const cashWeightG = Item_CalculateInstanceWeight(ITEM_ID_CASH_BUNDLE, amount_usd);
+    new const cashVolumeMl = Item_CalculateInstanceVolume(ITEM_ID_CASH_BUNDLE, amount_usd);
+    if ((Storage_GetCurrentWeight(layer1Slot) + cashWeightG) > Storage_GetMaxWeight(layer1Slot) ||
+        (Storage_GetCurrentVolume(layer1Slot) + cashVolumeMl) > Storage_GetMaxVolume(layer1Slot))
+    {
+        return false;
+    }
+
+    new remaining = amount_usd;
+    new added = 0;
+    while (remaining > 0)
+    {
+        new const chunk = (remaining > 10000) ? 10000 : remaining;
+        new outItemSlot = INVALID_STORAGE_ITEM_SLOT;
+        new const E_STORAGE_RESULT:result = Storage_AddItem(
+            layer1Slot,
+            ITEM_ID_CASH_BUNDLE,
+            chunk,
+            0,
+            100.0,
+            cash_flag,
+            CURRENCY_USD,
+            "",
+            outItemSlot
+        );
+
+        if (result != STORAGE_RES_OK)
+        {
+            if (added > 0)
+            {
+                Storage_RemoveItemInTree(layer1Slot, ITEM_ID_CASH_BUNDLE, added);
+            }
+            return false;
+        }
+
+        added += chunk;
+        remaining -= chunk;
+    }
+    return true;
+}
+
+// Списание указанной суммы физических наличных USD из Слоя 1 и Слоя 2 персонажа
+stock bool:Character_RemovePhysicalCashUsd(playerid, amount_usd)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || amount_usd <= 0 || !Character_IsLoaded(playerid))
+    {
+        return false;
+    }
+    if (Character_GetPhysicalCashUsd(playerid) < amount_usd)
+    {
+        return false;
+    }
+
+    new remaining = amount_usd;
+    new storageSlots[2];
+    storageSlots[0] = Character_GetLayer1Slot(playerid);
+    storageSlots[1] = Character_GetLayer2Slot(playerid);
+
+    for (new stIdx = 0; stIdx < 2 && remaining > 0; stIdx++)
+    {
+        new const storageSlot = storageSlots[stIdx];
+        if (!Storage_IsValidSlot(storageSlot))
+        {
+            continue;
+        }
+
+        new itemSlot = Storage_GetFirstItemSlot(storageSlot);
+        while (itemSlot != INVALID_STORAGE_ITEM_SLOT && remaining > 0)
+        {
+            new const nextItemSlot = Storage_GetNextItemSlot(itemSlot);
+            if (Storage_GetItemDefId(itemSlot) == ITEM_ID_CASH_BUNDLE)
+            {
+                new const stackAmount = Storage_GetItemAmount(itemSlot);
+                new const takeAmount = (stackAmount > remaining) ? remaining : stackAmount;
+                if (Storage_RemoveItem(storageSlot, itemSlot, takeAmount))
+                {
+                    remaining -= takeAmount;
+                }
+            }
+            itemSlot = nextItemSlot;
+        }
+    }
+
+    return (remaining == 0);
+}
+
+stock Character_GetOrgId(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    return sCharacters[playerid][E_CHAR_ORG_ID];
+}
+
+stock Character_GetOrgRankId(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    return sCharacters[playerid][E_CHAR_ORG_RANK_ID];
 }
 
 stock Character_GetBankBalanceUsd(playerid)

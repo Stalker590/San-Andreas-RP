@@ -90,6 +90,8 @@ enum E_SERVER_BOOT_STATE
 
 static stock sServerBootState[E_SERVER_BOOT_STATE];
 static stock Iterator:sStartupProbeIter<8>;
+static stock sMinuteSystemCounter = 0;
+static stock sLastMinuteSystemTick = 0;
 
 stock bool:Main_IsServerShuttingDown()
 {
@@ -325,6 +327,8 @@ public OnGameModeInit()
 {
     sServerBootState[E_BOOT_IS_SHUTTING_DOWN] = false;
     sServerBootState[E_BOOT_UPTIME_SECONDS] = 0;
+    sMinuteSystemCounter = 0;
+    sLastMinuteSystemTick = 0;
 
     new const configuredSlots = GetMaxPlayers();
 
@@ -381,6 +385,28 @@ timer OnStartupYsiTimerPing[500]()
         SERVER_LOG_PREFIX);
 }
 
+// Глобальный минутный обработчик: котировки портов и контракты логистики.
+// Вызывается из Tick_Minute, а также из счетчика Tick_Second как страховка,
+// если платформа не доставляет таймер с интервалом 60000 мс.
+static stock Internal_RunMinuteSystems()
+{
+    new const nowTick = GetTickCount();
+    if (sLastMinuteSystemTick != 0 && (nowTick - sLastMinuteSystemTick) < 55000)
+    {
+        return 0;
+    }
+    sLastMinuteSystemTick = nowTick;
+
+    #if defined _mod_ports_included
+        Ports_TickMinute();
+    #endif
+
+    #if defined _mod_logistics_included
+        Logistics_TickMinute();
+    #endif
+    return 1;
+}
+
 // Глобальный быстрый тик (250 мс): античит, контроль оружия и заклинивания
 task Tick_Fast[250]()
 {
@@ -398,6 +424,13 @@ task Tick_Second[1000]()
         return;
     }
     sServerBootState[E_BOOT_UPTIME_SECONDS]++;
+
+    sMinuteSystemCounter++;
+    if (sMinuteSystemCounter >= 60)
+    {
+        sMinuteSystemCounter = 0;
+        Internal_RunMinuteSystems();
+    }
 }
 
 // Глобальный минутный тик (60000 мс): голод/жажда, котировки портов, пакетный сброс is_dirty
@@ -407,6 +440,7 @@ task Tick_Minute[60000]()
     {
         return;
     }
+    Internal_RunMinuteSystems();
 }
 
 CMD:serverinfo(playerid, params[])
