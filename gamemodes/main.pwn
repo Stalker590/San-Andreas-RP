@@ -41,6 +41,7 @@
 // C++ плагины и компоненты (6 обязательных компонентов по TECH_CONTEXT.MD 1.1)
 #include <a_mysql>
 #include <streamer>
+// Pawn.CMD: enable OnPlayerCommandReceived callback for anti-cheat flood filtering.
 #include <Pawn.CMD>
 #include <Pawn.RakNet>
 #include <Pawn.Regex>
@@ -57,7 +58,7 @@
 // =============================================================================
 
 #define SERVER_GAMEMODE_TEXT                    "SAN ANDREAS RP | Русский Мир"
-#define SERVER_VERSION_STRING                   "1.0.0-phase0"
+#define SERVER_VERSION_STRING                   "1.0.0-phase9"
 #define SERVER_LOG_PREFIX                       "[SA:RP]"
 
 #define MYSQL_PLUGIN_RELEASE_TAG                "R41-4"
@@ -114,7 +115,6 @@ stock Main_GetUptimeSeconds()
 #tryinclude "modules/core/mod_utils.pwn"
 #tryinclude "modules/core/mod_database.pwn"
 #tryinclude "modules/core/mod_audit.pwn"
-#tryinclude "modules/core/mod_anticheat.pwn"
 
 // Слой 2: Базовые сущности и хранилища (entities/)
 #tryinclude "modules/entities/mod_items.pwn"
@@ -144,6 +144,9 @@ stock Main_GetUptimeSeconds()
 #tryinclude "modules/ui/mod_hud.pwn"
 #tryinclude "modules/ui/mod_dialogs.pwn"
 #tryinclude "modules/ui/mod_commands.pwn"
+
+// Phase 9: network anti-cheat depends on every previous phase, so load it last.
+#tryinclude "modules/core/mod_anticheat.pwn"
 
 #include <YSI_Coding\y_hooks>
 

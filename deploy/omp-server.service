@@ -1,0 +1,37 @@
+[Unit]
+Description=SAN ANDREAS RP — сервер open.mp
+Documentation=https://open.mp
+After=network-online.target mariadb.service mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=@APP_USER@
+Group=@APP_USER@
+WorkingDirectory=@APP_DIR@
+Environment=LD_LIBRARY_PATH=@APP_DIR@/components:@APP_DIR@
+ExecStart=@APP_DIR@/omp-server
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=5
+TimeoutStopSec=45
+KillSignal=SIGINT
+LimitNOFILE=65535
+LimitCORE=0
+UMask=0027
+
+# Потоки вывода и ошибок направляются в отдельные файлы, которые
+# обрабатываются правилом logrotate из deploy/logrotate-sarp.
+StandardOutput=append:@APP_DIR@/logs/server-stdout.log
+StandardError=append:@APP_DIR@/logs/server-stderr.log
+
+# Минимальная песочница: сервер не должен получать новые привилегии
+# и не имеет доступа к домашним каталогам пользователей.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=@APP_DIR@/logs @APP_DIR@/scriptfiles @APP_DIR@/gamemodes @APP_DIR@/models @APP_DIR@
+
+[Install]
+WantedBy=multi-user.target

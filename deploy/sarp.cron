@@ -1,0 +1,12 @@
+# =============================================================================
+#  SAN ANDREAS RP — задачи cron для продакшн-сервера open.mp
+#  Устанавливается в /etc/cron.d/sarp скриптом deploy/install_devops.sh.
+# =============================================================================
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Полный дамп базы каждые 6 часов с хранением архивов за 14 суток.
+0 */6 * * * @APP_USER@ @APP_DIR@/deploy/backup_mysql.sh >> @APP_DIR@/logs/backup.log 2>&1
+
+# Ежедневная ротация таблицы audit_logs (записи старше 90 суток).
+15 4 * * * @APP_USER@ @APP_DIR@/deploy/prune_audit_logs.sh >> @APP_DIR@/logs/audit-retention.log 2>&1

@@ -12,3 +12,10 @@ logs/
 .env.*
 !.env.example
 scriptfiles/mysql.ini
+
+# Резервные копии БД
+scriptfiles/backups/
+
+# Python-кеш тестовых скриптов
+__pycache__/
+*.pyc

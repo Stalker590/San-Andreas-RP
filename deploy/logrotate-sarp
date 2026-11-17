@@ -1,0 +1,17 @@
+# =============================================================================
+#  SAN ANDREAS RP — ротация текстовых логов open.mp
+#  Устанавливается в /etc/logrotate.d/sarp скриптом deploy/install_devops.sh.
+# =============================================================================
+@APP_DIR@/log.txt
+@APP_DIR@/logs/*.log
+@APP_DIR@/scriptfiles/audit_fallback.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+    create 0640 @APP_USER@ @APP_USER@
+    su @APP_USER@ @APP_USER@
+}
