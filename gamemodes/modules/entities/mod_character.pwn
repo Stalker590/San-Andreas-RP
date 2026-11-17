@@ -1701,6 +1701,213 @@ stock Character_GetBankDebtUsd(playerid)
     return sCharacters[playerid][E_CHAR_BANK_DEBT_USD];
 }
 
+// Проверка наличия действующего банковского счета (IBAN открыт и не пуст)
+stock bool:Character_HasBankAccount(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return false;
+    }
+    return (sCharacters[playerid][E_CHAR_BANK_IBAN][0] != EOS);
+}
+
+// Копирование IBAN персонажа в буфер вызывающего модуля
+stock Character_GetBankIban(playerid, output[], len = sizeof(output))
+{
+    if (output[0] != EOS)
+    {
+        output[0] = EOS;
+    }
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    format(output, len, "%s", sCharacters[playerid][E_CHAR_BANK_IBAN]);
+    return 1;
+}
+
+// Идентификатор записи банковского счета в таблице bank_accounts
+stock Character_GetBankAccountDbId(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    return sCharacters[playerid][E_CHAR_BANK_ACC_DB_ID];
+}
+
+// Состояние заморозки банковского счета по решению суда или ФБР
+stock bool:Character_IsBankFrozen(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return false;
+    }
+    return sCharacters[playerid][E_CHAR_BANK_FROZEN];
+}
+
+// Регистрация нового банковского счета в оперативной памяти персонажа
+stock Character_SetBankAccount(playerid, const iban[], balance, bool:frozen, account_db_id)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+
+    format(sCharacters[playerid][E_CHAR_BANK_IBAN], IBAN_STRING_LENGTH, "%s", iban);
+    sCharacters[playerid][E_CHAR_BANK_BALANCE_USD] = balance;
+    sCharacters[playerid][E_CHAR_BANK_FROZEN] = frozen;
+    sCharacters[playerid][E_CHAR_BANK_ACC_DB_ID] = account_db_id;
+    return 1;
+}
+
+// Обновление безналичного баланса в RAM (запись в bank_accounts выполняет mod_banking)
+stock Character_SetBankBalanceUsd(playerid, amount)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    if (amount < 0)
+    {
+        amount = 0;
+    }
+    sCharacters[playerid][E_CHAR_BANK_BALANCE_USD] = amount;
+    return 1;
+}
+
+// Изменение флага заморозки счета в RAM (синхронизация с bank_accounts в mod_banking)
+stock Character_SetBankFrozen(playerid, bool:frozen)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    sCharacters[playerid][E_CHAR_BANK_FROZEN] = frozen;
+    return 1;
+}
+
+// Назначение или снятие членства в организации (немедленная запись в characters)
+stock Character_SetOrgMembership(playerid, org_id, rank_id)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+
+    if (org_id < 0) org_id = 0;
+    if (rank_id < 0) rank_id = 0;
+    if (org_id == 0)
+    {
+        rank_id = 0;
+    }
+
+    sCharacters[playerid][E_CHAR_ORG_ID] = org_id;
+    sCharacters[playerid][E_CHAR_ORG_RANK_ID] = rank_id;
+
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        new query[192];
+        if (org_id > 0 && rank_id > 0)
+        {
+            mysql_format(gMySQL, query, sizeof(query),
+                "UPDATE `characters` SET `org_id` = %d, `org_rank_id` = %d WHERE `id` = %d;",
+                org_id, rank_id, sCharacters[playerid][E_CHAR_DB_ID]);
+        }
+        else
+        {
+            mysql_format(gMySQL, query, sizeof(query),
+                "UPDATE `characters` SET `org_id` = NULL, `org_rank_id` = NULL WHERE `id` = %d;",
+                sCharacters[playerid][E_CHAR_DB_ID]);
+        }
+        // pquery сохраняет порядок после INSERT organizations/organization_ranks
+        mysql_pquery(gMySQL, query);
+    }
+    return 1;
+}
+
+// Остаток срока заключения в секундах активного онлайна
+stock Character_GetJailSecondsLeft(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    return sCharacters[playerid][E_CHAR_JAIL_SECONDS_LEFT];
+}
+
+// Текущий тип исправительного учреждения
+stock E_JAIL_TYPE:Character_GetJailType(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return JAIL_TYPE_NONE;
+    }
+    return sCharacters[playerid][E_CHAR_JAIL_KIND];
+}
+
+// Установка срока и учреждения заключения с немедленной синхронизацией в БД
+stock Character_SetJailState(playerid, seconds, E_JAIL_TYPE:jail_type, bool:persist = true)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    if (seconds < 0)
+    {
+        seconds = 0;
+    }
+    if (seconds == 0)
+    {
+        jail_type = JAIL_TYPE_NONE;
+    }
+
+    sCharacters[playerid][E_CHAR_JAIL_SECONDS_LEFT] = seconds;
+    sCharacters[playerid][E_CHAR_JAIL_KIND] = jail_type;
+
+    if (persist && DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        new jailStr[24];
+        new query[192];
+        Internal_JailTypeToString(jail_type, jailStr, sizeof(jailStr));
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `characters` SET `jail_seconds_left` = %d, `jail_type` = '%e' WHERE `id` = %d;",
+            seconds, jailStr, sCharacters[playerid][E_CHAR_DB_ID]);
+        mysql_tquery(gMySQL, query);
+    }
+    return 1;
+}
+
+// Счетчик активного (не AFK) времени для честного Warrant Decay
+stock Character_GetActivePlaySeconds(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    return sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS];
+}
+
+stock Character_AddActivePlaySeconds(playerid, delta)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid) || delta <= 0)
+    {
+        return 0;
+    }
+    sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS] += delta;
+    return sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS];
+}
+
+stock Character_ResetActivePlaySeconds(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid))
+    {
+        return 0;
+    }
+    sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS] = 0;
+    return 1;
+}
+
 stock Character_GetWantedLevel(playerid)
 {
     if (playerid < 0 || playerid >= MAX_PLAYERS)
@@ -2286,23 +2493,6 @@ task Character_SecondProgressionTask[1000]()
             Character_MarkDirty(playerid);
         }
 
-        // 2. Естественное снижение уровня розыска (Warrant Decay: 3600 секунд активной игры = -1 пункт)
-        if (sCharacters[playerid][E_CHAR_WANTED_LEVEL] > 0 &&
-            sCharacters[playerid][E_CHAR_JAIL_SECONDS_LEFT] <= 0)
-        {
-            sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS]++;
-            if (sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS] >= WARRANT_DECAY_ACTIVE_SECONDS)
-            {
-                sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS] = 0;
-                Character_SetWantedLevel(playerid, sCharacters[playerid][E_CHAR_WANTED_LEVEL] - 1);
-
-                new decayMsg[144];
-                format(decayMsg, sizeof(decayMsg),
-                    "Оперативное внимание полиции ослабло за давностью времени. Текущий уровень розыска: %d / 100.",
-                    sCharacters[playerid][E_CHAR_WANTED_LEVEL]);
-                SendClientMessage(playerid, COLOR_UI_INFO, decayMsg);
-            }
-        }
     }
 }
 

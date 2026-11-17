@@ -461,6 +461,71 @@ stock Storage_SetMaxLimits(slot_id, max_weight_g, max_volume_ml)
     return 1;
 }
 
+// Сложность замка хранилища (0..5), используется при взломе сейфов
+stock Storage_GetLockLevel(slot_id)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return 0;
+    }
+    return sStorages[slot_id][E_STORAGE_LOCK_LEVEL];
+}
+
+// Текущее состояние замка: true — хранилище заперто
+stock bool:Storage_GetIsLocked(slot_id)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return false;
+    }
+    return sStorages[slot_id][E_STORAGE_IS_LOCKED];
+}
+
+// Открытие или закрытие замка хранилища с немедленной записью в БД
+stock Storage_SetLocked(slot_id, bool:locked)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return 0;
+    }
+
+    sStorages[slot_id][E_STORAGE_IS_LOCKED] = locked;
+    sStorages[slot_id][E_STORAGE_IS_DIRTY] = true;
+
+    if (DB_IsConnected() && sStorages[slot_id][E_STORAGE_DB_ID] > 0)
+    {
+        new query[128];
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `storages` SET `is_locked` = %d WHERE `id` = %d;",
+            locked ? 1 : 0,
+            sStorages[slot_id][E_STORAGE_DB_ID]);
+        mysql_tquery(gMySQL, query);
+    }
+    return 1;
+}
+
+// Мировые координаты хранилища (для поиска ближайшей казны и проверки дистанции)
+stock bool:Storage_GetWorldPosition(slot_id, &Float:x, &Float:y, &Float:z, &interior, &virtual_world)
+{
+    x = 0.0;
+    y = 0.0;
+    z = 0.0;
+    interior = 0;
+    virtual_world = 0;
+
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return false;
+    }
+
+    x = sStorages[slot_id][E_STORAGE_POS_X];
+    y = sStorages[slot_id][E_STORAGE_POS_Y];
+    z = sStorages[slot_id][E_STORAGE_POS_Z];
+    interior = sStorages[slot_id][E_STORAGE_INTERIOR];
+    virtual_world = sStorages[slot_id][E_STORAGE_VW];
+    return true;
+}
+
 stock Storage_GetFirstItemSlot(slot_id)
 {
     if (!Storage_IsValidSlot(slot_id))
