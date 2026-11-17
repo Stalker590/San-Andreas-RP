@@ -1362,6 +1362,97 @@ static stock Internal_ConfiscateProperty(slot)
     return 1;
 }
 
+// =============================================================================
+//  ¿ƒÃ»Õ»—“–¿“»¬ÕŒ≈ ”œ–¿¬À≈Õ»≈ Õ≈ƒ¬»∆»ÃŒ—“‹ﬁ (‘‡Á‡ 10)
+// =============================================================================
+
+stock Properties_GetOwnerCharId(property_db_id)
+{
+    new const slot = Properties_FindByDbId(property_db_id);
+    if (slot < 0)
+    {
+        return 0;
+    }
+    return sProperties[slot][E_PROP_OWNER_CHAR_ID];
+}
+
+stock Properties_GetTypeNameRu(property_db_id, output[], len = sizeof(output))
+{
+    output[0] = EOS;
+    new const slot = Properties_FindByDbId(property_db_id);
+    if (slot < 0)
+    {
+        return 0;
+    }
+    return Properties_GetTypeTitleRu(sProperties[slot][E_PROP_TYPE], output, len);
+}
+
+stock bool:Properties_AdminAssign(property_db_id, owner_char_id)
+{
+    new const slot = Properties_FindByDbId(property_db_id);
+    if (slot < 0 || owner_char_id <= 0)
+    {
+        return false;
+    }
+
+    sProperties[slot][E_PROP_OWNERSHIP] = PROPERTY_OWN_PRIVATE;
+    sProperties[slot][E_PROP_OWNER_CHAR_ID] = owner_char_id;
+    sProperties[slot][E_PROP_OWNER_ORG_ID] = 0;
+    sProperties[slot][E_PROP_UTILITY_DEBT_USD] = 0;
+    sProperties[slot][E_PROP_UTILITIES_ACTIVE] = true;
+    sProperties[slot][E_PROP_IS_RENTED] = false;
+    sProperties[slot][E_PROP_IS_LOCKED] = false;
+    Internal_UpdatePropertyDb(slot);
+    Internal_RefreshLabel(property_db_id);
+
+    foreach (new playerid : Player)
+    {
+        if (Character_IsLoaded(playerid) && Character_GetId(playerid) == owner_char_id)
+        {
+            Internal_IssuePropertyKey(playerid, property_db_id);
+            break;
+        }
+    }
+    return true;
+}
+
+stock bool:Properties_AdminClear(property_db_id)
+{
+    new const slot = Properties_FindByDbId(property_db_id);
+    if (slot < 0)
+    {
+        return false;
+    }
+
+    Vehicle_ReleaseGarage(property_db_id,
+        sProperties[slot][E_PROP_EXT_X],
+        sProperties[slot][E_PROP_EXT_Y],
+        sProperties[slot][E_PROP_EXT_Z],
+        sProperties[slot][E_PROP_EXT_A]);
+    sProperties[slot][E_PROP_OWNERSHIP] = (sProperties[slot][E_PROP_RENT_PER_DAY_USD] > 0)
+        ? PROPERTY_OWN_STATE_FOR_RENT
+        : PROPERTY_OWN_STATE_FOR_SALE;
+    sProperties[slot][E_PROP_OWNER_CHAR_ID] = 0;
+    sProperties[slot][E_PROP_OWNER_ORG_ID] = 0;
+    sProperties[slot][E_PROP_UTILITY_DEBT_USD] = 0;
+    sProperties[slot][E_PROP_UTILITIES_ACTIVE] = true;
+    sProperties[slot][E_PROP_IS_LOCKED] = true;
+    sProperties[slot][E_PROP_IS_RENTED] = false;
+    Internal_UpdatePropertyDb(slot);
+    Internal_RefreshLabel(property_db_id);
+    return true;
+}
+
+stock Properties_GetNearestDbId(playerid, Float:radius)
+{
+    new propertyDbId = 0;
+    if (Properties_GetNearestProperty(playerid, radius, propertyDbId))
+    {
+        return propertyDbId;
+    }
+    return 0;
+}
+
 static stock Internal_RunPropertyBilling()
 {
     foreach (new slot : PropertyIter)

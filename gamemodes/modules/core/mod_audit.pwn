@@ -33,6 +33,9 @@ enum E_AUDIT_RECORD
 {
     bool:E_AUDIT_USED,
     E_AUDIT_ACTOR_CHAR_ID,
+    E_AUDIT_ADMIN_ACCOUNT_ID,
+    E_AUDIT_TARGET_ACCOUNT_ID,
+    E_AUDIT_TARGET_CHAR_ID,
     E_AUDIT_ACTION_TYPE[AUDIT_ACTION_TYPE_LEN],
     E_AUDIT_SOURCE_ENTITY[AUDIT_ENTITY_NAME_LEN],
     E_AUDIT_TARGET_ENTITY[AUDIT_ENTITY_NAME_LEN],
@@ -61,9 +64,12 @@ static stock Internal_WriteAuditFallbackLine(slot)
 
     new line[512];
     format(line, sizeof(line),
-        "[ts=%d] actor=%d | action=%s | src=%s | dst=%s | item=%d | amount=%d | details=%s\r\n",
+        "[ts=%d] actor=%d | admin=%d | target_acc=%d | target_char=%d | action=%s | src=%s | dst=%s | item=%d | amount=%d | details=%s\r\n",
         sAuditBuffer[slot][E_AUDIT_TIMESTAMP],
         sAuditBuffer[slot][E_AUDIT_ACTOR_CHAR_ID],
+        sAuditBuffer[slot][E_AUDIT_ADMIN_ACCOUNT_ID],
+        sAuditBuffer[slot][E_AUDIT_TARGET_ACCOUNT_ID],
+        sAuditBuffer[slot][E_AUDIT_TARGET_CHAR_ID],
         sAuditBuffer[slot][E_AUDIT_ACTION_TYPE],
         sAuditBuffer[slot][E_AUDIT_SOURCE_ENTITY],
         sAuditBuffer[slot][E_AUDIT_TARGET_ENTITY],
@@ -101,11 +107,14 @@ static stock Internal_FlushAuditBufferToDb()
 
     sAuditBatchSqlBuffer[0] = '\0';
     strcat(sAuditBatchSqlBuffer,
-        "INSERT INTO `audit_logs` (`actor_char_id`, `action_type`, `source_entity`, `target_entity`, `item_def_id`, `amount`, `details`) VALUES ",
+        "INSERT INTO `audit_logs` (`actor_char_id`, `admin_account_id`, `target_account_id`, `target_char_id`, `action_type`, `source_entity`, `target_entity`, `item_def_id`, `amount`, `details`) VALUES ",
         sizeof(sAuditBatchSqlBuffer));
 
-    new rowSql[512];
+    new rowSql[640];
     new actorSql[24];
+    new adminSql[24];
+    new targetAccSql[24];
+    new targetCharSql[24];
     new itemSql[24];
     new appendedRows = 0;
 
@@ -125,6 +134,33 @@ static stock Internal_FlushAuditBufferToDb()
             format(actorSql, sizeof(actorSql), "NULL");
         }
 
+        if (sAuditBuffer[i][E_AUDIT_ADMIN_ACCOUNT_ID] > 0)
+        {
+            format(adminSql, sizeof(adminSql), "%d", sAuditBuffer[i][E_AUDIT_ADMIN_ACCOUNT_ID]);
+        }
+        else
+        {
+            format(adminSql, sizeof(adminSql), "NULL");
+        }
+
+        if (sAuditBuffer[i][E_AUDIT_TARGET_ACCOUNT_ID] > 0)
+        {
+            format(targetAccSql, sizeof(targetAccSql), "%d", sAuditBuffer[i][E_AUDIT_TARGET_ACCOUNT_ID]);
+        }
+        else
+        {
+            format(targetAccSql, sizeof(targetAccSql), "NULL");
+        }
+
+        if (sAuditBuffer[i][E_AUDIT_TARGET_CHAR_ID] > 0)
+        {
+            format(targetCharSql, sizeof(targetCharSql), "%d", sAuditBuffer[i][E_AUDIT_TARGET_CHAR_ID]);
+        }
+        else
+        {
+            format(targetCharSql, sizeof(targetCharSql), "NULL");
+        }
+
         if (sAuditBuffer[i][E_AUDIT_ITEM_DEF_ID] > 0)
         {
             format(itemSql, sizeof(itemSql), "%d", sAuditBuffer[i][E_AUDIT_ITEM_DEF_ID]);
@@ -135,9 +171,12 @@ static stock Internal_FlushAuditBufferToDb()
         }
 
         mysql_format(gMySQL, rowSql, sizeof(rowSql),
-            "%s(%s, '%e', '%e', '%e', %s, %d, '%e')",
+            "%s(%s, %s, %s, %s, '%e', '%e', '%e', %s, %d, '%e')",
             (appendedRows > 0) ? (", ") : (""),
             actorSql,
+            adminSql,
+            targetAccSql,
+            targetCharSql,
             sAuditBuffer[i][E_AUDIT_ACTION_TYPE],
             sAuditBuffer[i][E_AUDIT_SOURCE_ENTITY],
             sAuditBuffer[i][E_AUDIT_TARGET_ENTITY],
@@ -165,7 +204,10 @@ static stock Internal_FlushAuditBufferToDb()
 //  4. осакхвмши API лндскъ юсдхрю (Audit_*)
 // =============================================================================
 
-stock Audit_Log(
+stock Audit_LogAdmin(
+    admin_account_id,
+    target_account_id,
+    target_char_id,
     actor_char_id,
     const action_type[],
     const source[],
@@ -187,6 +229,9 @@ stock Audit_Log(
 
     sAuditBuffer[slot][E_AUDIT_USED] = true;
     sAuditBuffer[slot][E_AUDIT_ACTOR_CHAR_ID] = (actor_char_id > 0) ? actor_char_id : 0;
+    sAuditBuffer[slot][E_AUDIT_ADMIN_ACCOUNT_ID] = (admin_account_id > 0) ? admin_account_id : 0;
+    sAuditBuffer[slot][E_AUDIT_TARGET_ACCOUNT_ID] = (target_account_id > 0) ? target_account_id : 0;
+    sAuditBuffer[slot][E_AUDIT_TARGET_CHAR_ID] = (target_char_id > 0) ? target_char_id : 0;
     format(sAuditBuffer[slot][E_AUDIT_ACTION_TYPE], AUDIT_ACTION_TYPE_LEN, "%s", action_type);
     format(sAuditBuffer[slot][E_AUDIT_SOURCE_ENTITY], AUDIT_ENTITY_NAME_LEN, "%s", source);
     format(sAuditBuffer[slot][E_AUDIT_TARGET_ENTITY], AUDIT_ENTITY_NAME_LEN, "%s", target);
@@ -203,6 +248,18 @@ stock Audit_Log(
         Internal_FlushAuditBufferToDb();
     }
     return 1;
+}
+
+stock Audit_Log(
+    actor_char_id,
+    const action_type[],
+    const source[],
+    const target[],
+    item_def_id,
+    amount,
+    const details[])
+{
+    return Audit_LogAdmin(0, 0, 0, actor_char_id, action_type, source, target, item_def_id, amount, details);
 }
 
 stock Audit_FlushBufferSync()

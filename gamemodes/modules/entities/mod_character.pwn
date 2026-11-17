@@ -2048,6 +2048,165 @@ stock Character_MarkDirty(playerid)
     return 1;
 }
 
+// =============================================================================
+//  АДМИНИСТРАТИВНЫЕ СЕТТЕРЫ (Фаза 10): HP, броня, стамина, уровень, EXP, долг
+// =============================================================================
+
+stock Float:Character_GetHP(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return 100.0;
+    return sCharacters[playerid][E_CHAR_HP];
+}
+
+stock Character_SetHP(playerid, Float:value)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (value < 0.0) value = 0.0;
+    if (value > 100.0) value = 100.0;
+    sCharacters[playerid][E_CHAR_HP] = value;
+    if (IsPlayerConnected(playerid))
+    {
+        SetPlayerHealth(playerid, value);
+    }
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Float:Character_GetArmour(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return 0.0;
+    return sCharacters[playerid][E_CHAR_ARMOUR];
+}
+
+stock Character_SetArmour(playerid, Float:value)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (value < 0.0) value = 0.0;
+    if (value > 100.0) value = 100.0;
+    sCharacters[playerid][E_CHAR_ARMOUR] = value;
+    if (IsPlayerConnected(playerid))
+    {
+        SetPlayerArmour(playerid, value);
+    }
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Float:Character_GetStamina(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return 100.0;
+    return sCharacters[playerid][E_CHAR_STAMINA];
+}
+
+stock Character_SetStamina(playerid, Float:value)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (value < 0.0) value = 0.0;
+    if (value > 100.0) value = 100.0;
+    sCharacters[playerid][E_CHAR_STAMINA] = value;
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Character_GetExpSeconds(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return 0;
+    return sCharacters[playerid][E_CHAR_EXP_SECONDS];
+}
+
+stock Character_SetExpSeconds(playerid, seconds)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (seconds < 0) seconds = 0;
+    sCharacters[playerid][E_CHAR_EXP_SECONDS] = seconds;
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Character_SetLevel(playerid, level)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (level < 1) level = 1;
+    if (level > 1000) level = 1000;
+    sCharacters[playerid][E_CHAR_LEVEL] = level;
+    if (IsPlayerConnected(playerid))
+    {
+        SetPlayerScore(playerid, level);
+    }
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Character_SetBankDebtUsd(playerid, amount)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (amount < 0) amount = 0;
+    sCharacters[playerid][E_CHAR_BANK_DEBT_USD] = amount;
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock Character_SetCitizenship(playerid, E_CITIZENSHIP_TYPE:citizenship)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    if (citizenship != CITIZENSHIP_CITIZEN && citizenship != CITIZENSHIP_IMMIGRANT) return 0;
+    sCharacters[playerid][E_CHAR_CITIZENSHIP] = citizenship;
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        new query[192];
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `characters` SET `citizenship` = '%e' WHERE `id` = %d;",
+            (citizenship == CITIZENSHIP_CITIZEN) ? ("CITIZEN") : ("IMMIGRANT"),
+            sCharacters[playerid][E_CHAR_DB_ID]);
+        mysql_tquery(gMySQL, query);
+    }
+    return 1;
+}
+
+stock Character_SetSSN(playerid, const ssn[])
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    format(sCharacters[playerid][E_CHAR_SSN], SSN_STRING_LENGTH, "%s", ssn);
+    if (DB_IsConnected() && sCharacters[playerid][E_CHAR_DB_ID] > 0)
+    {
+        new query[192];
+        if (ssn[0] == EOS)
+        {
+            mysql_format(gMySQL, query, sizeof(query),
+                "UPDATE `characters` SET `ssn` = NULL WHERE `id` = %d;",
+                sCharacters[playerid][E_CHAR_DB_ID]);
+        }
+        else
+        {
+            mysql_format(gMySQL, query, sizeof(query),
+                "UPDATE `characters` SET `ssn` = '%e' WHERE `id` = %d;",
+                ssn, sCharacters[playerid][E_CHAR_DB_ID]);
+        }
+        mysql_tquery(gMySQL, query);
+    }
+    return 1;
+}
+
+stock Character_SetWeaponLicenseBanned(playerid, bool:banned)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    sCharacters[playerid][E_CHAR_WEAPON_LIC_BANNED] = banned;
+    Character_MarkDirty(playerid);
+    return 1;
+}
+
+stock bool:Character_IsWeaponLicenseBanned(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS) return false;
+    return sCharacters[playerid][E_CHAR_WEAPON_LIC_BANNED];
+}
+
+stock Character_AdminSetSkin(playerid, skinId)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !sCharacters[playerid][E_CHAR_LOADED]) return 0;
+    return Internal_ApplyPlayerSkin(playerid, skinId, true);
+}
+
 // Синхронизация оружия в руках игрока с предметами в Слое 1 (и бронежилета)
 stock Character_SyncLayer1Weapons(playerid)
 {

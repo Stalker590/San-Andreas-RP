@@ -1079,6 +1079,88 @@ stock Enterprise_GetReserve(enterprise_id)
     return sEnterprises[enterprise_id][E_ENT_RESERVE_USD];
 }
 
+// Административная выдача предприятия игроку (Фаза 10). Проверка RBAC — в mod_admin.
+stock bool:Enterprise_AdminAssignByDbId(db_enterprise_id, owner_char_id)
+{
+    new const slot = Enterprise_FindByDbId(db_enterprise_id);
+    if (slot == INVALID_ENTERPRISE_ID || owner_char_id <= 0)
+    {
+        return false;
+    }
+
+    sEnterprises[slot][E_ENT_OWNERSHIP] = ENTERPRISE_OWN_PRIVATE;
+    sEnterprises[slot][E_ENT_OWNER_CHAR_ID] = owner_char_id;
+    sEnterprises[slot][E_ENT_OWNER_ORG_ID] = 0;
+    sEnterprises[slot][E_ENT_AUCTION_PRICE_USD] = 0;
+
+    if (DB_IsConnected())
+    {
+        new query[256];
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `enterprises` SET `ownership` = 'PRIVATE', `owner_char_id` = %d, `owner_org_id` = NULL, `auction_price_usd` = NULL WHERE `id` = %d;",
+            owner_char_id, db_enterprise_id);
+        mysql_tquery(gMySQL, query);
+    }
+    return true;
+}
+
+stock bool:Enterprise_AdminClearByDbId(db_enterprise_id)
+{
+    new const slot = Enterprise_FindByDbId(db_enterprise_id);
+    if (slot == INVALID_ENTERPRISE_ID)
+    {
+        return false;
+    }
+
+    sEnterprises[slot][E_ENT_OWNERSHIP] = ENTERPRISE_OWN_UNOWNED;
+    sEnterprises[slot][E_ENT_OWNER_CHAR_ID] = 0;
+    sEnterprises[slot][E_ENT_OWNER_ORG_ID] = 0;
+    sEnterprises[slot][E_ENT_AUCTION_PRICE_USD] = 0;
+
+    if (DB_IsConnected())
+    {
+        new query[256];
+        mysql_format(gMySQL, query, sizeof(query),
+            "UPDATE `enterprises` SET `ownership` = 'UNOWNED', `owner_char_id` = NULL, `owner_org_id` = NULL, `auction_price_usd` = NULL WHERE `id` = %d;",
+            db_enterprise_id);
+        mysql_tquery(gMySQL, query);
+    }
+    return true;
+}
+
+stock Enterprise_GetNameByDbId(db_enterprise_id, output[], len = sizeof(output))
+{
+    output[0] = EOS;
+    new const slot = Enterprise_FindByDbId(db_enterprise_id);
+    if (slot == INVALID_ENTERPRISE_ID)
+    {
+        return 0;
+    }
+    return Enterprise_GetName(slot, output, len);
+}
+
+stock Enterprise_GetCount()
+{
+    new count = 0;
+    foreach (new slot : EnterpriseIter)
+    {
+        if (sEnterprises[slot][E_ENT_VALID]) count++;
+    }
+    return count;
+}
+
+stock Enterprise_GetDbIdByIndex(index)
+{
+    new current = 0;
+    foreach (new slot : EnterpriseIter)
+    {
+        if (!sEnterprises[slot][E_ENT_VALID]) continue;
+        if (current == index) return sEnterprises[slot][E_ENT_DB_ID];
+        current++;
+    }
+    return 0;
+}
+
 stock Enterprise_AddReserve(enterprise_id, amount)
 {
     if (!Enterprise_IsValid(enterprise_id) || amount <= 0)

@@ -58,7 +58,7 @@
 // =============================================================================
 
 #define SERVER_GAMEMODE_TEXT                    "SAN ANDREAS RP | Русский Мир"
-#define SERVER_VERSION_STRING                   "1.0.0-phase9"
+#define SERVER_VERSION_STRING                   "1.0.0-phase10"
 #define SERVER_LOG_PREFIX                       "[SA:RP]"
 
 #define MYSQL_PLUGIN_RELEASE_TAG                "R41-4"
@@ -139,11 +139,13 @@ stock Main_GetUptimeSeconds()
 #tryinclude "modules/systems/mod_organizations.pwn"
 #tryinclude "modules/systems/mod_justice.pwn"
 #tryinclude "modules/systems/mod_telecom.pwn"
+#tryinclude "modules/systems/mod_admin.pwn"
 
 // Слой 4: Пользовательский интерфейс и команды (ui/)
 #tryinclude "modules/ui/mod_hud.pwn"
 #tryinclude "modules/ui/mod_dialogs.pwn"
 #tryinclude "modules/ui/mod_commands.pwn"
+#tryinclude "modules/ui/mod_admin_panel.pwn"
 
 // Phase 9: network anti-cheat depends on every previous phase, so load it last.
 #tryinclude "modules/core/mod_anticheat.pwn"

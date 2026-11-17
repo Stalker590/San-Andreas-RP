@@ -365,6 +365,26 @@ stock Justice_ReleasePlayer(playerid)
     return 1;
 }
 
+// Административная отправка в КПЗ/деморган (Фаза 10). Проверка RBAC выполняется в mod_admin.
+stock Justice_AdminJail(playerid, seconds, const reason[])
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid) || seconds <= 0)
+    {
+        return 0;
+    }
+
+    Character_SetJailState(playerid, seconds, JAIL_TYPE_KPZ, true);
+    Survival_SetCuffed(playerid, false);
+    Internal_TeleportToJail(playerid);
+
+    new msg[192];
+    format(msg, sizeof(msg),
+        "Администратор отправил вас в КПЗ на %d минут. Причина: %s", (seconds / 60) + 1, reason);
+    SendClientMessage(playerid, COLOR_UI_ERROR, msg);
+    Audit_Log(Character_GetId(playerid), "ADMIN_JAIL", "JUSTICE", "CHARACTER", 0, seconds, reason);
+    return 1;
+}
+
 stock bool:Justice_ArrestPlayer(actorid, targetid)
 {
     if (actorid < 0 || actorid >= MAX_PLAYERS || targetid < 0 || targetid >= MAX_PLAYERS)

@@ -14,6 +14,8 @@
 
 #include <YSI_Coding\y_hooks>
 
+forward bool:AdminPanel_TryOpenSkillsEditor(playerid, const params[]);
+
 // Модуль персонажа подключается после модуля навыков: объявляем публичный API заранее.
 forward bool:Character_IsLoaded(playerid);
 
@@ -800,7 +802,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 CMD:skills(playerid, params[])
 {
-    #pragma unused params
+    if (params[0] != EOS && AdminPanel_TryOpenSkillsEditor(playerid, params))
+    {
+        return 1;
+    }
     if (!Account_IsLogged(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,

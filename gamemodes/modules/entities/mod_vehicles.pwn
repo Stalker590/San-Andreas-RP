@@ -400,6 +400,19 @@ stock Vehicle_GetDbId(slot)
     return sVehicles[slot][E_VEH_DB_ID];
 }
 
+stock Vehicle_FindSlotByDbId(db_id)
+{
+    if (db_id <= 0) return -1;
+    foreach (new slot : VehicleDataIter)
+    {
+        if (sVehicles[slot][E_VEH_VALID] && sVehicles[slot][E_VEH_DB_ID] == db_id)
+        {
+            return slot;
+        }
+    }
+    return -1;
+}
+
 stock Vehicle_GetModel(slot)
 {
     if (!Vehicle_IsValidSlot(slot))
@@ -1743,6 +1756,84 @@ stock bool:Vehicle_PlayerHasAnyKey(playerid)
         }
     }
     return false;
+}
+
+// =============================================================================
+//  ÀÄÌÈÍÈÑÒÐÀÒÈÂÍÛÅ ÎÏÅÐÀÖÈÈ Ñ ÒÐÀÍÑÏÎÐÒÎÌ (Ôàçà 10)
+// =============================================================================
+
+stock bool:Vehicle_AdminRepair(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    sVehicles[slot][E_VEH_ENGINE_HP] = 1000.0;
+    sVehicles[slot][E_VEH_BODY_HP] = 1000.0;
+    if (IsValidVehicle(sVehicles[slot][E_VEH_RUNTIME_ID]))
+    {
+        SetVehicleHealth(sVehicles[slot][E_VEH_RUNTIME_ID], 1000.0);
+        RepairVehicle(sVehicles[slot][E_VEH_RUNTIME_ID]);
+    }
+    Vehicle_SaveSlot(slot);
+    return true;
+}
+
+stock bool:Vehicle_AdminRefuel(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    sVehicles[slot][E_VEH_FUEL_ML] = sVehicles[slot][E_VEH_MAX_FUEL_ML];
+    Vehicle_SaveSlot(slot);
+    return true;
+}
+
+stock bool:Vehicle_AdminFlip(slot)
+{
+    if (!Vehicle_IsValidSlot(slot) || !IsValidVehicle(sVehicles[slot][E_VEH_RUNTIME_ID]))
+    {
+        return false;
+    }
+    new Float:x, Float:y, Float:z;
+    GetVehiclePos(sVehicles[slot][E_VEH_RUNTIME_ID], x, y, z);
+    SetVehiclePos(sVehicles[slot][E_VEH_RUNTIME_ID], x, y, z + 1.2);
+    SetVehicleVelocity(sVehicles[slot][E_VEH_RUNTIME_ID], 0.0, 0.0, 0.0);
+    return true;
+}
+
+stock bool:Vehicle_AdminDespawn(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    Vehicle_DespawnSlot(slot);
+    return true;
+}
+
+stock bool:Vehicle_AdminRespawn(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    return (Vehicle_SpawnSlot(slot) != 0);
+}
+
+stock bool:Vehicle_AdminIssueKey(playerid, slot)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Character_IsLoaded(playerid) || !Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    return Internal_IssueKey(playerid, slot, true);
+}
+
+stock Vehicle_AdminGetNearestSlot(playerid, Float:radius)
+{
+    return Vehicle_GetNearestSlot(playerid, radius);
 }
 
 // =============================================================================

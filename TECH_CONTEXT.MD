@@ -1,6 +1,6 @@
 # SAN ANDREAS RP — Technical Architecture & System Specification (`TECH_CONTEXT.MD`)
 
-**Версия документа:** 1.0.0  
+**Версия документа:** 1.1.0  
 **Платформа:** open.mp Server v1.6.7+ (Linux x86/x64 Native)  
 **Основной язык разработки:** Pawn (`qawno` compiler с оптимизацией `-O2 -d1`) + C++ Components SDK  
 **Язык пользовательского интерфейса:** Русский (`Windows-1251 / CP1251` для клиентских строк Pawn)  
@@ -65,11 +65,13 @@ Server/
         │   ├── mod_organizations.pwn
         │   ├── mod_justice.pwn
         │   ├── mod_forensics.pwn
-        │   └── mod_telecom.pwn
+        │   ├── mod_telecom.pwn
+        │   └── mod_admin.pwn       # RBAC-ядро, роли, наказания и аудит админ-действий
         └── ui/                 # Текстовый интерфейс (Text-First, 100% Русский)
             ├── mod_dialogs.pwn
             ├── mod_commands.pwn
-            └── mod_hud.pwn
+            ├── mod_hud.pwn
+            └── mod_admin_panel.pwn # /apanel, /ahelp, /sp-HUD и многоуровневые диалоги
 ```
 
 ### 1.3. Правила межмодульного взаимодействия (Архитектурные контракты)
@@ -98,7 +100,8 @@ CREATE TABLE `accounts` (
     `username` VARCHAR(32) NOT NULL,
     `password_hash` CHAR(60) NOT NULL,
     `email` VARCHAR(128) DEFAULT NULL,
-    `admin_level` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `admin_level` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'LEGACY: устаревший уровень, не используется для проверки доступа',
+    `admin_role_id` INT UNSIGNED DEFAULT NULL COMMENT 'Активная админ-роль; NULL = нет прав. Логический FK на admin_roles.id',
     `is_banned` TINYINT(1) NOT NULL DEFAULT 0,
     `ban_reason` VARCHAR(255) DEFAULT NULL,
     `ban_expires_at` DATETIME DEFAULT NULL,
@@ -108,7 +111,8 @@ CREATE TABLE `accounts` (
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `last_login_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_accounts_username` (`username`)
+    UNIQUE KEY `uk_accounts_username` (`username`),
+    KEY `idx_accounts_admin_role` (`admin_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `account_sessions` (
@@ -547,7 +551,10 @@ CREATE TABLE `forensic_evidence` (
 CREATE TABLE `audit_logs` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `actor_char_id` INT UNSIGNED DEFAULT NULL,
-    `action_type` VARCHAR(32) NOT NULL COMMENT 'ITEM_MOVE, CASH_TRANSFER, CRAFT, PORT_EXPORT, ADMIN_CMD',
+    `admin_account_id` INT UNSIGNED DEFAULT NULL COMMENT 'ID админ-аккаунта (для ADMIN_* действий)',
+    `target_account_id` INT UNSIGNED DEFAULT NULL COMMENT 'ID аккаунта-цели',
+    `target_char_id` INT UNSIGNED DEFAULT NULL COMMENT 'ID персонажа-цели',
+    `action_type` VARCHAR(32) NOT NULL COMMENT 'ITEM_MOVE, CASH_TRANSFER, CRAFT, PORT_EXPORT, ADMIN_CMD, ADMIN_BAN, ADMIN_GIVE_ITEM, ADMIN_ROLE_CHANGE',
     `source_entity` VARCHAR(48) NOT NULL,
     `target_entity` VARCHAR(48) NOT NULL,
     `item_def_id` SMALLINT UNSIGNED DEFAULT NULL,
@@ -556,9 +563,65 @@ CREATE TABLE `audit_logs` (
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     KEY `idx_audit_actor` (`actor_char_id`),
+    KEY `idx_audit_admin` (`admin_account_id`),
+    KEY `idx_audit_target` (`target_account_id`, `target_char_id`),
     KEY `idx_audit_time` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 ```
+
+### 2.7. Динамическая административная система, RBAC-ранги и наказания (Фаза 10)
+
+Базовый набор из 22 таблиц сохраняется; миграция `sql/003_admin_rbac.sql` (Фаза 10) дополняет `accounts` (колонка `admin_role_id`) и `audit_logs` (поля администратора и цели) обратно совместимыми колонками и добавляет административный контур: `admin_roles`, `admin_role_permissions` и `admin_punishments`. Поле `accounts.admin_level` остается только как legacy-совместимость и **не участвует** в проверках доступа.
+
+```sql
+-- Динамические административные роли. По умолчанию создается только Root (level = 100, is_root = 1)
+CREATE TABLE `admin_roles` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(48) NOT NULL COMMENT 'Русское название ранга для UI',
+    `level` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1..99 для кастомных ролей; 100 для Root. Только сортировка/отображение',
+    `is_root` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = Root-администратор, полный обход RBAC',
+    `is_system` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = системная роль, запрещено удалять',
+    `permissions_mask` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Битовая маска быстрых разрешений',
+    `chat_color_hex` CHAR(6) NOT NULL DEFAULT 'FFFFFF' COMMENT 'Цвет ника в админ-чате',
+    `created_by_account_id` INT UNSIGNED DEFAULT NULL,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_admin_roles_name` (`name`),
+    KEY `idx_admin_roles_root` (`is_root`),
+    CONSTRAINT `fk_admin_roles_creator` FOREIGN KEY (`created_by_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Строковые (гранулярные) разрешения роли: одна запись = один permission_key
+CREATE TABLE `admin_role_permissions` (
+    `role_id` INT UNSIGNED NOT NULL,
+    `permission_key` VARCHAR(48) NOT NULL COMMENT 'ADMIN_PANEL_ACCESS, MANAGE_ADMINS, PLAYER_BAN, INV_GIVE_ITEM, ...',
+    `is_allowed` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '1 = разрешено, 0 = явный запрет',
+    PRIMARY KEY (`role_id`, `permission_key`),
+    CONSTRAINT `fk_admin_perm_role` FOREIGN KEY (`role_id`) REFERENCES `admin_roles` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Журнал административных наказаний (мут, варн, деморган, временный/постоянный бан)
+CREATE TABLE `admin_punishments` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `target_account_id` INT UNSIGNED NOT NULL,
+    `target_char_id` INT UNSIGNED DEFAULT NULL,
+    `admin_account_id` INT UNSIGNED DEFAULT NULL,
+    `punishment_type` ENUM('MUTE', 'WARN', 'DEMORGAN', 'BAN_TEMP', 'BAN_PERM') NOT NULL,
+    `reason` VARCHAR(255) NOT NULL,
+    `issued_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `expires_at` DATETIME DEFAULT NULL COMMENT 'NULL для перманентных наказаний',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `revoked_by_account_id` INT UNSIGNED DEFAULT NULL,
+    `revoked_at` DATETIME DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_punish_target` (`target_account_id`, `is_active`),
+    KEY `idx_punish_expires` (`expires_at`),
+    CONSTRAINT `fk_punish_target` FOREIGN KEY (`target_account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_punish_admin` FOREIGN KEY (`admin_account_id`) REFERENCES `accounts` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+> **Важно:** `accounts.admin_role_id` ссылается на `admin_roles.id` логически (без `FOREIGN KEY`), чтобы избежать циклической зависимости при создании таблиц. Целостность обеспечивается серверным API `Admin_AssignRole` и проверкой существования роли перед `UPDATE accounts SET admin_role_id = ...`.
 
 ---
 
@@ -660,6 +723,46 @@ CREATE TABLE `audit_logs` (
   * Неудачный `/lockpick` создает `LOCKPICK_SCRATCH` на двери/замке (TTL = 30 мин).
   * Игроки с навыком `FORENSICS >= 300` и предметом `Forensics Kit` (или ролью *Отставной Коп*) видят 3D-маркеры улик и могут собрать их в пакет для судебной экспертизы.
 
+### 3.7. Модули `mod_admin` и `mod_admin_panel` (динамический RBAC и админ-панель, Фаза 10)
+Административный контур разделен на два модуля: **`systems/mod_admin.pwn`** (серверное RBAC-ядро, хранение ролей, проверка прав, наказания и аудит) и **`ui/mod_admin_panel.pwn`** (многоуровневые диалоги `/apanel`, `/ahelp`, HUD-панель `/sp`). UI-модуль не имеет права самостоятельно изменять состояние мира — он только собирает параметры и вызывает публичный API `Admin_*`.
+
+* **Структуры данных в RAM:**
+  * `MAX_ADMIN_ROLES = 64`; `MAX_ADMIN_PERMISSIONS = 64`.
+  * `static stock sAdminRoles[MAX_ADMIN_ROLES][E_ADMIN_ROLE];`
+  * `static stock sAdminRolePerms[MAX_ADMIN_ROLES][MAX_ADMIN_PERMISSIONS];` (кэш «role_id → permission_key → bool»).
+  * `static stock sPlayerAdminRole[MAX_PLAYERS];` (индекс роли в пуле, `-1` = нет прав).
+  * `static stock sPlayerAdminPermCache[MAX_PLAYERS][MAX_ADMIN_PERMISSIONS];` (пересчитывается при входе, смене роли и `/apanel`).
+  * `static stock sPlayerSpectateTarget[MAX_PLAYERS];`, `sPlayerApanelPage[MAX_PLAYERS];`, `sPlayerAdminDialogMap[MAX_PLAYERS][MAX_APANEL_ITEMS];` — состояние UI и защита от подмены `listitem`.
+  * `permissions_mask` (`BIGINT UNSIGNED`) не помещается в 32-битную ячейку Pawn: читать его через `cache_get_value_name` в строку или двумя 32-битными половинами. Источником истины остаются строковые `admin_role_permissions`; маска служит только быстрым кэшем.
+
+* **Перечисление разрешений (`E_ADMIN_PERM`):** `ADMIN_PERM_PANEL_ACCESS`, `ADMIN_PERM_HELP_ACCESS`, `ADMIN_PERM_MANAGE_ADMINS`, `ADMIN_PERM_MANAGE_ROLES`, `ADMIN_PERM_VIEW_AUDIT`, `ADMIN_PERM_VIEW_ANTICHEAT`, `ADMIN_PERM_PLAYER_TELEPORT`, `ADMIN_PERM_PLAYER_GET_HERE`, `ADMIN_PERM_PLAYER_SPECTATE`, `ADMIN_PERM_PLAYER_FREEZE`, `ADMIN_PERM_PLAYER_SLAP`, `ADMIN_PERM_PLAYER_SET_STATS`, `ADMIN_PERM_PLAYER_SET_SKIN`, `ADMIN_PERM_PLAYER_KICK`, `ADMIN_PERM_PLAYER_BAN`, `ADMIN_PERM_PLAYER_UNBAN`, `ADMIN_PERM_PLAYER_MUTE`, `ADMIN_PERM_PLAYER_WARN`, `ADMIN_PERM_PLAYER_JAIL`, `ADMIN_PERM_PLAYER_SET_WANTED`, `ADMIN_PERM_ORG_SET_LEADER`, `ADMIN_PERM_ORG_SET_MEMBER`, `ADMIN_PERM_ORG_MANAGE_RANKS`, `ADMIN_PERM_CHAR_SET_LEVEL`, `ADMIN_PERM_CHAR_SET_EXP`, `ADMIN_PERM_CHAR_SET_SKILLS`, `ADMIN_PERM_CHAR_SET_LICENSES`, `ADMIN_PERM_CHAR_SET_STATUS`, `ADMIN_PERM_ECON_GIVE_CASH`, `ADMIN_PERM_ECON_SET_BANK`, `ADMIN_PERM_ECON_CLEAR_DEBT`, `ADMIN_PERM_ECON_ISSUE_DEBT`, `ADMIN_PERM_INV_VIEW`, `ADMIN_PERM_INV_GIVE_ITEM`, `ADMIN_PERM_INV_EDIT_ITEM`, `ADMIN_PERM_INV_CLEAR`, `ADMIN_PERM_PROP_GIVE`, `ADMIN_PERM_PROP_REMOVE`, `ADMIN_PERM_VEH_SPAWN`, `ADMIN_PERM_VEH_DELETE`, `ADMIN_PERM_VEH_KEYS`, `ADMIN_PERM_VEH_REFUEL`, `ADMIN_PERM_VEH_REPAIR`, `ADMIN_PERM_VEH_TELEPORT`, `ADMIN_PERM_WORLD_TELEPORT`, `ADMIN_PERM_WORLD_WEATHER`, `ADMIN_PERM_WORLD_TIME`, `ADMIN_PERM_WORLD_ANNOUNCE`, `ADMIN_PERM_SERVER_SAVE`, `ADMIN_PERM_SERVER_RESTART`.
+
+* **Публичный API RBAC:**
+  * `Admin_LoadRoles()` — блокирующая загрузка `admin_roles` и `admin_role_permissions` в RAM **только** в `OnGameModeInit`.
+  * `Admin_IsRoot(playerid)` — `true`, если у аккаунта `admin_roles.is_root = 1`.
+  * `Admin_HasPermission(playerid, E_ADMIN_PERM:perm)` — единственная точка проверки; сначала `Admin_IsRoot`, затем кэш роли.
+  * `Admin_GetRoleName(playerid, dest[], size)`, `Admin_GetRoleLevel(playerid)` — только для отображения и сортировки, не для доступа.
+  * `Admin_AssignRole(admin_playerid, target_account_id, role_id)`, `Admin_RemoveRole(admin_playerid, target_account_id)` — смены состава с проверкой `MANAGE_ADMINS`.
+  * `Admin_CreateRole(admin_playerid, name[], level)`, `Admin_DeleteRole(admin_playerid, role_id)`, `Admin_SetRolePermission(admin_playerid, role_id, permission_key[], bool:allowed)` — управление ролями с проверкой `MANAGE_ROLES`; Root-роль и `is_system = 1` удалить нельзя.
+  * `Admin_Punish(admin_playerid, target_account_id, E_PUNISHMENT:type, reason[], duration_sec)` — мут, варн, деморган, временный/постоянный бан; пишет `admin_punishments` и `audit_logs`.
+  * `Admin_Audit(admin_playerid, target_id, action_type[], details[])` — единая обертка над `Audit_Log`, заполняющая `admin_account_id`, `target_account_id`, `target_char_id`, тип и параметры действия.
+
+* **Пайплайн выполнения админ-команды (обязательный):**
+  1. Проверить `IsPlayerConnected` и активную сессию администратора; проверить, что администратор не в наручниках/не в тюрьме, если действие этого требует.
+  2. Вызвать `Admin_HasPermission(playerid, perm)`; при отказе — сообщение на русском и запись `ADMIN_DENIED` в `audit_logs` (без выполнения действия).
+  3. Провалидировать цель: существование `target_account_id`/`char_id`, диапазоны сумм, количеств, `item_def_id` (0..91+), координат и интервалов времени.
+  4. Выполнить действие через публичный API соответствующего модуля (`Storage_GiveItem`, `Char_ModifyWantedLevel`, `Org_SetRank`, `Vehicle_SpawnTemporary`, `Survival_SetHunger` и т.д.), не дублируя его внутреннюю логику.
+  5. Вызвать `Admin_Audit(...)` с точными параметрами (до/после) и отправить подтверждение администратору.
+  6. Для оффлайн-целей — выполнить асинхронный `UPDATE`/`INSERT` с проверкой `gPlayerSessionToken` и факта, что аккаунт не перешел другому игроку.
+
+* **Root-роль и первичная инициализация:** `sql/003_admin_rbac.sql` создает единственную запись `admin_roles (name = 'Root-администратор', level = 100, is_root = 1, is_system = 1, permissions_mask = 0xFFFFFFFFFFFFFFFF)`. Для Root `Admin_HasPermission` всегда возвращает `true`, поэтому отдельные строки в `admin_role_permissions` не требуются. Кастомные роли создаются только через `Admin_CreateRole` и по умолчанию не имеют ни одного права.
+
+* **Наказания и баны:** мут/варн/деморган хранятся в `admin_punishments`; временный и перманентный бан дополнительно выставляют `accounts.is_banned`, `ban_reason`, `ban_expires_at`. Оффлайн-бан по нику/IP/HWID выполняется асинхронно и обязательно логируется. Разбан снимает `is_banned = 0`, обнуляет `ban_expires_at` и помечает запись `admin_punishments` как `is_active = 0`.
+
+* **Слежка `/sp`:** сервер запоминает `sPlayerSpectateTarget[playerid]`, переключает камеру (`TogglePlayerSpectating` / `PlayerSpectatePlayer`) и раз в `Tick_Fast` обновляет HUD-панель: имя, ID, HP, броня, пинг, текущий транспорт, координаты, интерьер и виртуальный мир. Кнопки действий в HUD вызывают те же RBAC-проверенные команды, что и `/apanel`. Выход из слежки восстанавливает камеру и состояние игрока.
+
+* **Инварианты:** ни один админ-модуль не читает и не пишет `accounts.admin_level` для проверки доступа; UI-строки — только русский язык в `Windows-1251`; все привилегированные операции — только через `Admin_HasPermission` + `Admin_Audit`.
+
 ---
 
 ## 4. Критические игровые пайплайны (Потоки данных)
@@ -731,3 +834,10 @@ CREATE TABLE `audit_logs` (
 * **Dirty-Flag Pattern:** Каждая сущность в памяти (`Character`, `Vehicle`, `Enterprise`, `Storage`) имеет булев флаг `is_dirty`. Ежеминутный тик сохраняет в БД **только** те сущности, у которых `is_dirty == true`, распределяя запросы равномерно по кадрам, чтобы избежать фризов.
 * **Критические операции:** Перемещение предметов между хранилищами, покупка/продажа имущества, банковские переводы и изменение состава организации сохраняются в БД **мгновенно** в рамках SQL-транзакции.
 * **Резервное копирование на Linux:** Cron-скрипт каждые 6 часов выполняет `mysqldump --single-transaction --quick` с ротацией архивов за последние 14 суток.
+
+### 6.3. Административный RBAC, аудит и защита от эскалации привилегий (Фаза 10)
+* **Единая точка авторизации:** любая админ-команда, диалог или HUD-кнопка обязаны вызывать `Admin_HasPermission(playerid, perm)`. Проверки `admin_level >= X`, `IsPlayerAdmin` и прямые сравнения `admin_role_id` в бизнес-логике **запрещены**; допускается только `Admin_IsRoot(playerid)` как встроенный обход внутри самой функции проверки.
+* **Защита от эскалации:** назначать роли может только обладатель `MANAGE_ADMINS`; редактировать матрицу прав — только `MANAGE_ROLES`. Роль не может выдать другой роли право, которым не обладает сама (кроме Root). Запрещено удалять Root-роль, снимать последнего Root-администратора и менять `is_root`/`is_system` через игровой UI.
+* **Аудит:** каждое действие, изменяющее состояние (выдача/изъятие предметов и денег, бан, мут, варн, деморган, смена скина/статов/навыков/лицензий, выдача транспорта и ключей, изменение ролей), пишется в `audit_logs` через `Admin_Audit` с `admin_account_id`, `target_account_id`, `target_char_id`, `action_type`, `details` и результатом. Отказ в доступе также логируется как `ADMIN_DENIED`.
+* **Асинхронность и гонки:** оффлайн-операции выполняются через `mysql_tquery` с проверкой `gPlayerSessionToken` и повторной валидацией `target_account_id` перед `COMMIT`; для онлайн-целей запрещено доверять `playerid` без сверки `account_id`/`char_id`.
+* **Кодировка и UI:** все тексты админ-панели, `/ahelp`, HUD `/sp`, причин наказаний и объявлений — грамотный русский язык, исходники `.pwn` в `Windows-1251`, соединение БД с `cp1251`.
