@@ -221,7 +221,7 @@ static stock Internal_TeleportToJail(playerid)
 
     SetPlayerInterior(playerid, sJailInteriorIds[jailIndex]);
     SetPlayerVirtualWorld(playerid, 0);
-    SetPlayerPos(playerid, sJailPositions[jailIndex][0], sJailPositions[jailIndex][1], sJailPositions[jailIndex][2]);
+    Utils_SetPlayerPos(playerid, sJailPositions[jailIndex][0], sJailPositions[jailIndex][1], sJailPositions[jailIndex][2]);
     SetCameraBehindPlayer(playerid);
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
     return 1;
@@ -351,7 +351,7 @@ stock Justice_ReleasePlayer(playerid)
     new const releaseIndex = (jailIndex >= 0) ? jailIndex : 0;
     SetPlayerInterior(playerid, 0);
     SetPlayerVirtualWorld(playerid, 0);
-    SetPlayerPos(
+    Utils_SetPlayerPos(
         playerid,
         sReleasePositions[releaseIndex][0],
         sReleasePositions[releaseIndex][1],

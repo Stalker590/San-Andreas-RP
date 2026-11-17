@@ -327,6 +327,29 @@ static stock Internal_StorePosition(playerid, Float:x, Float:y, Float:z, mode)
     sAcPlayers[playerid][E_AC_HAS_LAST_POS] = true;
 }
 
+// Принудительно фиксирует целевые координаты серверного телепорта/спавна
+// и выдаёт окно иммунитета AC_TELEPORT. Режим сбрасывается в 0, чтобы
+// первый же пакет OnFoot/InCar стал новой опорной точкой.
+static stock Internal_CacheServerPosition(playerid, Float:x, Float:y, Float:z, grace_ms)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return 0;
+    }
+
+    new const nowTick = GetTickCount();
+    sAcPlayers[playerid][E_AC_LAST_X] = x;
+    sAcPlayers[playerid][E_AC_LAST_Y] = y;
+    sAcPlayers[playerid][E_AC_LAST_Z] = z;
+    sAcPlayers[playerid][E_AC_LAST_SYNC_TICK] = nowTick;
+    sAcPlayers[playerid][E_AC_SYNC_MODE] = 0;
+    sAcPlayers[playerid][E_AC_HAS_LAST_POS] = true;
+    sAcPlayers[playerid][E_AC_GRACE_UNTIL] = nowTick + grace_ms;
+    sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + grace_ms;
+    sAcPlayers[playerid][E_AC_AIRBREAK_SAMPLES] = 0;
+    return 1;
+}
+
 static stock Internal_SendKickNotice(playerid, const title[])
 {
     new message[224];
@@ -817,7 +840,29 @@ stock AC_MarkServerTeleport(playerid, grace_ms = AC_TELEPORT_GRACE_MS)
     {
         return 0;
     }
-    sAcPlayers[playerid][E_AC_GRACE_UNTIL] = GetTickCount() + grace_ms;
+
+    new Float:x = 0.0, Float:y = 0.0, Float:z = 0.0;
+    GetPlayerPos(playerid, x, y, z);
+    return Internal_CacheServerPosition(playerid, x, y, z, grace_ms);
+}
+
+// Публичный колбек для Utils_SetPlayerPos: вызывается ДО нативного
+// SetPlayerPos, поэтому кэш античита уже содержит целевые координаты.
+forward AC_OnServerTeleport(playerid, Float:x, Float:y, Float:z);
+public AC_OnServerTeleport(playerid, Float:x, Float:y, Float:z)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return 0;
+    }
+    if (!IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+
+    Internal_CacheServerPosition(playerid, x, y, z, AC_TELEPORT_GRACE_MS);
+    sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+    sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
     return 1;
 }
 
@@ -1224,9 +1269,11 @@ hook OnPlayerSpawn(playerid)
     {
         new const nowTick = GetTickCount();
 
-        sAcPlayers[playerid][E_AC_HAS_LAST_POS] = false;
-        sAcPlayers[playerid][E_AC_SYNC_MODE] = 0;
-        sAcPlayers[playerid][E_AC_GRACE_UNTIL] = nowTick + AC_TELEPORT_GRACE_MS;
+        new Float:spawnX = 0.0, Float:spawnY = 0.0, Float:spawnZ = 0.0;
+        GetPlayerPos(playerid, spawnX, spawnY, spawnZ);
+
+        // Точка спавна сразу становится опорной точкой кэша AC_TELEPORT.
+        Internal_CacheServerPosition(playerid, spawnX, spawnY, spawnZ, AC_TELEPORT_GRACE_MS);
         sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_SPAWN_SYNC_GRACE_MS;
         sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = false;
         sAcPlayers[playerid][E_AC_CACHED_HEALTH] = 0.0;
@@ -1599,13 +1646,15 @@ timer AC_SpawnStateSync[250](playerid, expectedToken)
     SetPlayerHealth(playerid, serverHealth);
     SetPlayerArmour(playerid, serverArmour);
 
+    new Float:posX = 0.0, Float:posY = 0.0, Float:posZ = 0.0;
+    GetPlayerPos(playerid, posX, posY, posZ);
+
     new const nowTick = GetTickCount();
     sAcPlayers[playerid][E_AC_CACHED_HEALTH] = serverHealth;
     sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = serverArmour;
     sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = true;
     sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_STATE_GRACE_MS;
-    sAcPlayers[playerid][E_AC_GRACE_UNTIL] = nowTick + AC_TELEPORT_GRACE_MS;
-    sAcPlayers[playerid][E_AC_HAS_LAST_POS] = false;
+    Internal_CacheServerPosition(playerid, posX, posY, posZ, AC_TELEPORT_GRACE_MS);
     sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
     sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
 }

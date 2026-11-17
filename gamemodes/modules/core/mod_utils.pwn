@@ -161,6 +161,20 @@ stock bool:Utils_IsPlayerNearPoint(playerid, Float:radius, Float:x, Float:y, Flo
     return (Utils_GetDistance3D(px, py, pz, x, y, z) <= radius);
 }
 
+// Серверная телепортация с обязательным уведомлением античита.
+// Координаты записываются в кэш AC_TELEPORT до вызова натива, поэтому
+// первый синхронизационный пакет после SetPlayerPos не считается читом.
+stock bool:Utils_SetPlayerPos(playerid, Float:x, Float:y, Float:z)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return false;
+    }
+
+    CallLocalFunction("AC_OnServerTeleport", "ifff", playerid, x, y, z);
+    return SetPlayerPos(playerid, x, y, z);
+}
+
 stock Float:Utils_GetDistanceBetweenPlayers(playerid, targetid)
 {
     if (!IsPlayerConnected(playerid) || !IsPlayerConnected(targetid))

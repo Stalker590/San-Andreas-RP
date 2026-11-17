@@ -1172,7 +1172,7 @@ timer Medical_HospitalRelocate[750](playerid, expectedToken)
         return;
     }
 
-    SetPlayerPos(playerid, HOSPITAL_LS_X, HOSPITAL_LS_Y, HOSPITAL_LS_Z);
+    Utils_SetPlayerPos(playerid, HOSPITAL_LS_X, HOSPITAL_LS_Y, HOSPITAL_LS_Z);
     SetPlayerFacingAngle(playerid, HOSPITAL_LS_A);
     SetPlayerInterior(playerid, 0);
     SetPlayerVirtualWorld(playerid, 0);

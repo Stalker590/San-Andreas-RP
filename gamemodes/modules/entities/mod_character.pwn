@@ -2433,7 +2433,7 @@ hook OnPlayerSpawn(playerid)
     SetPlayerSkin(playerid, sCharacters[playerid][E_CHAR_SKIN_ID]);
     SetPlayerInterior(playerid, sCharacters[playerid][E_CHAR_INTERIOR]);
     SetPlayerVirtualWorld(playerid, sCharacters[playerid][E_CHAR_VW]);
-    SetPlayerPos(
+    Utils_SetPlayerPos(
         playerid,
         sCharacters[playerid][E_CHAR_POS_X],
         sCharacters[playerid][E_CHAR_POS_Y],

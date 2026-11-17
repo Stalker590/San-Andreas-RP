@@ -1195,7 +1195,7 @@ static stock Internal_EnterProperty(playerid, property_db_id)
     }
 
     sPropertyInsideDbId[playerid] = property_db_id;
-    SetPlayerPos(playerid,
+    Utils_SetPlayerPos(playerid,
         sProperties[slot][E_PROP_INT_X],
         sProperties[slot][E_PROP_INT_Y],
         sProperties[slot][E_PROP_INT_Z]);
@@ -1225,7 +1225,7 @@ static stock Internal_ExitProperty(playerid)
         return 0;
     }
 
-    SetPlayerPos(playerid,
+    Utils_SetPlayerPos(playerid,
         sProperties[slot][E_PROP_EXT_X],
         sProperties[slot][E_PROP_EXT_Y],
         sProperties[slot][E_PROP_EXT_Z]);
