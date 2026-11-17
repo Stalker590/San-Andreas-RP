@@ -2274,6 +2274,50 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 }
 
 // =============================================================================
+//  9.1. ÃŒ—“€ ƒÀﬂ MOD_VEHICLES (¿«— » ÿ–Œ“€)
+// =============================================================================
+
+public bool:Vehicles_FindGasStation(playerid, &enterprise_slot, &warehouse_slot)
+{
+    enterprise_slot = INVALID_ENTERPRISE_ID;
+    warehouse_slot = INVALID_STORAGE_SLOT;
+
+    new const ent = Enterprise_FindNearest(playerid, 10.0);
+    if (ent == INVALID_ENTERPRISE_ID)
+    {
+        return false;
+    }
+    if (Enterprise_GetType(ent) != ENTERPRISE_GAS_STATION)
+    {
+        return false;
+    }
+
+    enterprise_slot = ent;
+    warehouse_slot = Enterprise_GetWarehouseSlot(ent);
+    return true;
+}
+
+public bool:Vehicles_FindChopShop(playerid, Float:radius, &enterprise_slot, &warehouse_slot)
+{
+    enterprise_slot = INVALID_ENTERPRISE_ID;
+    warehouse_slot = INVALID_STORAGE_SLOT;
+
+    new const ent = Enterprise_FindNearest(playerid, radius);
+    if (ent == INVALID_ENTERPRISE_ID)
+    {
+        return false;
+    }
+    if (Enterprise_GetType(ent) != ENTERPRISE_CHOP_SHOP)
+    {
+        return false;
+    }
+
+    enterprise_slot = ent;
+    warehouse_slot = Enterprise_GetWarehouseSlot(ent);
+    return true;
+}
+
+// =============================================================================
 // 10. —»—“≈ÃÕ€≈ ’” » (y_hooks)
 // =============================================================================
 

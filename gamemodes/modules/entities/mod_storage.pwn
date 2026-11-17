@@ -679,6 +679,62 @@ stock Storage_SetItemMetaInt2(item_slot, value)
     return 1;
 }
 
+stock Storage_SetItemMetaInt1(item_slot, value)
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+    sStorageItems[item_slot][E_SITEM_META_INT1] = value;
+    if (DB_IsConnected() && sStorageItems[item_slot][E_SITEM_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+            "UPDATE `storage_items` SET `meta_int1` = %d WHERE `id` = %d;",
+            value,
+            sStorageItems[item_slot][E_SITEM_DB_ID]);
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+    }
+    return 1;
+}
+
+stock Storage_SetItemMetaStr(item_slot, const value[])
+{
+    if (!Storage_IsValidItemSlot(item_slot))
+    {
+        return 0;
+    }
+    format(sStorageItems[item_slot][E_SITEM_META_STR], STORAGE_ITEM_META_STR_LEN, "%s", value);
+    if (DB_IsConnected() && sStorageItems[item_slot][E_SITEM_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+            "UPDATE `storage_items` SET `meta_str` = '%e' WHERE `id` = %d;",
+            value,
+            sStorageItems[item_slot][E_SITEM_DB_ID]);
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+    }
+    return 1;
+}
+
+// Смена владельца хранилища (например, при привязке багажника к runtime-ID автомобиля)
+stock Storage_SetOwnerId(slot_id, owner_id)
+{
+    if (!Storage_IsValidSlot(slot_id))
+    {
+        return 0;
+    }
+    sStorages[slot_id][E_STORAGE_OWNER_ID] = owner_id;
+    sStorages[slot_id][E_STORAGE_IS_DIRTY] = true;
+    if (DB_IsConnected() && sStorages[slot_id][E_STORAGE_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sStorageSqlTxBuffer, sizeof(sStorageSqlTxBuffer),
+            "UPDATE `storages` SET `owner_id` = %d WHERE `id` = %d;",
+            owner_id,
+            sStorages[slot_id][E_STORAGE_DB_ID]);
+        mysql_tquery(gMySQL, sStorageSqlTxBuffer);
+    }
+    return 1;
+}
+
 // Атомарное обновление боезапаса и износа ствола (одна SQL-запись на вызов)
 stock Storage_UpdateWeaponState(item_slot, ammo_count, Float:durability, bool:persist = false)
 {
@@ -1938,7 +1994,7 @@ static stock Internal_LoadPersistentStoragesOnInitSync()
 
     // Разрешенный синхронный запрос строго внутри OnGameModeInit (загрузка казн фракций и складов предприятий)
     new const Cache:storageCache = mysql_query(gMySQL,
-        "SELECT `id`, `storage_type`, `owner_id`, `max_weight_g`, `max_volume_ml`, `is_locked`, `lock_level`, IFNULL(`pos_x`, 0.0) AS `px`, IFNULL(`pos_y`, 0.0) AS `py`, IFNULL(`pos_z`, 0.0) AS `pz`, `interior`, `virtual_world`, IFNULL(UNIX_TIMESTAMP(`expires_at`), 0) AS `exp_ts` FROM `storages` WHERE `storage_type` IN ('ORG_VAULT', 'ENTERPRISE_WAREHOUSE', 'NESTED_BAG') ORDER BY `id` ASC;",
+        "SELECT `id`, `storage_type`, `owner_id`, `max_weight_g`, `max_volume_ml`, `is_locked`, `lock_level`, IFNULL(`pos_x`, 0.0) AS `px`, IFNULL(`pos_y`, 0.0) AS `py`, IFNULL(`pos_z`, 0.0) AS `pz`, `interior`, `virtual_world`, IFNULL(UNIX_TIMESTAMP(`expires_at`), 0) AS `exp_ts` FROM `storages` WHERE `storage_type` IN ('ORG_VAULT', 'ENTERPRISE_WAREHOUSE', 'NESTED_BAG', 'VEHICLE_GLOVEBOX', 'VEHICLE_TRUNK', 'PROPERTY_STASH') ORDER BY `id` ASC;",
         true);
 
     if (!cache_is_valid(storageCache))
