@@ -35,8 +35,12 @@
 #define AC_TELEPORT_INSTANT_WINDOW_MS           (1000)
 #define AC_TELEPORT_GRACE_MS                    (2500)
 
-// ВРЕМЕННО: проверка AC_TELEPORT отключена для тестирования спавна.
-// Остальные проверки (SpeedHack, AirBreak, оружие, HP/Armour) продолжают работать.
+// ВРЕМЕННО: античит полностью отключён для тестирования.
+// 0 = ни одна проверка не выполняется, очки подозрений не начисляются,
+// кики и баны не выдаются. Публичный API сохранён для совместимости.
+#define AC_RUNTIME_ENABLED                      (0)
+
+// Отдельный флаг проверки AC_TELEPORT (учитывается только при AC_RUNTIME_ENABLED = 1).
 #define AC_TELEPORT_CHECK_ENABLED               (0)
 
 #define AC_FOOT_MAX_HORIZONTAL_SPEED            (45.0)
@@ -145,6 +149,11 @@ static stock sAcTestsEverRan = 0;
 // =============================================================================
 //  3. Внутренние вспомогательные функции (static stock)
 // =============================================================================
+
+static stock bool:Internal_IsAntiCheatEnabled()
+{
+    return (AC_RUNTIME_ENABLED != 0);
+}
 
 static stock Internal_GetViolationCode(E_AC_VIOLATION:violation, output[], len = sizeof(output))
 {
@@ -278,6 +287,10 @@ static stock Internal_ResetPlayerState(playerid)
 
 static stock bool:Internal_CanCheckPlayer(playerid)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return false;
+    }
     if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return false;
@@ -365,6 +378,11 @@ static stock Internal_SendKickNotice(playerid, const title[])
 
 static stock Internal_KickPlayer(playerid, E_AC_VIOLATION:violation)
 {
+    #pragma unused playerid, violation
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     if (!IsPlayerConnected(playerid) || sAcPlayers[playerid][E_AC_PENDING_KICK] || sAcPlayers[playerid][E_AC_BANNED])
     {
         return 0;
@@ -383,6 +401,11 @@ static stock Internal_KickPlayer(playerid, E_AC_VIOLATION:violation)
 
 static stock Internal_BanPlayer(playerid, E_AC_VIOLATION:violation, const details[])
 {
+    #pragma unused playerid, violation, details
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     if (!IsPlayerConnected(playerid) || sAcPlayers[playerid][E_AC_BANNED])
     {
         return 0;
@@ -409,6 +432,11 @@ static stock Internal_BanPlayer(playerid, E_AC_VIOLATION:violation, const detail
 
 static stock Internal_ApplyViolation(playerid, E_AC_VIOLATION:violation, const details[])
 {
+    #pragma unused playerid, violation, details
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     if (violation <= AC_VIOL_NONE || violation >= AC_VIOL_MAX)
     {
         return 0;
@@ -480,6 +508,12 @@ static stock Internal_ApplyViolation(playerid, E_AC_VIOLATION:violation, const d
 
 static stock Internal_RegisterSyncMismatch(playerid, E_AC_VIOLATION:violation, const details[])
 {
+    #pragma unused playerid, violation, details
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     new const nowTick = GetTickCount();
 
     if ((nowTick - sAcPlayers[playerid][E_AC_LAST_SYNC_MISMATCH_TICK]) > AC_SYNC_MISMATCH_WINDOW_MS)
@@ -518,6 +552,11 @@ static stock Internal_RegisterSyncMismatch(playerid, E_AC_VIOLATION:violation, c
 
 static stock bool:Internal_CheckWeaponOwnership(playerid, weaponid)
 {
+    #pragma unused playerid, weaponid
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return true;
+    }
     if (!Weapons_IsTrackedFirearm(weaponid))
     {
         return true;
@@ -539,6 +578,12 @@ static stock bool:Internal_CheckWeaponOwnership(playerid, weaponid)
 
 static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
 {
+    #pragma unused playerid, clientHealth, clientArmour
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
+
     new Float:serverHealth = 0.0;
     new Float:serverArmour = 0.0;
 
@@ -629,6 +674,11 @@ static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
 
 static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z, mode)
 {
+    #pragma unused playerid, x, y, z, mode
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return true;
+    }
     if (!Internal_IsCoordValid(x, AC_WORLD_BOUND_MIN, AC_WORLD_BOUND_MAX) ||
         !Internal_IsCoordValid(y, AC_WORLD_BOUND_MIN, AC_WORLD_BOUND_MAX) ||
         !Internal_IsCoordValid(z, AC_WORLD_Z_MIN, AC_WORLD_Z_MAX))
@@ -782,6 +832,12 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
 
 static stock bool:Internal_CheckPacketFlood(playerid)
 {
+    #pragma unused playerid
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return true;
+    }
+
     new const nowTick = GetTickCount();
 
     if ((nowTick - sAcPlayers[playerid][E_AC_LAST_PACKET_WINDOW]) >= 1000)
@@ -804,6 +860,12 @@ static stock bool:Internal_CheckPacketFlood(playerid)
 
 static stock bool:Internal_CheckDialogFlood(playerid)
 {
+    #pragma unused playerid
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return true;
+    }
+
     new const nowTick = GetTickCount();
 
     if ((nowTick - sAcPlayers[playerid][E_AC_LAST_DIALOG_WINDOW]) >= 1000)
@@ -826,6 +888,12 @@ static stock bool:Internal_CheckDialogFlood(playerid)
 
 static stock bool:Internal_CheckCommandFlood(playerid)
 {
+    #pragma unused playerid
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return true;
+    }
+
     new const nowTick = GetTickCount();
 
     if ((nowTick - sAcPlayers[playerid][E_AC_LAST_COMMAND_WINDOW]) >= 1000)
@@ -852,6 +920,11 @@ static stock bool:Internal_CheckCommandFlood(playerid)
 
 stock AC_MarkServerTeleport(playerid, grace_ms = AC_TELEPORT_GRACE_MS)
 {
+    #pragma unused playerid, grace_ms
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
     if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return 0;
@@ -871,6 +944,11 @@ stock AC_MarkServerTeleport(playerid, grace_ms = AC_TELEPORT_GRACE_MS)
 forward AC_OnServerTeleport(playerid, Float:x, Float:y, Float:z);
 public AC_OnServerTeleport(playerid, Float:x, Float:y, Float:z)
 {
+    #pragma unused playerid, x, y, z
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
     if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return 0;
@@ -888,6 +966,10 @@ public AC_OnServerTeleport(playerid, Float:x, Float:y, Float:z)
 
 stock AC_GetViolationScore(playerid)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     if (playerid < 0 || playerid >= MAX_PLAYERS)
     {
         return 0;
@@ -897,26 +979,46 @@ stock AC_GetViolationScore(playerid)
 
 stock AC_GetTotalViolations()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     return sAcTotalViolations;
 }
 
 stock AC_GetTotalKicks()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     return sAcTotalKicks;
 }
 
 stock AC_GetTotalBans()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     return sAcTotalBans;
 }
 
 stock AC_GetPacketsChecked()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 0;
+    }
     return sAcPacketsChecked;
 }
 
 stock bool:AC_AreIntegrationTestsPassed()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return false;
+    }
     return (sAcTestsEverRan > 0 &&
         sAcTestRolesFailures == 0 &&
         sAcTestItemsFailures == 0 &&
@@ -1213,6 +1315,11 @@ static stock bool:Internal_RunIntegrationTests()
 forward AC_KickTimer(playerid, expectedToken);
 public AC_KickTimer(playerid, expectedToken)
 {
+    #pragma unused playerid, expectedToken
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
     if (!IsPlayerConnected(playerid))
     {
         return 0;
@@ -1228,6 +1335,10 @@ public AC_KickTimer(playerid, expectedToken)
 
 timer AC_IntegrationTests[1500]()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return;
+    }
     if (Main_IsServerShuttingDown())
     {
         return;
@@ -1257,19 +1368,19 @@ hook OnGameModeInit()
     sAcTotalBans = 0;
     sAcTestsEverRan = 0;
 
-    // Тесты запускаются после завершения всех OnGameModeInit, когда
-    // предприятия, порты и предметы уже загружены в RAM.
+    // Таймер запускается всегда, но при AC_RUNTIME_ENABLED = 0
+    // немедленно выходит и не выполняет проверок.
     defer AC_IntegrationTests();
 
+#if AC_RUNTIME_ENABLED
     printf("%s [Core/AntiCheat] Сетевой античит Pawn.RakNet активирован (пакеты %d/%d/%d/%d).",
         SERVER_LOG_PREFIX,
         AC_PACKET_VEHICLE_SYNC,
         AC_PACKET_AIM_SYNC,
         AC_PACKET_WEAPONS_UPDATE,
         AC_PACKET_PLAYER_SYNC);
-
-#if !AC_TELEPORT_CHECK_ENABLED
-    printf("%s [Core/AntiCheat] ВНИМАНИЕ: проверка AC_TELEPORT временно отключена для тестирования.",
+#else
+    printf("%s [Core/AntiCheat] Античит полностью отключён для тестирования: проверки, очки подозрений, кики и баны не работают.",
         SERVER_LOG_PREFIX);
 #endif
     return 1;
@@ -1290,6 +1401,11 @@ hook OnPlayerDisconnect(playerid, reason)
 
 hook OnPlayerSpawn(playerid)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (playerid >= 0 && playerid < MAX_PLAYERS)
     {
         new const nowTick = GetTickCount();
@@ -1317,6 +1433,11 @@ hook OnPlayerSpawn(playerid)
 
 hook OnPlayerUpdate(playerid)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
     {
         return 1;
@@ -1327,6 +1448,11 @@ hook OnPlayerUpdate(playerid)
 
 hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     #pragma unused hittype, hitid, fX, fY, fZ
 
     if (!Internal_CanCheckPlayer(playerid))
@@ -1347,6 +1473,11 @@ hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hiti
 
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     #pragma unused dialogid, response, listitem, inputtext
 
     if (playerid < 0 || playerid >= MAX_PLAYERS)
@@ -1363,6 +1494,11 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     #pragma unused cmd, params, flags
 
     if (playerid < 0 || playerid >= MAX_PLAYERS)
@@ -1383,6 +1519,11 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 
 IPacket:207(playerid, BitStream:bs)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (!Internal_CanCheckPlayer(playerid))
     {
         return 1;
@@ -1426,6 +1567,11 @@ IPacket:207(playerid, BitStream:bs)
 
 IPacket:200(playerid, BitStream:bs)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (!Internal_CanCheckPlayer(playerid))
     {
         return 1;
@@ -1470,6 +1616,11 @@ IPacket:200(playerid, BitStream:bs)
 
 IPacket:203(playerid, BitStream:bs)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (!Internal_CanCheckPlayer(playerid))
     {
         return 1;
@@ -1512,6 +1663,11 @@ IPacket:203(playerid, BitStream:bs)
 
 IPacket:204(playerid, BitStream:bs)
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return 1;
+    }
+
     if (!Internal_CanCheckPlayer(playerid))
     {
         return 1;
@@ -1578,6 +1734,13 @@ CMD:acstats(playerid, params[])
         return 1;
     }
 
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Античит]: Модуль полностью отключён для тестирования. Проверки, очки и кики не работают.");
+        return 1;
+    }
+
     new message[208];
     format(message, sizeof(message),
         "[Античит]: Проверено пакетов: %d | Нарушений: %d | Киков: %d | Банов: %d.",
@@ -1613,6 +1776,13 @@ CMD:actest(playerid, params[])
         return 1;
     }
 
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        SendClientMessage(playerid, COLOR_UI_WARNING,
+            "[Античит]: Модуль полностью отключён для тестирования. Запуск проверок недоступен.");
+        return 1;
+    }
+
     Internal_RunIntegrationTests();
 
     new message[208];
@@ -1640,6 +1810,11 @@ CMD:actest(playerid, params[])
 
 timer AC_SpawnStateSync[250](playerid, expectedToken)
 {
+    #pragma unused playerid, expectedToken
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return;
+    }
     if (!IsPlayerConnected(playerid))
     {
         return;
@@ -1686,6 +1861,10 @@ timer AC_SpawnStateSync[250](playerid, expectedToken)
 
 task Tick_AntiCheat[250]()
 {
+    if (!Internal_IsAntiCheatEnabled())
+    {
+        return;
+    }
     if (Main_IsServerShuttingDown())
     {
         return;
