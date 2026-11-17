@@ -26,7 +26,9 @@
 #define DB_CONFIG_FILE_NAME                     "mysql.ini"
 
 #define MAX_DIRTY_QUEUE_ENTRIES                 (1024)
-#define DIRTY_QUERY_MAX_LEN                     (512)
+// 2048 ячеек: строка UPDATE characters содержит 26 полей и при 512
+// обрывалась на `interior` (SQL ERROR #1064 в OnDatabaseDirtyQueryFlushed).
+#define DIRTY_QUERY_MAX_LEN                     (2048)
 #define DIRTY_FLUSH_BATCH_LIMIT                 (20)
 
 // =============================================================================

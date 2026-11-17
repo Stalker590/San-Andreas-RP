@@ -70,7 +70,8 @@ enum E_STORAGE_DATA
     STREAMER_TAG_OBJECT:E_STORAGE_OBJECT_ID,
     STREAMER_TAG_3D_TEXT_LABEL:E_STORAGE_LABEL_ID,
     STREAMER_TAG_AREA:E_STORAGE_AREA_ID,
-    bool:E_STORAGE_IS_DIRTY
+    bool:E_STORAGE_IS_DIRTY,
+    bool:E_STORAGE_RAM_ONLY
 };
 
 enum E_STORAGE_ITEM_DATA
@@ -138,6 +139,7 @@ static stock Internal_ResetStorageSlot(slot_id)
     sStorages[slot_id][E_STORAGE_LABEL_ID] = STREAMER_TAG_3D_TEXT_LABEL:INVALID_STREAMER_ID;
     sStorages[slot_id][E_STORAGE_AREA_ID] = STREAMER_TAG_AREA:INVALID_STREAMER_ID;
     sStorages[slot_id][E_STORAGE_IS_DIRTY] = false;
+    sStorages[slot_id][E_STORAGE_RAM_ONLY] = false;
 
     sStorageMutex[slot_id] = false;
     sStorageMutexOwner[slot_id] = INVALID_PLAYER_ID;
@@ -1011,7 +1013,8 @@ stock Storage_Create(
     interior = 0,
     virtual_world = 0,
     ttl_seconds = 0,
-    existing_db_id = 0)
+    existing_db_id = 0,
+    bool:ram_only = false)
 {
     new const slot_id = Iter_Free(StorageIter);
     if (slot_id == INVALID_ITERATOR_SLOT)
@@ -1025,7 +1028,15 @@ stock Storage_Create(
     Internal_ResetStorageSlot(slot_id);
 
     sStorages[slot_id][E_STORAGE_VALID] = true;
-    sStorages[slot_id][E_STORAGE_DB_ID] = (existing_db_id > 0) ? existing_db_id : (++sSyntheticStorageDbIdSeq);
+    sStorages[slot_id][E_STORAGE_RAM_ONLY] = ram_only;
+    if (ram_only)
+    {
+        sStorages[slot_id][E_STORAGE_DB_ID] = 0;
+    }
+    else
+    {
+        sStorages[slot_id][E_STORAGE_DB_ID] = (existing_db_id > 0) ? existing_db_id : (++sSyntheticStorageDbIdSeq);
+    }
     sStorages[slot_id][E_STORAGE_KIND] = type;
     sStorages[slot_id][E_STORAGE_OWNER_ID] = owner_id;
     sStorages[slot_id][E_STORAGE_MAX_WEIGHT_G] = max_weight_g;
@@ -1039,9 +1050,9 @@ stock Storage_Create(
     sStorages[slot_id][E_STORAGE_VW] = virtual_world;
     sStorages[slot_id][E_STORAGE_EXPIRES_AT] = (ttl_seconds > 0) ? (gettime() + ttl_seconds) : 0;
     // Новое хранилище не требует чтения из БД: его содержимое формируется синхронно.
-    sStorageItemsReady[slot_id] = (existing_db_id <= 0);
+    sStorageItemsReady[slot_id] = (ram_only || existing_db_id <= 0);
 
-    if (existing_db_id <= 0 && DB_IsConnected())
+    if (!ram_only && existing_db_id <= 0 && DB_IsConnected())
     {
         new typeStr[24];
         new expiresSql[64];
@@ -1201,7 +1212,8 @@ stock E_STORAGE_RESULT:Storage_AddItem(
                 false,
                 0,
                 0.0, 0.0, 0.0, 0, 0, 0,
-                existing_nested_storage_db_id
+                existing_nested_storage_db_id,
+                sStorages[storage_slot][E_STORAGE_RAM_ONLY]
             );
         }
 
@@ -1753,7 +1765,8 @@ stock Storage_CreateWorldDrop(
     interior,
     virtual_world,
     primary_item_def_id = 0,
-    ttl_seconds = TTL_WORLD_DROP_SECONDS)
+    ttl_seconds = TTL_WORLD_DROP_SECONDS,
+    bool:ram_only = false)
 {
     new const slot_id = Storage_Create(
         STORAGE_WORLD_DROP,
@@ -1765,7 +1778,9 @@ stock Storage_CreateWorldDrop(
         x, y, z,
         interior,
         virtual_world,
-        ttl_seconds
+        ttl_seconds,
+        0,
+        ram_only
     );
 
     if (slot_id == INVALID_STORAGE_SLOT)
@@ -2302,14 +2317,14 @@ static stock Internal_RunStorageSelfTests()
         999901,
         DEFAULT_PLAYER_LAYER1_WEIGHT_G,
         DEFAULT_PLAYER_LAYER1_VOLUME_ML,
-        false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 999901
+        false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, true
     );
     new const testTrunkSlot = Storage_Create(
         STORAGE_VEHICLE_TRUNK,
         999902,
         10000,
         10000,
-        false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 999902
+        false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, true
     );
 
     new const bool:firstLockOk = Storage_AcquireMutex(testPocketSlot, 1);
@@ -2337,7 +2352,7 @@ static stock Internal_RunStorageSelfTests()
     new const bool:overflowRejectedOk = (overflowRes == STORAGE_RES_WEIGHT_EXCEEDED);
 
     // Тест 3 (DoD 2.4): Создание и удаление полевого контейнера WORLD_DROP со streamer-объектом
-    new const dropSlot = Storage_CreateWorldDrop(1481.0, -1771.0, 18.8, 0, 0, 23, 60);
+    new const dropSlot = Storage_CreateWorldDrop(1481.0, -1771.0, 18.8, 0, 0, 23, 60, true);
     new const bool:worldDropOk = (
         dropSlot != INVALID_STORAGE_SLOT &&
         sStorages[dropSlot][E_STORAGE_OBJECT_ID] != STREAMER_TAG_OBJECT:INVALID_STREAMER_ID &&

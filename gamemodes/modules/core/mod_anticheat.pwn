@@ -49,6 +49,9 @@
 #define AC_AMMO_TOLERANCE                       (8)
 #define AC_SYNC_MISMATCH_STREAK                 (3)
 #define AC_SYNC_MISMATCH_WINDOW_MS              (2000)
+#define AC_STATE_GRACE_MS                       (2500)
+#define AC_SPAWN_SYNC_GRACE_MS                  (3500)
+#define AC_SERVER_VALUE_EPSILON                 (0.5)
 
 #define AC_SCORE_DECAY_INTERVAL_MS              (10000)
 #define AC_SCORE_KICK_THRESHOLD                 (55)
@@ -112,6 +115,10 @@ enum E_AC_PLAYER_STATE
     E_AC_WEAPON_STREAK,
     E_AC_AMMO_STREAK,
     E_AC_LAST_SYNC_MISMATCH_TICK,
+    bool:E_AC_SERVER_CACHE_VALID,
+    Float:E_AC_CACHED_HEALTH,
+    Float:E_AC_CACHED_ARMOUR,
+    E_AC_STATE_GRACE_UNTIL,
     E_AC_TOTAL_VIOLATIONS
 };
 
@@ -258,6 +265,10 @@ static stock Internal_ResetPlayerState(playerid)
     sAcPlayers[playerid][E_AC_WEAPON_STREAK] = 0;
     sAcPlayers[playerid][E_AC_AMMO_STREAK] = 0;
     sAcPlayers[playerid][E_AC_LAST_SYNC_MISMATCH_TICK] = 0;
+    sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = false;
+    sAcPlayers[playerid][E_AC_CACHED_HEALTH] = 0.0;
+    sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = 0.0;
+    sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = 0;
     sAcPlayers[playerid][E_AC_TOTAL_VIOLATIONS] = 0;
 }
 
@@ -275,11 +286,31 @@ static stock bool:Internal_CanCheckPlayer(playerid)
     {
         return false;
     }
+
+    // До завершения авторизации клиентские пакеты не анализируются:
+    // в этот период персонаж ещё не привязан к аккаунту.
+    if (!Account_IsLogged(playerid))
+    {
+        return false;
+    }
     if (!Character_IsLoaded(playerid))
     {
         return false;
     }
+    if (!Character_IsAlive(playerid))
+    {
+        return false;
+    }
     if (!IsPlayerSpawned(playerid))
+    {
+        return false;
+    }
+
+    // Жёсткий фильтр состояний: движение/здоровье проверяются только
+    // для пешего игрока или водителя. Смерть, выбор персонажа и
+    // спектатор (PLAYER_STATE_WASTED / NONE / SPECTATING) игнорируются.
+    new const PLAYER_STATE:playerState = GetPlayerState(playerid);
+    if (playerState != PLAYER_STATE_ONFOOT && playerState != PLAYER_STATE_DRIVER)
     {
         return false;
     }
@@ -493,7 +524,46 @@ static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
         return 0;
     }
 
-    if (float(clientHealth) > (serverHealth + float(AC_HP_TOLERANCE)))
+    new const nowTick = GetTickCount();
+
+    // Первый пакет после входа/спавна: кэш серверных значений ещё пуст,
+    // поэтому клиентские HP/Armour не сравниваем и выдаём окно стабилизации.
+    if (!sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID])
+    {
+        sAcPlayers[playerid][E_AC_CACHED_HEALTH] = serverHealth;
+        sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = serverArmour;
+        sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = true;
+        sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_STATE_GRACE_MS;
+        sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+        sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
+        return 0;
+    }
+
+    new Float:cachedHealth = sAcPlayers[playerid][E_AC_CACHED_HEALTH];
+    new Float:cachedArmour = sAcPlayers[playerid][E_AC_CACHED_ARMOUR];
+
+    // Серверное изменение HP/Armour (лечение, урон, кровотечение, спавн):
+    // обновляем кэш и не считаем это читерством.
+    if (floatabs(serverHealth - cachedHealth) > AC_SERVER_VALUE_EPSILON ||
+        floatabs(serverArmour - cachedArmour) > AC_SERVER_VALUE_EPSILON)
+    {
+        sAcPlayers[playerid][E_AC_CACHED_HEALTH] = serverHealth;
+        sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = serverArmour;
+        sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_STATE_GRACE_MS;
+        sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+        sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
+        return 0;
+    }
+
+    // Окно стабилизации после спавна или серверного изменения HP/Armour.
+    if (nowTick < sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL])
+    {
+        sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+        sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
+        return 0;
+    }
+
+    if (float(clientHealth) > (cachedHealth + float(AC_HP_TOLERANCE)))
     {
         sAcPlayers[playerid][E_AC_HP_MISMATCH]++;
     }
@@ -502,7 +572,7 @@ static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
         sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
     }
 
-    if (float(clientArmour) > (serverArmour + float(AC_ARMOUR_TOLERANCE)))
+    if (float(clientArmour) > (cachedArmour + float(AC_ARMOUR_TOLERANCE)))
     {
         sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH]++;
     }
@@ -517,7 +587,7 @@ static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
         new details[192];
         format(details, sizeof(details),
             "Клиент сообщает HP %d / броню %d, сервер: HP %.0f / броня %.0f",
-            clientHealth, clientArmour, serverHealth, serverArmour);
+            clientHealth, clientArmour, cachedHealth, cachedArmour);
         Internal_ApplyViolation(playerid, AC_VIOL_GODMODE, details);
 
         sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
@@ -537,6 +607,12 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
     }
 
     new const nowTick = GetTickCount();
+
+    if (nowTick < sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL])
+    {
+        Internal_StorePosition(playerid, x, y, z, mode);
+        return true;
+    }
 
     if (!sAcPlayers[playerid][E_AC_HAS_LAST_POS] || sAcPlayers[playerid][E_AC_SYNC_MODE] != mode)
     {
@@ -982,7 +1058,8 @@ static stock Internal_TestStorageMutexStress()
         0,
         0,
         0,
-        9999980
+        0,
+        true
     );
 
     if (testSlot == INVALID_STORAGE_SLOT)
@@ -1145,9 +1222,23 @@ hook OnPlayerSpawn(playerid)
 {
     if (playerid >= 0 && playerid < MAX_PLAYERS)
     {
+        new const nowTick = GetTickCount();
+
         sAcPlayers[playerid][E_AC_HAS_LAST_POS] = false;
         sAcPlayers[playerid][E_AC_SYNC_MODE] = 0;
-        sAcPlayers[playerid][E_AC_GRACE_UNTIL] = GetTickCount() + AC_TELEPORT_GRACE_MS;
+        sAcPlayers[playerid][E_AC_GRACE_UNTIL] = nowTick + AC_TELEPORT_GRACE_MS;
+        sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_SPAWN_SYNC_GRACE_MS;
+        sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = false;
+        sAcPlayers[playerid][E_AC_CACHED_HEALTH] = 0.0;
+        sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = 0.0;
+        sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+        sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
+        sAcPlayers[playerid][E_AC_WEAPON_STREAK] = 0;
+        sAcPlayers[playerid][E_AC_AMMO_STREAK] = 0;
+
+        // Все модули уже применили спавн-позицию и HP/Armour, после чего
+        // принудительно синхронизируем серверные значения с клиентом.
+        defer AC_SpawnStateSync(playerid, Config_GetPlayerSessionToken(playerid));
     }
     return 1;
 }
@@ -1221,6 +1312,10 @@ public OnPlayerCommandReceived(playerid, cmd[], params[], flags)
 IPacket:207(playerid, BitStream:bs)
 {
     if (!Internal_CanCheckPlayer(playerid))
+    {
+        return 1;
+    }
+    if (GetPlayerState(playerid) != PLAYER_STATE_ONFOOT)
     {
         return 1;
     }
@@ -1469,6 +1564,50 @@ CMD:actest(playerid, params[])
             ? "[Античит/9.2] Все автоматические проверки пройдены."
             : "[Античит/9.2] Обнаружены ошибки интеграционных проверок, см. консоль сервера.");
     return 1;
+}
+
+timer AC_SpawnStateSync[250](playerid, expectedToken)
+{
+    if (!IsPlayerConnected(playerid))
+    {
+        return;
+    }
+    if (Config_GetPlayerSessionToken(playerid) != expectedToken)
+    {
+        return;
+    }
+    if (!Character_IsLoaded(playerid) || !IsPlayerSpawned(playerid))
+    {
+        return;
+    }
+
+    new Float:serverHealth = 0.0;
+    new Float:serverArmour = 0.0;
+    if (!GetPlayerHealth(playerid, serverHealth))
+    {
+        return;
+    }
+    GetPlayerArmour(playerid, serverArmour);
+
+    // Мёртвого персонажа не «лечим» античитом: HP <= 0 обрабатывает медицина.
+    if (serverHealth <= 0.0)
+    {
+        return;
+    }
+
+    // Принудительная синхронизация серверных значений с клиентом.
+    SetPlayerHealth(playerid, serverHealth);
+    SetPlayerArmour(playerid, serverArmour);
+
+    new const nowTick = GetTickCount();
+    sAcPlayers[playerid][E_AC_CACHED_HEALTH] = serverHealth;
+    sAcPlayers[playerid][E_AC_CACHED_ARMOUR] = serverArmour;
+    sAcPlayers[playerid][E_AC_SERVER_CACHE_VALID] = true;
+    sAcPlayers[playerid][E_AC_STATE_GRACE_UNTIL] = nowTick + AC_STATE_GRACE_MS;
+    sAcPlayers[playerid][E_AC_GRACE_UNTIL] = nowTick + AC_TELEPORT_GRACE_MS;
+    sAcPlayers[playerid][E_AC_HAS_LAST_POS] = false;
+    sAcPlayers[playerid][E_AC_HP_MISMATCH] = 0;
+    sAcPlayers[playerid][E_AC_ARMOUR_MISMATCH] = 0;
 }
 
 task Tick_AntiCheat[250]()

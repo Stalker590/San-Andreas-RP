@@ -2339,8 +2339,10 @@ hook OnGameModeInit()
     new const bool:doubleLayer2Ok = (l2W == (DEFAULT_PLAYER_LAYER2_WEIGHT_G * 2));
     new const bool:ageFormulaOk = (CHAR_AgeFromLevel(1) == 18 && CHAR_AgeFromLevel(5) == 22);
 
-    new const testL1 = Storage_Create(STORAGE_PLAYER_LAYER1, 0, DEFAULT_PLAYER_LAYER1_WEIGHT_G, DEFAULT_PLAYER_LAYER1_VOLUME_ML, false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 999901);
-    new const testL2 = Storage_Create(STORAGE_PLAYER_LAYER2, 0, DEFAULT_PLAYER_LAYER2_WEIGHT_G, DEFAULT_PLAYER_LAYER2_VOLUME_ML, false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 999902);
+    // Самотест выполняется исключительно в RAM: synthetic DB ID = 0 и
+    // ram_only = true полностью исключают INSERT в storages/storage_items.
+    new const testL1 = Storage_Create(STORAGE_PLAYER_LAYER1, 0, DEFAULT_PLAYER_LAYER1_WEIGHT_G, DEFAULT_PLAYER_LAYER1_VOLUME_ML, false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, true);
+    new const testL2 = Storage_Create(STORAGE_PLAYER_LAYER2, 0, DEFAULT_PLAYER_LAYER2_WEIGHT_G, DEFAULT_PLAYER_LAYER2_VOLUME_ML, false, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, true);
     Roles_ApplyTemplate(0, 6, testL1, testL2, "900-11-2233", 1, 287);
     new const vetM4Skill = Skills_Get(0, SKILL_M4);
     new const vetL1Weight = Storage_GetCurrentWeight(testL1);
