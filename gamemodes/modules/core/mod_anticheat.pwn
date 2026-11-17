@@ -35,6 +35,10 @@
 #define AC_TELEPORT_INSTANT_WINDOW_MS           (1000)
 #define AC_TELEPORT_GRACE_MS                    (2500)
 
+// ВРЕМЕННО: проверка AC_TELEPORT отключена для тестирования спавна.
+// Остальные проверки (SpeedHack, AirBreak, оружие, HP/Armour) продолжают работать.
+#define AC_TELEPORT_CHECK_ENABLED               (0)
+
 #define AC_FOOT_MAX_HORIZONTAL_SPEED            (45.0)
 #define AC_FOOT_AIRBREAK_SPEED                  (28.0)
 #define AC_FOOT_AIRBREAK_VERTICAL_TOLERANCE     (4.0)
@@ -409,6 +413,10 @@ static stock Internal_ApplyViolation(playerid, E_AC_VIOLATION:violation, const d
     {
         return 0;
     }
+    if (violation == AC_VIOL_TELEPORT && !AC_TELEPORT_CHECK_ENABLED)
+    {
+        return 0;
+    }
     if (!IsPlayerConnected(playerid))
     {
         return 0;
@@ -625,8 +633,13 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
         !Internal_IsCoordValid(y, AC_WORLD_BOUND_MIN, AC_WORLD_BOUND_MAX) ||
         !Internal_IsCoordValid(z, AC_WORLD_Z_MIN, AC_WORLD_Z_MAX))
     {
+#if AC_TELEPORT_CHECK_ENABLED
         Internal_ApplyViolation(playerid, AC_VIOL_TELEPORT, "Координаты вне допустимых границ карты");
         return false;
+#else
+        Internal_StorePosition(playerid, x, y, z, mode);
+        return true;
+#endif
     }
 
     new const nowTick = GetTickCount();
@@ -687,12 +700,19 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
 
     if (distance > AC_TELEPORT_DISTANCE && elapsedMs <= AC_TELEPORT_INSTANT_WINDOW_MS)
     {
+#if AC_TELEPORT_CHECK_ENABLED
         new details[176];
         format(details, sizeof(details),
             "Мгновенное перемещение на %.1f м за %d мс", distance, elapsedMs);
         Internal_ApplyViolation(playerid, AC_VIOL_TELEPORT, details);
         Internal_StorePosition(playerid, x, y, z, mode);
         return false;
+#else
+        // Временный режим тестирования: прыжок принимается как новая
+        // опорная точка, чтобы не сработали SpeedHack/AirBreak.
+        Internal_StorePosition(playerid, x, y, z, mode);
+        return true;
+#endif
     }
 
     new Float:seconds = float(elapsedMs) / 1000.0;
@@ -1247,6 +1267,11 @@ hook OnGameModeInit()
         AC_PACKET_AIM_SYNC,
         AC_PACKET_WEAPONS_UPDATE,
         AC_PACKET_PLAYER_SYNC);
+
+#if !AC_TELEPORT_CHECK_ENABLED
+    printf("%s [Core/AntiCheat] ВНИМАНИЕ: проверка AC_TELEPORT временно отключена для тестирования.",
+        SERVER_LOG_PREFIX);
+#endif
     return 1;
 }
 
