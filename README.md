@@ -1,4 +1,5 @@
-<img width="1024" height="572" alt="image" src="https://github.com/user-attachments/assets/894069ff-df3d-4906-91eb-ac428ce808e7" />
+<img width="1997" height="2015" alt="SanAndreas" src="https://github.com/user-attachments/assets/aae9927c-ec9f-408d-bf56-abce1bdb595d" />
+
 <div align="center">
 
 **Hardcore Text-First Multiplayer Roleplay Sandbox on Native `open.mp`**  
