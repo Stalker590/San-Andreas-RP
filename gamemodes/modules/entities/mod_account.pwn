@@ -477,6 +477,18 @@ static stock Internal_BeginPasswordHashing(playerid)
 //  4. АСИНХРОННЫЕ КОЛБЕКИ MYSQL И BCRYPT (forward / public)
 // =============================================================================
 
+forward OnPlayerStartLoginAudio(playerid, token);
+public OnPlayerStartLoginAudio(playerid, token)
+{
+    if (!IsPlayerConnected(playerid) || gPlayerSessionToken[playerid] != token || !sPlayerLoginAudioActive[playerid])
+    {
+        return 0;
+    }
+
+    PlayAudioStreamForPlayer(playerid, LOGIN_AUDIO_STREAM_URL);
+    return 1;
+}
+
 forward OnAccountLookupCompleted(playerid, sessionToken);
 public OnAccountLookupCompleted(playerid, sessionToken)
 {
@@ -897,9 +909,9 @@ hook OnPlayerConnect(playerid)
     SendClientMessage(playerid, COLOR_SERVER_GOLD,
         "Welcome to SAN ANDREAS RP | Fair market, honest physics and survival!");
 
-    // Запуск фонового аудиопотока на время авторизации, регистрации и создания персонажа
-    PlayAudioStreamForPlayer(playerid, LOGIN_AUDIO_STREAM_URL);
+    // Отложенный запуск фонового аудиопотока (через 1000 мс после подключения)
     sPlayerLoginAudioActive[playerid] = true;
+    SetTimerEx("OnPlayerStartLoginAudio", 1000, false, "dd", playerid, gPlayerSessionToken[playerid]);
 
     // 1. Валидация формата RP-ника First_Last через Pawn.Regex
     if (!Internal_ValidateRpNickFormat(sPlayerAccounts[playerid][E_ACC_USERNAME]))
