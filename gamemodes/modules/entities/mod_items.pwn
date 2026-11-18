@@ -71,8 +71,8 @@ static stock const sBuiltinItemDefs[TOTAL_SEED_ITEM_DEFS][E_ITEM_DEF] =
     { true, 19, "WEAPON_MICRO_UZI",     "Micro Uzi",         ITEM_CAT_FIREARM,           1500,  1500,  false, 1,     28, 8,    0,     0,     false },
     { true, 20, "WEAPON_TEC9",          "Tec-9",             ITEM_CAT_FIREARM,           1400,  1500,  false, 1,     32, 8,    0,     0,     false },
     { true, 21, "WEAPON_MP5",           "MP5",               ITEM_CAT_FIREARM,           2900,  3000,  false, 1,     29, 8,    0,     0,     false },
-    { true, 22, "WEAPON_AK47",          "AK-47",                      ITEM_CAT_FIREARM,           4300,  4500,  false, 1,     30, 16,   0,     0,     false },
-    { true, 23, "WEAPON_M4",            "M4",              ITEM_CAT_FIREARM,           3400,  4000,  false, 1,     31, 12,   0,     0,     false },
+    { true, 22, "WEAPON_AK47",          "AK-47 Assault Rifle",                      ITEM_CAT_FIREARM,           4300,  4500,  false, 1,     30, 16,   0,     0,     false },
+    { true, 23, "WEAPON_M4",            "M4 Assault Rifle",              ITEM_CAT_FIREARM,           3400,  4000,  false, 1,     31, 12,   0,     0,     false },
     { true, 24, "WEAPON_COUNTRY_RIFLE", "Hunting Rifle",                 ITEM_CAT_FIREARM,           3800,  4500,  false, 1,     33, 24,   0,     0,     false },
     { true, 25, "WEAPON_SNIPER_RIFLE",  "Sniper Rifle",               ITEM_CAT_FIREARM,           6500,  6000,  false, 1,     34, 26,   0,     0,     false },
 

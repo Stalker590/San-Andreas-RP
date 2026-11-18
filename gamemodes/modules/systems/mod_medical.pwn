@@ -784,18 +784,18 @@ stock Medical_ShowTriageDialog(viewerid, targetid)
     new body[1400];
     format(body, sizeof(body),
         "{FFC800}Zonal damage:{FFFFFF}\n" \
-        "• Head: %d%%\n" \
-        "• Torso: %d%%\n" \
-        "• Left hand: %d%%\n" \
-        "• Right hand: %d%%\n" \
-        "• Left leg: %d%%\n" \
-        "• Right leg: %d%%\n\n" \
+        "- Head: %d%%\n" \
+        "- Torso: %d%%\n" \
+        "- Left hand: %d%%\n" \
+        "- Right hand: %d%%\n" \
+        "- Left leg: %d%%\n" \
+        "- Right leg: %d%%\n\n" \
         "{FFC800} Clinical picture: {FFFFFF}\n" \
-        "• Bleeding: %s\n" \
-        "• Before death: %d sec.\n" \
-        "• Tourniquet applied: %s\n" \
-        "• Pain shock: %s\n" \
-        "• Fractures: %s\n\n" \
+        "- Bleeding: %s\n" \
+        "- Before death: %d sec.\n" \
+        "- Tourniquet applied: %s\n" \
+        "- Pain shock: %s\n" \
+        "- Fractures: %s\n\n" \
         "{90A4AE}Treat: /treat [id]. For arterial bleeding you need a tourniquet, then a surgical kit.{FFFFFF}",
         sInjuries[targetid][E_INJ_HEAD_HP],
         sInjuries[targetid][E_INJ_TORSO_HP],

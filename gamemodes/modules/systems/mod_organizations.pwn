@@ -2171,7 +2171,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[192];
-    format(details, sizeof(details), "Organization #%d “%s” was created", newOrgId, sOrgCreateName[playerid]);
+    format(details, sizeof(details), "Organization #%d \"%s\" was created", newOrgId, sOrgCreateName[playerid]);
     Audit_Log(Character_GetId(playerid), "ORG_CREATE", "CHARACTER", "ORG", 0, cost, details);
     return 1;
 }
@@ -3337,7 +3337,7 @@ CMD:orginvite(playerid, params[])
     Organizations_GetRankTitle(orgId, rankIndex, rankTitle, sizeof(rankTitle));
 
     new msg[224];
-    format(msg, sizeof(msg), "You have been accepted into the organization “%s” for the position %s.", orgName, rankTitle);
+    format(msg, sizeof(msg), "You have been accepted into the organization \"%s\" for the position %s.", orgName, rankTitle);
     SendClientMessage(targetid, COLOR_UI_SUCCESS, msg);
     format(msg, sizeof(msg), "The player has been accepted into the organization for the position %s.", rankTitle);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);

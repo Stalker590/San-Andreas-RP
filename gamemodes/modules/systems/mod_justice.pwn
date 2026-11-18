@@ -453,14 +453,14 @@ stock bool:Justice_ArrestPlayer(actorid, targetid)
 
     new msg[288];
     format(msg, sizeof(msg),
-        "You are under arrest. Wanted level: %d. Punishment assigned: %s in the institution “%s”.",
+        "You are under arrest. Wanted level: %d. Punishment assigned: %s in the institution \"%s\".",
         wantedLevel, sentenceText, jailName);
     SendClientMessage(targetid, COLOR_UI_ERROR, msg);
     SendClientMessage(targetid, COLOR_UI_INFO,
         "The period is reduced only by active play. Hard labor: /labor (no more than once per minute).");
 
     format(msg, sizeof(msg),
-        "The arrest has been made. The detainee was sent to “%s” for a period of %s.",
+        "The arrest has been made. The detainee was sent to \"%s\" for a period of %s.",
         jailName, sentenceText);
     SendClientMessage(actorid, COLOR_UI_SUCCESS, msg);
 

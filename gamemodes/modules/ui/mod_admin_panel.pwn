@@ -1227,7 +1227,7 @@ static stock AdminPanel_StartSpectate(playerid, target)
 
     new name[MAX_PLAYER_NAME + 1], msg[160];
     AdminPanel_GetTargetName(target, name, sizeof(name));
-    format(msg, sizeof(msg), "Spectate started: %s (ID %d). The exit is the “Close” button.", name, target);
+    format(msg, sizeof(msg), "Spectate started: %s (ID %d). The exit is the \"Close\" button.", name, target);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     AdminPanel_SendAudit(playerid, target, "ADMIN_SPECTATE_START", 0, 0, "Start of spectating");
     return 1;
@@ -1386,8 +1386,8 @@ static stock AdminPanel_ShowHelp(playerid)
     if (Admin_HasPermission(playerid, ADMIN_PERM_PLAYER_SET_WANTED)) strcat(body, "/setwanted [id] [0-100]\n", sizeof(body));
     if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_LEVEL)) strcat(body, "/setlevel [id] [level]\n", sizeof(body));
     if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_EXP)) strcat(body, "/setexp [id] [seconds]\n", sizeof(body));
-    if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_SKILLS)) strcat(body, "/skills [id] – skill editor\n", sizeof(body));
-    if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_LICENSES)) strcat(body, "/setlicenses [id] — issue/withdraw a license\n", sizeof(body));
+    if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_SKILLS)) strcat(body, "/skills [id] - skill editor\n", sizeof(body));
+    if (Admin_HasPermission(playerid, ADMIN_PERM_CHAR_SET_LICENSES)) strcat(body, "/setlicenses [id] - issue/withdraw a license\n", sizeof(body));
     if (Admin_HasPermission(playerid, ADMIN_PERM_ECON_GIVE_CASH)) strcat(body, "/setcash [id] [amount] - issue/withdraw cash\n", sizeof(body));
     if (Admin_HasPermission(playerid, ADMIN_PERM_ECON_SET_BANK)) strcat(body, "/setbank [id] [amount]\n", sizeof(body));
     if (Admin_HasPermission(playerid, ADMIN_PERM_ECON_ISSUE_DEBT) || Admin_HasPermission(playerid, ADMIN_PERM_ECON_CLEAR_DEBT)) strcat(body, "/setdebt [id] [amount]\n", sizeof(body));
@@ -1484,13 +1484,13 @@ static stock AdminPanel_HandlePlayerAction(playerid, E_ADMIN_PLAYER_ACTION:actio
             SendClientMessage(playerid, COLOR_UI_SUCCESS, "The slap is completed.");
             AdminPanel_SendAudit(playerid, target, "ADMIN_SLAP", 0, 5, "Player slap");
         }
-        case AP_SET_HP: return AdminPanel_ShowInput(playerid, AI_INPUT_HP, "Player HP", "Enter a new HP value (0–100):");
-        case AP_SET_ARMOUR: return AdminPanel_ShowInput(playerid, AI_INPUT_ARMOUR, "Player armor", "Enter a new armor value (0–100):");
-        case AP_SET_HUNGER: return AdminPanel_ShowInput(playerid, AI_INPUT_HUNGER, "Player hunger", "Enter hunger value (0–100):");
-        case AP_SET_THIRST: return AdminPanel_ShowInput(playerid, AI_INPUT_THIRST, "Player's Thirst", "Enter thirst value (0–100):");
-        case AP_SET_STAMINA: return AdminPanel_ShowInput(playerid, AI_INPUT_STAMINA, "Player Stamina", "Enter stamina value (0–100):");
-        case AP_SET_STRESS: return AdminPanel_ShowInput(playerid, AI_INPUT_STRESS, "Player stress", "Enter stress value (0–100):");
-        case AP_SET_SKIN: return AdminPanel_ShowInput(playerid, AI_INPUT_SKIN, "Player skin", "Enter skin ID (1–311, except 74):");
+        case AP_SET_HP: return AdminPanel_ShowInput(playerid, AI_INPUT_HP, "Player HP", "Enter a new HP value (0-100):");
+        case AP_SET_ARMOUR: return AdminPanel_ShowInput(playerid, AI_INPUT_ARMOUR, "Player armor", "Enter a new armor value (0-100):");
+        case AP_SET_HUNGER: return AdminPanel_ShowInput(playerid, AI_INPUT_HUNGER, "Player hunger", "Enter hunger value (0-100):");
+        case AP_SET_THIRST: return AdminPanel_ShowInput(playerid, AI_INPUT_THIRST, "Player's Thirst", "Enter thirst value (0-100):");
+        case AP_SET_STAMINA: return AdminPanel_ShowInput(playerid, AI_INPUT_STAMINA, "Player Stamina", "Enter stamina value (0-100):");
+        case AP_SET_STRESS: return AdminPanel_ShowInput(playerid, AI_INPUT_STRESS, "Player stress", "Enter stress value (0-100):");
+        case AP_SET_SKIN: return AdminPanel_ShowInput(playerid, AI_INPUT_SKIN, "Player skin", "Enter skin ID (1-311, except 74):");
         case AP_KICK:
         {
             if (!AdminPanel_Require(playerid, ADMIN_PERM_PLAYER_KICK, "ADMIN_KICK")) return 0;
@@ -1510,9 +1510,9 @@ static stock AdminPanel_HandlePlayerAction(playerid, E_ADMIN_PLAYER_ACTION:actio
         case AP_BAN_PERM: return AdminPanel_ShowInput(playerid, AI_INPUT_BAN_PERM, "Permanent ban", "Enter the reason for the permanent ban:");
         case AP_MUTE: return AdminPanel_ShowInput(playerid, AI_INPUT_MUTE, "Mute player", "Enter mute minutes and reason:\nExample: 30 Flood in general chat");
         case AP_WARN: return AdminPanel_ShowInput(playerid, AI_INPUT_WARN, "Warning", "Enter the reason for the warning:");
-        case AP_JAIL: return AdminPanel_ShowInput(playerid, AI_INPUT_JAIL, "Admin prison", "Enter the minutes of the disturbance and the reason: \n Example: 15 Inappropriate behavior");
-        case AP_SET_WANTED: return AdminPanel_ShowInput(playerid, AI_INPUT_WANTED, "Wanted level", "Enter your wanted level (0–100):");
-        case AP_SET_LEVEL: return AdminPanel_ShowInput(playerid, AI_INPUT_LEVEL, "Character level", "Enter new level (1–1000):");
+        case AP_JAIL: return AdminPanel_ShowInput(playerid, AI_INPUT_JAIL, "Admin prison", "Enter jail duration in minutes and the reason:\nExample: 15 Inappropriate behavior");
+        case AP_SET_WANTED: return AdminPanel_ShowInput(playerid, AI_INPUT_WANTED, "Wanted level", "Enter your wanted level (0-100):");
+        case AP_SET_LEVEL: return AdminPanel_ShowInput(playerid, AI_INPUT_LEVEL, "Character level", "Enter new level (1-1000):");
         case AP_SET_EXP: return AdminPanel_ShowInput(playerid, AI_INPUT_EXP, "Character Experience", "Enter the number of seconds of experience:");
         case AP_SKILLS:
         {
@@ -1793,8 +1793,8 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 case AW_ACTION_NONE: {}
                 case AW_TELEPORT: AdminPanel_ShowInput(playerid, AI_INPUT_TP, "Teleport by coordinates", "Enter coordinates: X Y Z\nExample: 1481.0 -1771.0 18.8");
-                case AW_WEATHER: AdminPanel_ShowInput(playerid, AI_INPUT_WEATHER, "weather", "Enter weather ID (0–20):");
-                case AW_TIME: AdminPanel_ShowInput(playerid, AI_INPUT_TIME, "Time of day", "Enter hour (0–23):");
+                case AW_WEATHER: AdminPanel_ShowInput(playerid, AI_INPUT_WEATHER, "weather", "Enter weather ID (0-20):");
+                case AW_TIME: AdminPanel_ShowInput(playerid, AI_INPUT_TIME, "Time of day", "Enter hour (0-23):");
                 case AW_ANNOUNCE: AdminPanel_ShowInput(playerid, AI_INPUT_ANNOUNCE, "Global announcement", "Enter ad text:");
                 case AW_SAVE:
                 {
@@ -1895,7 +1895,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new title[128];
             format(title, sizeof(title), "Skill: %s", skillName);
             ShowPlayerDialog(playerid, DIALOG_ADMIN_INPUT, DIALOG_STYLE_INPUT, title,
-                "Enter a new skill value (0–1000):", "Apply", "Cancel");
+                "Enter a new skill value (0-1000):", "Apply", "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_ADMIN_ROLES:
@@ -2178,7 +2178,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     if (!AdminPanel_Require(playerid, ADMIN_PERM_PLAYER_SET_WANTED, "ADMIN_WANTED")) return Y_HOOKS_BREAK_RETURN_1;
                     if (!AdminPanel_ValidTarget(playerid, target)) return Y_HOOKS_BREAK_RETURN_1;
                     new const level = strval(inputtext);
-                    if (level < 0 || level > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0–100."); return Y_HOOKS_BREAK_RETURN_1; }
+                    if (level < 0 || level > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0-100."); return Y_HOOKS_BREAK_RETURN_1; }
                     Justice_SetWantedLevel(target, level, "Administrative change in search", Character_GetId(playerid));
                     SendClientMessage(playerid, COLOR_UI_SUCCESS, "Wanted level updated.");
                 }
@@ -2251,7 +2251,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new const target2 = (sAdminPendingTarget[playerid] > 0) ? sAdminPendingTarget[playerid] : playerid;
                     if (!AdminPanel_ValidTarget(playerid, target2)) return Y_HOOKS_BREAK_RETURN_1;
                     new const model = strval(inputtext);
-                    if (model < 400 || model > 611) { SendClientMessage(playerid, COLOR_UI_ERROR, "The model should be in the range 400–611."); return Y_HOOKS_BREAK_RETURN_1; }
+                    if (model < 400 || model > 611) { SendClientMessage(playerid, COLOR_UI_ERROR, "The model should be in the range 400-611."); return Y_HOOKS_BREAK_RETURN_1; }
                     new slot = Vehicle_CreateForPlayer(target2, model, 0, false);
                     if (slot < 0) { SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to spawn the vehicle."); return Y_HOOKS_BREAK_RETURN_1; }
                     SendClientMessage(playerid, COLOR_UI_SUCCESS, "The vehicle has been spawned, the keys have been given to the player.");
@@ -2261,7 +2261,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!AdminPanel_Require(playerid, ADMIN_PERM_WORLD_WEATHER, "ADMIN_WEATHER")) return Y_HOOKS_BREAK_RETURN_1;
                     new const weather = strval(inputtext);
-                    if (weather < 0 || weather > 20) { SendClientMessage(playerid, COLOR_UI_ERROR, "Weather ID: 0–20."); return Y_HOOKS_BREAK_RETURN_1; }
+                    if (weather < 0 || weather > 20) { SendClientMessage(playerid, COLOR_UI_ERROR, "Weather ID: 0-20."); return Y_HOOKS_BREAK_RETURN_1; }
                     SetWeather(weather);
                     format(msg, sizeof(msg), "Weather changed: %d.", weather);
                     SendClientMessageToAll(COLOR_UI_INFO, msg);
@@ -2271,7 +2271,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!AdminPanel_Require(playerid, ADMIN_PERM_WORLD_TIME, "ADMIN_TIME")) return Y_HOOKS_BREAK_RETURN_1;
                     new const hour = strval(inputtext);
-                    if (hour < 0 || hour > 23) { SendClientMessage(playerid, COLOR_UI_ERROR, "Hour: 0–23."); return Y_HOOKS_BREAK_RETURN_1; }
+                    if (hour < 0 || hour > 23) { SendClientMessage(playerid, COLOR_UI_ERROR, "Hour: 0-23."); return Y_HOOKS_BREAK_RETURN_1; }
                     SetWorldTime(hour);
                     format(msg, sizeof(msg), "Time of day changed: %02d:00.", hour);
                     SendClientMessageToAll(COLOR_UI_INFO, msg);
@@ -2307,7 +2307,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     if (!AdminPanel_Require(playerid, ADMIN_PERM_CHAR_SET_SKILLS, "ADMIN_SKILLS")) return Y_HOOKS_BREAK_RETURN_1;
                     if (!AdminPanel_ValidTarget(playerid, target)) return Y_HOOKS_BREAK_RETURN_1;
                     new const value = strval(inputtext);
-                    if (value < 0 || value > 1000) { SendClientMessage(playerid, COLOR_UI_ERROR, "Skill: 0–1000."); return Y_HOOKS_BREAK_RETURN_1; }
+                    if (value < 0 || value > 1000) { SendClientMessage(playerid, COLOR_UI_ERROR, "Skill: 0-1000."); return Y_HOOKS_BREAK_RETURN_1; }
                     new const skill = sAdminPendingSkill[playerid];
                     Skills_Set(target, E_SKILL_TYPE:skill, value, true);
                     SendClientMessage(playerid, COLOR_UI_SUCCESS, "Skill updated.");
@@ -2805,7 +2805,7 @@ CMD:setwanted(playerid, params[])
     if (!AdminPanel_ValidTarget(playerid, target)) return 1;
     if (!Internal_NextToken(params, pos, tok, sizeof(tok))) return 1;
     new const level = strval(tok);
-    if (level < 0 || level > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0–100."); return 1; }
+    if (level < 0 || level > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0-100."); return 1; }
     Justice_SetWantedLevel(target, level, "Administrative change in search", Character_GetId(playerid));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, "Wanted level updated.");
     return 1;
@@ -3047,7 +3047,7 @@ CMD:veh(playerid, params[])
     new pos = 0, tok[24];
     if (!Internal_NextToken(params, pos, tok, sizeof(tok))) { SendClientMessage(playerid, COLOR_UI_ERROR, "Usage: /veh [model] [id?]"); return 1; }
     new const model = strval(tok);
-    if (model < 400 || model > 611) { SendClientMessage(playerid, COLOR_UI_ERROR, "The model should be in the range 400–611."); return 1; }
+    if (model < 400 || model > 611) { SendClientMessage(playerid, COLOR_UI_ERROR, "The model should be in the range 400-611."); return 1; }
     new target = playerid;
     if (Internal_NextToken(params, pos, tok, sizeof(tok)))
     {
@@ -3146,7 +3146,7 @@ CMD:weather(playerid, params[])
     new pos = 0, tok[16];
     if (!Internal_NextToken(params, pos, tok, sizeof(tok))) { SendClientMessage(playerid, COLOR_UI_ERROR, "Usage: /weather [0-20]"); return 1; }
     new const weather = strval(tok);
-    if (weather < 0 || weather > 20) { SendClientMessage(playerid, COLOR_UI_ERROR, "Weather ID: 0–20."); return 1; }
+    if (weather < 0 || weather > 20) { SendClientMessage(playerid, COLOR_UI_ERROR, "Weather ID: 0-20."); return 1; }
     SetWeather(weather);
     new msg[128];
     format(msg, sizeof(msg), "The weather was changed by the administrator: %d.", weather);
@@ -3162,7 +3162,7 @@ CMD:time(playerid, params[])
     new pos = 0, tok[16];
     if (!Internal_NextToken(params, pos, tok, sizeof(tok))) { SendClientMessage(playerid, COLOR_UI_ERROR, "Usage: /time [0-23]"); return 1; }
     new const hour = strval(tok);
-    if (hour < 0 || hour > 23) { SendClientMessage(playerid, COLOR_UI_ERROR, "Hour: 0–23."); return 1; }
+    if (hour < 0 || hour > 23) { SendClientMessage(playerid, COLOR_UI_ERROR, "Hour: 0-23."); return 1; }
     SetWorldTime(hour);
     new msg[128];
     format(msg, sizeof(msg), "The time of day was changed by the administrator: %02d:00.", hour);
@@ -3261,7 +3261,7 @@ CMD:bizgive(playerid, params[])
     if (!Enterprise_AdminAssignByDbId(enterpriseDbId, Character_GetId(target))) { SendClientMessage(playerid, COLOR_UI_ERROR, "Business not found."); return 1; }
     new bizName[64], details[160];
     Enterprise_GetNameByDbId(enterpriseDbId, bizName, sizeof(bizName));
-    format(details, sizeof(details), "Give the enterprise “%s” (id %d)", bizName, enterpriseDbId);
+    format(details, sizeof(details), "Give the enterprise \"%s\" (id %d)", bizName, enterpriseDbId);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, "The enterprise is given to the player.");
     SendClientMessage(target, COLOR_UI_INFO, "The administrator gave you the enterprise.");
     AdminPanel_SendAudit(playerid, target, "ADMIN_BIZ_GIVE", 0, enterpriseDbId, details);
@@ -3295,7 +3295,7 @@ CMD:bizlist(playerid, params[])
         if (dbId <= 0) continue;
         new name[64];
         Enterprise_GetNameByDbId(dbId, name, sizeof(name));
-        format(msg, sizeof(msg), "ID %d — %s", dbId, name);
+        format(msg, sizeof(msg), "ID %d - %s", dbId, name);
         SendClientMessage(playerid, COLOR_UI_INFO, msg);
     }
     return 1;
@@ -3357,7 +3357,7 @@ CMD:setaddiction(playerid, params[])
     if (!AdminPanel_ValidTarget(playerid, target)) return 1;
     if (!Internal_NextToken(params, pos, tok, sizeof(tok))) return 1;
     new const value = strval(tok);
-    if (value < 0 || value > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0–100."); return 1; }
+    if (value < 0 || value > 100) { SendClientMessage(playerid, COLOR_UI_ERROR, "Range: 0-100."); return 1; }
     Character_SetAddiction(target, float(value));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, "Dependency level updated.");
     AdminPanel_SendAudit(playerid, target, "ADMIN_SET_ADDICTION", 0, value, "Change dependency");

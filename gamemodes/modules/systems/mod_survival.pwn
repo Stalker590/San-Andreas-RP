@@ -473,7 +473,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
 
             if (Roles_HasPerk(roleId, PERK_DRUG_BOOST_25X))
             {
-                SendClientMessage(playerid, COLOR_WARNING, "[Chemistry]: The “Street Junkie” perk gave 2.5x income! Health increased above normal (up to 135 HP).");
+                SendClientMessage(playerid, COLOR_WARNING, "[Chemistry]: The \"Street Junkie\" perk gave 2.5x income! Health increased above normal (up to 135 HP).");
             }
             else
             {

@@ -1329,7 +1329,7 @@ static stock Internal_ExecuteAuctionBuyout(playerid, enterprise_id)
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Auction]: Congratulations! You purchased the enterprise “%s” for $%d.",
+        "[Auction]: Congratulations! You purchased the enterprise \"%s\" for $%d.",
         enterpriseName, price);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 

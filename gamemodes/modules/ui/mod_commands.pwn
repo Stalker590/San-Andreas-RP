@@ -424,7 +424,7 @@ CMD:todo(playerid, params[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new outMsg[220];
-    format(outMsg, sizeof(outMsg), "— “%s,” said %s, {C2A2DA}%s", speechPart, rpName, actionPart);
+    format(outMsg, sizeof(outMsg), "- \"%s,\" said %s, {C2A2DA}%s", speechPart, rpName, actionPart);
     Commands_SendProximityMessage(playerid, RP_RADIUS_NORMAL, COLOR_RP_TALK, outMsg);
     SetPlayerChatBubble(playerid, speechPart, COLOR_RP_TALK, RP_RADIUS_NORMAL, 6000);
     return 1;
@@ -941,7 +941,7 @@ CMD:give(playerid, params[])
     new amount = 0;
     if (!Internal_ParseTwoInts(params, targetid, amount))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Usage: /give [player id] [USD amount] (to transfer items: /inv -> item -> “Give to the person nearby”).");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /give [player id] [USD amount] (to transfer items: /inv -> item -> \"Give to the person nearby\").");
         return 1;
     }
     return Internal_TransferHandCash(playerid, targetid, amount);
@@ -970,7 +970,7 @@ hook OnPlayerText(playerid, text[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new chatLine[192];
-    format(chatLine, sizeof(chatLine), "— %s [%d] says: %s", rpName, playerid, text);
+    format(chatLine, sizeof(chatLine), "- %s [%d] says: %s", rpName, playerid, text);
     Commands_SendProximityMessage(playerid, RP_RADIUS_NORMAL, COLOR_RP_TALK, chatLine);
     SetPlayerChatBubble(playerid, text, COLOR_RP_TALK, RP_RADIUS_NORMAL, 5500);
     return 0;

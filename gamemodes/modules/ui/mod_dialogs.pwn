@@ -721,7 +721,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
             new E_STORAGE_TYPE:stType = Storage_GetType(nearSlot);
             if (stType == STORAGE_CORPSE_LOOT)
             {
-                strcat(menuStr, "3. {FFAB91}Search the deceased’s belongings nearby (2.5 m)\n", sizeof(menuStr));
+                strcat(menuStr, "3. {FFAB91}Search the deceased's belongings nearby (2.5 m)\n", sizeof(menuStr));
             }
             else
             {
@@ -787,7 +787,7 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
     strcat(actions, "3. Split / Combine pack\n", sizeof(actions));
     strcat(actions, "4. Transfer to another layer (Layer 1 <-> Layer 2)\n", sizeof(actions));
     strcat(actions, "5. Transfer to external storage\n", sizeof(actions));
-    strcat(actions, "6. Throw \n onto the ground", sizeof(actions));
+    strcat(actions, "6. Drop onto the ground\n", sizeof(actions));
     strcat(actions, "7. Pass it to the person nearby", sizeof(actions));
 
     ShowPlayerDialog(
@@ -1401,10 +1401,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 Survival_RecalculateEncumbrance(playerid);
 
                 new msg[160];
-                format(msg, sizeof(msg), "[Search]: You seized “%s” (%d pcs.) from the detainee.", itemName, amount);
+                format(msg, sizeof(msg), "[Search]: You seized \"%s\" (%d pcs.) from the detainee.", itemName, amount);
                 SendClientMessage(playerid, COLOR_SUCCESS, msg);
 
-                format(msg, sizeof(msg), "[Search]: During the search, “%s” (%d pcs.) was confiscated from you.", itemName, amount);
+                format(msg, sizeof(msg), "[Search]: During the search, \"%s\" (%d pcs.) was confiscated from you.", itemName, amount);
                 SendClientMessage(targetid, COLOR_WARNING, msg);
 
                 Dialogs_OpenSearchTarget(playerid, targetid, sPlayerSearchIncludeLayer2[playerid], true);

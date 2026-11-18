@@ -726,22 +726,22 @@ static stock Internal_OpenCollectedEvidence(playerid)
     new body[2048];
     format(body, sizeof(body),
         "{FFC800}Package of material evidence:{FFFFFF}\n" \
-        "Х Sleeves with serial numbers: %d\n" \
-        "Х Other evidence: %d\n\n" \
+        "- Sleeves with serial numbers: %d\n" \
+        "- Other evidence: %d\n\n" \
         "{FFC800}Serial numbers of seized cartridges:{FFFFFF}\n",
         sCollectedCount[playerid],
         sCollectedOtherCount[playerid]);
 
     if (sCollectedCount[playerid] <= 0)
     {
-        strcat(body, "Х Serial numbers are not recorded\n", sizeof(body));
+        strcat(body, "- Serial numbers are not recorded\n", sizeof(body));
     }
     else
     {
         for (new idx = 0; idx < sCollectedCount[playerid]; idx++)
         {
             new line[64];
-            format(line, sizeof(line), "Х Serial number: %d\n", sCollectedSerials[playerid][idx]);
+            format(line, sizeof(line), "- Serial number: %d\n", sCollectedSerials[playerid][idx]);
             strcat(body, line, sizeof(body));
         }
     }
@@ -870,7 +870,7 @@ static stock Internal_CollectEvidence(playerid, slot_id)
 
     new message[224];
     format(message, sizeof(message),
-        "[Forensics]: You have seized evidence У%sФ (%s) in the evidence package.", title, details);
+        "[Forensics]: You have seized evidence \"%s\" (%s) in the evidence package.", title, details);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, message);
 
     // јвтоматическа€ сверка гильзы со стволами, наход€щимис€ при криминалисте

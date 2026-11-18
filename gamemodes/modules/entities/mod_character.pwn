@@ -463,8 +463,8 @@ static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
         DIALOG_STYLE_MSGBOX,
         "{FFC800}SAN ANDREAS RP {FFFFFF}| Confirmation of biography and starting role",
         fullDialog,
-        "Start game",
-        "To the list");
+        "Select",
+        "Back");
 }
 
 // =============================================================================
@@ -1483,7 +1483,7 @@ stock Character_WearOutfitItem(playerid, item_slot)
     Internal_ApplyPlayerSkin(playerid, skinId, true);
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "[Wardrobe]: You are wearing the selected set of clothes. It is marked with the status “Equipped”.");
+        "[Wardrobe]: You are wearing the selected set of clothes. It is marked with the status \"Equipped\".");
     return 1;
 }
 
@@ -2430,18 +2430,18 @@ stock Character_ShowStatsDialog(playerid)
     new body[1280];
     format(body, sizeof(body),
         "{FFC800}1. Legal profile and biography:{FFFFFF}\n" \
-        "• First and Last Name: {88CCFF}%s{FFFFFF} (Character ID: %d)\n" \
-        "• Level in the state: {66CC66}%d level {FFFFFF} (Progress: %d / %d sec.) | Age: {66CC66}%d years {FFFFFF}\n" \
-        "• Gender: %s | Origin: %s | Starting role: {FFC800}%s (#%d){FFFFFF}\n" \
-        "• Citizenship: %s | SSN: {88CCFF}%s{FFFFFF}\n" \
-        "• Wanted level: {FF4444}%d / 100{FFFFFF} (Decreased after: %d sec.)\n\n" \
+        "- First and Last Name: {88CCFF}%s{FFFFFF} (Character ID: %d)\n" \
+        "- Level in the state: {66CC66}%d level {FFFFFF} (Progress: %d / %d sec.) | Age: {66CC66}%d years {FFFFFF}\n" \
+        "- Gender: %s | Origin: %s | Starting role: {FFC800}%s (#%d){FFFFFF}\n" \
+        "- Citizenship: %s | SSN: {88CCFF}%s{FFFFFF}\n" \
+        "- Wanted level: {FF4444}%d / 100{FFFFFF} (Decreased after: %d sec.)\n\n" \
         "{FFC800}2. Finance and Banking:{FFFFFF}\n" \
-        "• Cash in Pockets (USD): {66CC66}%s{FFFFFF}\n" \
-        "• Bank account IBAN: {88CCFF}%s{FFFFFF} | Balance: {66CC66}%s{FFFFFF}\n" \
-        "• Credit debt: {FFAA00}%s{FFFFFF}\n\n" \
+        "- Cash in Pockets (USD): {66CC66}%s{FFFFFF}\n" \
+        "- Bank account IBAN: {88CCFF}%s{FFFFFF} | Balance: {66CC66}%s{FFFFFF}\n" \
+        "- Credit debt: {FFAA00}%s{FFFFFF}\n\n" \
         "{FFC800}3. Physiology and double-layer storage:{FFFFFF}\n" \
-        "• Health: %.1f HP | Armor: %.1f%% | Hunger: %.1f%% | Thirst: %.1f%% | Stress: %.1f%%\n" \
-        "• Layer 1 (Outer): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF} | Layer 2 (Secret): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF}",
+        "- Health: %.1f HP | Armor: %.1f%% | Hunger: %.1f%% | Thirst: %.1f%% | Stress: %.1f%%\n" \
+        "- Layer 1 (Outer): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF} | Layer 2 (Secret): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF}",
         sCharacters[playerid][E_CHAR_RP_NAME],
         sCharacters[playerid][E_CHAR_DB_ID],
         sCharacters[playerid][E_CHAR_LEVEL],

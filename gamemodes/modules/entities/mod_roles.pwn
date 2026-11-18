@@ -975,7 +975,7 @@ stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
                 format(
                     itemRow,
                     sizeof(itemRow),
-                    "• %s (loaded: %d rds.)\n",
+                    "- %s (loaded: %d rds.)\n",
                     itemName,
                     itemAmmos[k]);
             }
@@ -984,7 +984,7 @@ stock Roles_FormatDetailedCardRu(role_id, output[], len = sizeof(output))
                 format(
                     itemRow,
                     sizeof(itemRow),
-                    "  • %s (x%d)\n",
+                    "  - %s (x%d)\n",
                     itemName,
                     itemAmts[k]);
             }

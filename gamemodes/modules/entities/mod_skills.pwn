@@ -469,7 +469,7 @@ stock Skills_Add(playerid, E_SKILL_TYPE:skill, delta)
     {
         new msg[144];
         format(msg, sizeof(msg),
-            "The skill “%s” has been increased to %d / %d units.",
+            "The skill \"%s\" has been increased to %d / %d units.",
             sSkillMetaTable[_:skill][E_SMETA_NAME_RU],
             newVal,
             maxCap);

@@ -1657,7 +1657,7 @@ static stock Internal_ReturnCargoToSource(playerid)
         !Enterprise_IsPlayerNearWarehouse(playerid, sourceEnterpriseSlot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Logistics]: The goods can only be returned to the sending company’s warehouse.");
+            "[Logistics]: The goods can only be returned to the sending company's warehouse.");
         return 0;
     }
 

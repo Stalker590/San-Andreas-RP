@@ -943,7 +943,7 @@ stock Admin_CreateRole(playerid, const name[], level)
     }
 
     new details[160];
-    format(details, sizeof(details), "The admin role “%s” has been created (level %d)", name, level);
+    format(details, sizeof(details), "The admin role \"%s\" has been created (level %d)", name, level);
     Admin_Audit(playerid, 0, 0, "ADMIN_ROLE_CREATE", 0, level, details);
     return role_db_id;
 }
@@ -993,7 +993,7 @@ stock Admin_DeleteRole(playerid, role_db_id)
     }
 
     new details[160];
-    format(details, sizeof(details), "Administrator role “%s” (id %d) was deleted", roleName, role_db_id);
+    format(details, sizeof(details), "Administrator role \"%s\" (id %d) was deleted", roleName, role_db_id);
     Admin_Audit(playerid, 0, 0, "ADMIN_ROLE_DELETE", 0, role_db_id, details);
     return 1;
 }
@@ -1176,7 +1176,7 @@ stock bool:Admin_BanOffline(playerid, const field[], const value[], minutes, con
     }
 
     new details[192];
-    format(details, sizeof(details), "Offline ban by %s “%s” on %d min.: %s", field, value, minutes, reason);
+    format(details, sizeof(details), "Offline ban by %s \"%s\" on %d min.: %s", field, value, minutes, reason);
     Admin_Audit(playerid, 0, 0, "ADMIN_BAN_OFFLINE", 0, minutes, details);
     return true;
 }

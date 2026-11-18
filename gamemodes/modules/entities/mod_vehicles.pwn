@@ -1382,9 +1382,9 @@ static stock Internal_StartRefuel(playerid)
     format(body, sizeof(body),
         "Current fuel level: %d / %d ml.\n" \
         "Select fuel type. Wrong type will damage the motor!\n\n" \
-        "Gasoline Regular — %d USD/l\n" \
-        "Diesel fuel — %d USD/l\n" \
-        "Aviation kerosene – %d USD/l",
+        "Gasoline Regular - %d USD/l\n" \
+        "Diesel fuel - %d USD/l\n" \
+        "Aviation kerosene - %d USD/l",
         sVehicles[slot][E_VEH_FUEL_ML],
         sVehicles[slot][E_VEH_MAX_FUEL_ML],
         VEHICLE_FUEL_PRICE_REGULAR_USD,

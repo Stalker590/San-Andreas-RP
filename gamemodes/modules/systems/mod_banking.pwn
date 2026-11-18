@@ -503,10 +503,10 @@ static stock Internal_ShowCashInfo(playerid)
     new body[512];
     format(body, sizeof(body),
         "{FFC800}Cash in your inventory:{FFFFFF}\n" \
-        "• US dollars (USD), net: {66CC66}%s{FFFFFF}\n" \
-        "• Euro (EUR), net: {66CC66}%s{FFFFFF}\n" \
-        "• Chinese Yuan (CNY), net: {66CC66}%s{FFFFFF}\n" \
-        "• US dollars (USD), dirty: {FFAA00}%s{FFFFFF}\n\n" \
+        "- US dollars (USD), net: {66CC66}%s{FFFFFF}\n" \
+        "- Euro (EUR), net: {66CC66}%s{FFFFFF}\n" \
+        "- Chinese Yuan (CNY), net: {66CC66}%s{FFFFFF}\n" \
+        "- US dollars (USD), dirty: {FFAA00}%s{FFFFFF}\n\n" \
         "Dirty cash is not accepted at ATMs. They can be legalized through the cash desk of your own legal business.",
         usdStr, eurStr, cnyStr, dirtyStr);
 
@@ -1265,7 +1265,7 @@ public OnBankStatementLoaded(playerid, sessionToken)
 
         new row[512];
         format(row, sizeof(row),
-            "{FFFFFF}• %s | {66CC66}%s{FFFFFF} | %s\n  {88CCFF}%s{FFFFFF}\n",
+            "{FFFFFF}- %s | {66CC66}%s{FFFFFF} | %s\n  {88CCFF}%s{FFFFFF}\n",
             createdAt, amountStr, actionType, details);
         if ((strlen(body) + strlen(row)) >= sizeof(body))
         {

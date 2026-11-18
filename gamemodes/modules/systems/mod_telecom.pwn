@@ -727,7 +727,7 @@ static stock Internal_BuySimDialog(playerid)
 
     new body[384];
     format(body, sizeof(body),
-        "Legal SIM card – %d USD\n" \
+        "Legal SIM card - %d USD\n" \
         "Linked to your SSN. Calls are visible in FBI billing.\n\n" \
         "Disposable anonymous SIM card - %d USD\n" \
         "No registration required. Completely anonymous and can be thrown away after use.",

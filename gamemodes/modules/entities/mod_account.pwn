@@ -221,7 +221,7 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
     if (errorNotice[0] != EOS)
     {
         format(body, sizeof(body),
-            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on fair economy, physical weight and complete freedom of action.\n\n{FF4444}Error: %s{FFFFFF}\n\nCreate a strong password to protect your account (from %d to %d characters):",
+            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on a fair market economy, realistic item weight, and complete freedom of action.\n\n{FF4444}Error: %s{FFFFFF}\n\nCreate a strong password to protect your account (%d to %d characters):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             errorNotice,
             ACCOUNT_PASSWORD_MIN_LEN,
@@ -230,7 +230,7 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on fair economy, physical weight and complete freedom of action.\n\n{FF4444}Error: %s{FFFFFF}\n\nCreate a strong password to protect your account (from %d to %d characters):",
+            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on a fair market economy, realistic item weight, and complete freedom of action.\n\nCreate a strong password to protect your account (%d to %d characters):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             ACCOUNT_PASSWORD_MIN_LEN,
             ACCOUNT_PASSWORD_MAX_LEN);
@@ -242,8 +242,8 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
         DIALOG_STYLE_PASSWORD,
         "{FFC800}SAN ANDREAS RP {FFFFFF}| Account Registration (Step 1/2)",
         body,
-        "Next",
-        "Exit");
+        "Register",
+        "Cancel");
 }
 
 static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = "")
@@ -254,14 +254,14 @@ static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = ""
     if (errorNotice[0] != EOS)
     {
         format(body, sizeof(body),
-            "{FFFFFF}Enter an email address (E-Mail) to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email now, press the \"Skip\" button.\n\n{FF4444}Error: %s{FFFFFF}\n\nEnter a valid E-Mail (for example: player@example.com):",
+            "{FFFFFF}Enter an email address to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email right now, click \"Skip\".\n\n{FF4444}Error: %s{FFFFFF}\n\nEnter a valid email address (for example: player@example.com):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             errorNotice);
     }
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}Enter an email address (E-Mail) to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email now, press the \"Skip\" button.\n\n{FF4444}Error: %s{FFFFFF}\n\nEnter a valid E-Mail (for example: player@example.com):",
+            "{FFFFFF}Enter an email address to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email right now, click \"Skip\".\n\nEnter a valid email address (for example: player@example.com):",
             sPlayerAccounts[playerid][E_ACC_USERNAME]);
     }
 
@@ -271,7 +271,7 @@ static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = ""
         DIALOG_STYLE_INPUT,
         "{FFC800}SAN ANDREAS RP {FFFFFF}| Email Linking (Step 2/2)",
         body,
-        "Done",
+        "Next",
         "Skip");
 }
 
@@ -294,19 +294,20 @@ static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = ""
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}Welcome back to the State of San Andreas, {FFC800}%s{FFFFFF}!\nYour account is registered in the state database.\n\n{FF4444}%s (attempts left: %d of %d){FFFFFF}\n\nEnter your account password to log in:",
+            "{FFFFFF}Welcome back to the State of San Andreas, {FFC800}%s{FFFFFF}!\nYour account is registered in the state database.\n\n{88CCFF}Login attempts available: %d of %d{FFFFFF}\n\nEnter your account password to log in:",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
-            remainingAttempts);
+            remainingAttempts,
+            ACCOUNT_MAX_LOGIN_ATTEMPTS);
     }
 
     ShowPlayerDialog(
         playerid,
         DIALOG_ACC_LOGIN_PASSWORD,
         DIALOG_STYLE_PASSWORD,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Login",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Account Login",
         body,
-        "Log In",
-        "Exit");
+        "Login",
+        "Cancel");
 }
 
 static stock Internal_FindRamAccountSlot(const username[])
