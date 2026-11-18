@@ -242,7 +242,7 @@ static stock Internal_LoadMarketOrdersSync()
     if (!DB_IsConnected())
     {
         Internal_SeedBuiltinMarketOrders();
-        printf("%s [Systems/Economy] MySQL недоступен: загружен встроенный набор ордеров (%d записей).",
+        printf("%s [Systems/Economy] MySQL is unavailable: the built-in order set (%d records) is loaded.",
             SERVER_LOG_PREFIX, TOTAL_BUILTIN_MARKET_ORDERS);
         return TOTAL_BUILTIN_MARKET_ORDERS;
     }
@@ -255,7 +255,7 @@ static stock Internal_LoadMarketOrdersSync()
     if (!cache_is_valid(cache))
     {
         Internal_SeedBuiltinMarketOrders();
-        printf("%s [Systems/Economy] [WARN] Не удалось прочитать enterprise_market_orders: загружен встроенный набор.",
+        printf("%s [Systems/Economy] [WARN] Failed to read enterprise_market_orders: built-in set loaded.",
             SERVER_LOG_PREFIX);
         return TOTAL_BUILTIN_MARKET_ORDERS;
     }
@@ -293,7 +293,7 @@ static stock Internal_LoadMarketOrdersSync()
     }
     cache_delete(cache);
 
-    printf("%s [Systems/Economy] Биржевые ордера загружены из MySQL (записей: %d).",
+    printf("%s [Systems/Economy] Exchange orders loaded from MySQL (records: %d).",
         SERVER_LOG_PREFIX, loadedOrders);
     return loadedOrders;
 }
@@ -377,7 +377,7 @@ static stock Internal_DropCashToWorld(playerid, amountUsd)
     }
 
     SendClientMessage(playerid, COLOR_UI_WARNING,
-        "Наличные не поместились в инвентарь и выданы отдельной пачкой на земле.");
+        "The cash did not fit into inventory and was issued in a separate bundle on the ground.");
     return 1;
 }
 
@@ -518,15 +518,15 @@ static stock Internal_GetCategoryTitleRu(E_ITEM_CATEGORY:category, output[], len
 {
     switch (category)
     {
-        case ITEM_CAT_RAW:              format(output, len, "Сырье");
-        case ITEM_CAT_INTERMEDIATE:     format(output, len, "Промышленность");
-        case ITEM_CAT_MELEE:            format(output, len, "Ближний бой");
-        case ITEM_CAT_FIREARM:          format(output, len, "Оружие");
-        case ITEM_CAT_HEAVY_THROWABLE:  format(output, len, "Тяжелое вооружение");
-        case ITEM_CAT_GEAR_ELECTRONICS: format(output, len, "Снаряжение");
-        case ITEM_CAT_MEDICAL_FOOD:     format(output, len, "Медицина и еда");
-        case ITEM_CAT_ILLEGAL:          format(output, len, "Нелегальный товар");
-        default:                        format(output, len, "Товар");
+        case ITEM_CAT_RAW:              format(output, len, "Raw materials");
+        case ITEM_CAT_INTERMEDIATE:     format(output, len, "Industry");
+        case ITEM_CAT_MELEE:            format(output, len, "Melee");
+        case ITEM_CAT_FIREARM:          format(output, len, "Weapons");
+        case ITEM_CAT_HEAVY_THROWABLE:  format(output, len, "Heavy Ordnance");
+        case ITEM_CAT_GEAR_ELECTRONICS: format(output, len, "Equipment");
+        case ITEM_CAT_MEDICAL_FOOD:     format(output, len, "Medicine and food");
+        case ITEM_CAT_ILLEGAL:          format(output, len, "Illegal goods");
+        default:                        format(output, len, "Product");
     }
     return 1;
 }
@@ -572,7 +572,7 @@ static stock Internal_ShowEnterpriseInfo(playerid, enterprise_id)
 {
     if (!Enterprise_IsValid(enterprise_id))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Объект не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Object not found.");
         return 0;
     }
 
@@ -590,15 +590,15 @@ static stock Internal_ShowEnterpriseInfo(playerid, enterprise_id)
         new weightStr[32], volumeStr[32];
         Utils_FormatWeightGrams(Storage_GetCurrentWeight(warehouseSlot), weightStr);
         Utils_FormatVolumeMl(Storage_GetCurrentVolume(warehouseSlot), volumeStr);
-        format(stockInfo, sizeof(stockInfo), "На складе: %s, %s", weightStr, volumeStr);
+        format(stockInfo, sizeof(stockInfo), "In stock: %s, %s", weightStr, volumeStr);
     }
     else
     {
-        format(stockInfo, sizeof(stockInfo), "Склад временно недоступен");
+        format(stockInfo, sizeof(stockInfo), "Warehouse temporarily unavailable");
     }
 
     format(body, sizeof(body),
-        "Название: %s\nТип: %s\nФорма собственности: %s\nОборотный капитал: $%d\nЗарплата за 1 кг добычи: $%d\n%s\nАктивных ордеров: %d",
+        "Name: %s\nType: %s\nForm of ownership: %s\nWorking capital: $%d\nSalary per 1 kg of production: $%d\n%s\nActive orders: %d",
         name,
         typeTitle,
         ownerTitle,
@@ -611,12 +611,12 @@ static stock Internal_ShowEnterpriseInfo(playerid, enterprise_id)
         Enterprise_GetAuctionPrice(enterprise_id) > 0)
     {
         new auctionLine[96];
-        format(auctionLine, sizeof(auctionLine), "\nАукционная цена выкупа: $%d",
+        format(auctionLine, sizeof(auctionLine), "\nAuction buyout price: $%d",
             Enterprise_GetAuctionPrice(enterprise_id));
         strcat(body, auctionLine, sizeof(body));
     }
 
-    ShowPlayerDialog(playerid, DIALOG_ECONOMY_INFO, DIALOG_STYLE_MSGBOX, "Предприятие", body, "Понятно", "");
+    ShowPlayerDialog(playerid, DIALOG_ECONOMY_INFO, DIALOG_STYLE_MSGBOX, "Enterprise", body, "Understood", "");
     return 1;
 }
 
@@ -636,49 +636,49 @@ static stock Internal_ShowEnterpriseMenu(playerid, enterprise_id)
 
     format(menu, sizeof(menu),
         "%s\n%s\n",
-        "Информация о предприятии",
-        "Открыть торговый зал (ордера)");
+        "Company information",
+        "Open trading floor (orders)");
 
     sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_INFO;
     sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_MARKET_TRADE;
 
     if (Enterprise_IsOwnedByPlayer(playerid, enterprise_id))
     {
-        strcat(menu, "Установить закупочную цену на сырье\n", sizeof(menu));
+        strcat(menu, "Set the purchase price for raw materials\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_SET_BUY_ORDER;
 
-        strcat(menu, "Установить отпускную цену на продукцию\n", sizeof(menu));
+        strcat(menu, "Set the selling price for products\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_SET_SELL_ORDER;
 
-        strcat(menu, "Пополнить оборотный капитал\n", sizeof(menu));
+        strcat(menu, "Replenish working capital\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_DEPOSIT;
 
-        strcat(menu, "Снять оборотный капитал\n", sizeof(menu));
+        strcat(menu, "Withdraw working capital\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_WITHDRAW;
 
-        strcat(menu, "Установить зарплату за 1 кг добычи\n", sizeof(menu));
+        strcat(menu, "Set the salary for 1 kg of production\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_SET_WAGE;
 
-        strcat(menu, "Управление ордерами\n", sizeof(menu));
+        strcat(menu, "Order management\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_MANAGE_ORDERS;
 
-        strcat(menu, "Создать контракт на перевозку\n", sizeof(menu));
+        strcat(menu, "Create a freight contract\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_CREATE_CONTRACT;
 
-        strcat(menu, "Взять товар со склада\n", sizeof(menu));
+        strcat(menu, "Take goods from warehouse\n", sizeof(menu));
         sEconomyMenuAction[sEconomyMenuActionCount[playerid]++] = ECON_ACTION_WITHDRAW_GOODS;
     }
 
     new title[96];
-    format(title, sizeof(title), "Предприятие: %s", name);
+    format(title, sizeof(title), "Company: %s", name);
     ShowPlayerDialog(
         playerid,
         DIALOG_ECONOMY_MENU,
         DIALOG_STYLE_LIST,
         title,
         menu,
-        "Выбрать",
-        "Закрыть");
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -734,7 +734,7 @@ static stock Internal_ShowItemSelection(playerid, enterprise_id, E_ECONOMY_ACTIO
         if (action == ECON_ACTION_CREATE_CONTRACT || action == ECON_ACTION_WITHDRAW_GOODS)
         {
             new const warehouseSlot = Enterprise_GetWarehouseSlot(enterprise_id);
-            format(rowLine, sizeof(rowLine), "%s | %s | на складе: %d шт.",
+            format(rowLine, sizeof(rowLine), "%s | %s | in stock: %d pcs.",
                 itemName, categoryTitle, Storage_CountItemInTree(warehouseSlot, defId));
         }
         else
@@ -749,7 +749,7 @@ static stock Internal_ShowItemSelection(playerid, enterprise_id, E_ECONOMY_ACTIO
 
     if (sEconomyRowCount[playerid] <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Предприятие]: Нет доступных товаров для этого действия.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Business]: There are no products available for this action.");
         return 0;
     }
 
@@ -759,11 +759,11 @@ static stock Internal_ShowItemSelection(playerid, enterprise_id, E_ECONOMY_ACTIO
     new title[96];
     switch (action)
     {
-        case ECON_ACTION_SET_BUY_ORDER:      format(title, sizeof(title), "Закупка сырья: выберите товар");
-        case ECON_ACTION_SET_SELL_ORDER:     format(title, sizeof(title), "Продажа продукции: выберите товар");
-        case ECON_ACTION_CREATE_CONTRACT:    format(title, sizeof(title), "Контракт: выберите груз со склада");
-        case ECON_ACTION_WITHDRAW_GOODS:     format(title, sizeof(title), "Склад: выберите товар для получения");
-        default:                             format(title, sizeof(title), "Выберите товар");
+        case ECON_ACTION_SET_BUY_ORDER:      format(title, sizeof(title), "Purchasing raw materials: select product");
+        case ECON_ACTION_SET_SELL_ORDER:     format(title, sizeof(title), "Selling products: select a product");
+        case ECON_ACTION_CREATE_CONTRACT:    format(title, sizeof(title), "Contract: select cargo from warehouse");
+        case ECON_ACTION_WITHDRAW_GOODS:     format(title, sizeof(title), "Warehouse: select the item to receive");
+        default:                             format(title, sizeof(title), "Select product");
     }
 
     ShowPlayerDialog(
@@ -772,8 +772,8 @@ static stock Internal_ShowItemSelection(playerid, enterprise_id, E_ECONOMY_ACTIO
         DIALOG_STYLE_LIST,
         title,
         sEconomyDialogBuffer,
-        "Выбрать",
-        "Отмена");
+        "Select",
+        "Cancel");
     return 1;
 }
 
@@ -798,15 +798,15 @@ static stock Internal_ShowOrdersManagement(playerid, enterprise_id)
         Item_GetName(sMarketOrders[orderSlot][E_ORDER_ITEM_DEF_ID], itemName);
         if (sMarketOrders[orderSlot][E_ORDER_TYPE] == MARKET_ORDER_BUY_RAW)
         {
-            format(typeTitle, sizeof(typeTitle), "ЗАКУПКА");
+            format(typeTitle, sizeof(typeTitle), "PURCHASE");
         }
         else
         {
-            format(typeTitle, sizeof(typeTitle), "ПРОДАЖА");
+            format(typeTitle, sizeof(typeTitle), "SALE");
         }
 
         format(rowLine, sizeof(rowLine),
-            "%s | %s | $%d/шт | %d/%d | [УДАЛИТЬ]",
+            "%s | %s | $%d/piece | %d/%d | [DELETE]",
             typeTitle,
             itemName,
             sMarketOrders[orderSlot][E_ORDER_PRICE_PER_UNIT_USD],
@@ -820,7 +820,7 @@ static stock Internal_ShowOrdersManagement(playerid, enterprise_id)
 
     if (sEconomyRowCount[playerid] <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Предприятие]: У этого предприятия нет ордеров.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Enterprise]: This enterprise has no orders.");
         return 0;
     }
 
@@ -829,10 +829,10 @@ static stock Internal_ShowOrdersManagement(playerid, enterprise_id)
         playerid,
         DIALOG_ECONOMY_ORDERS,
         DIALOG_STYLE_LIST,
-        "Управление ордерами",
+        "Order management",
         sEconomyDialogBuffer,
-        "Удалить",
-        "Назад");
+        "Delete",
+        "Back");
     return 1;
 }
 
@@ -870,7 +870,7 @@ static stock Internal_ShowMarket(playerid, enterprise_id)
                     warehouseSlot, sMarketOrders[orderSlot][E_ORDER_ITEM_DEF_ID]);
             }
             format(rowLine, sizeof(rowLine),
-                "[КУПИТЬ] %s | $%d/шт | в наличии: %d | осталось: %d",
+                "[BUY] %s | $%d/piece | in stock: %d | left: %d",
                 itemName,
                 sMarketOrders[orderSlot][E_ORDER_PRICE_PER_UNIT_USD],
                 stockAmount,
@@ -880,7 +880,7 @@ static stock Internal_ShowMarket(playerid, enterprise_id)
         else
         {
             format(rowLine, sizeof(rowLine),
-                "[ПРОДАТЬ] %s | $%d/шт | нужно: %d",
+                "[SELL] %s | $%d/piece | needed: %d",
                 itemName,
                 sMarketOrders[orderSlot][E_ORDER_PRICE_PER_UNIT_USD],
                 sMarketOrders[orderSlot][E_ORDER_TARGET_AMOUNT] -
@@ -894,7 +894,7 @@ static stock Internal_ShowMarket(playerid, enterprise_id)
 
     if (sEconomyRowCount[playerid] <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Торговый зал]: Все ордера выполнены или отсутствуют.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Trading floor]: All orders are filled or missing.");
         return 0;
     }
 
@@ -903,10 +903,10 @@ static stock Internal_ShowMarket(playerid, enterprise_id)
         playerid,
         DIALOG_ECONOMY_MARKET,
         DIALOG_STYLE_LIST,
-        "Торговый зал предприятия",
+        "Trading hall of the enterprise",
         sEconomyDialogBuffer,
-        "Выбрать",
-        "Закрыть");
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -921,7 +921,7 @@ static stock Internal_CreateOrUpdateOrder(
     if (!Enterprise_IsValid(enterprise_id) || !Item_IsValid(itemDefId) ||
         pricePerUnit <= 0 || targetAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Некорректные параметры ордера.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Incorrect order parameters.");
         return 0;
     }
 
@@ -952,7 +952,7 @@ static stock Internal_CreateOrUpdateOrder(
 
             new auditDetails[192];
             format(auditDetails, sizeof(auditDetails),
-                "Обновлен ордер #%d: товар %d, цена $%d, цель %d.",
+                "Order #%d updated: product %d, price $%d, target %d.",
                 sMarketOrders[orderSlot][E_ORDER_DB_ID], itemDefId,
                 pricePerUnit, sMarketOrders[orderSlot][E_ORDER_TARGET_AMOUNT]);
             Audit_Log(
@@ -964,7 +964,7 @@ static stock Internal_CreateOrUpdateOrder(
                 sMarketOrders[orderSlot][E_ORDER_TARGET_AMOUNT],
                 auditDetails);
 
-            SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Предприятие]: Ордер обновлен.");
+            SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Enterprise]: Order updated.");
             return 1;
         }
     }
@@ -981,7 +981,7 @@ static stock Internal_CreateOrUpdateOrder(
 
     if (orderSlot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Пул ордеров переполнен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: The order pool is full.");
         return 0;
     }
 
@@ -1001,7 +1001,7 @@ static stock Internal_CreateOrUpdateOrder(
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Создан ордер #%d: товар %d, цена $%d, цель %d.",
+        "Order #%d was created: product %d, price $%d, target %d.",
         dbId, itemDefId, pricePerUnit, targetAmount);
     Audit_Log(
         Character_GetId(playerid),
@@ -1012,7 +1012,7 @@ static stock Internal_CreateOrUpdateOrder(
         targetAmount,
         auditDetails);
 
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Предприятие]: Новый ордер создан.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Enterprise]: A new order has been created.");
     return 1;
 }
 
@@ -1020,7 +1020,7 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
 {
     if (order_slot < 0 || order_slot >= MAX_MARKET_ORDERS || !sMarketOrders[order_slot][E_ORDER_VALID])
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Ордер не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading floor]: Order not found.");
         return 0;
     }
 
@@ -1028,19 +1028,19 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
     new const itemDefId = sMarketOrders[order_slot][E_ORDER_ITEM_DEF_ID];
     if (sMarketOrders[order_slot][E_ORDER_TYPE] != MARKET_ORDER_SELL_PRODUCT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Этот ордер не предназначен для продажи товара.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Floor]: This order is not intended for the sale of goods.");
         return 0;
     }
     if (!Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Подойдите вплотную к складу магазина.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Shopping Hall]: Move close to the store's warehouse.");
         return 0;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(enterpriseId);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Торговый зал]: Склад еще загружается. Повторите через секунду.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Trading floor]: The warehouse is still loading. Repeat in a second.");
         return 0;
     }
 
@@ -1059,14 +1059,14 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: На складе нет этого товара.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading area]: This item is out of stock.");
         return 0;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Room]: Inventory unavailable.");
         return 0;
     }
 
@@ -1094,21 +1094,21 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
     if (amount <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Торговый зал]: Товар не помещается в инвентарь. Освободите место.");
+            "[Shopping area]: The product does not fit into inventory. Make room.");
         return 0;
     }
 
     new const pricePerUnit = sMarketOrders[order_slot][E_ORDER_PRICE_PER_UNIT_USD];
     if (pricePerUnit <= 0 || amount > (2000000000 / pricePerUnit))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Слишком большая сумма сделки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading room]: The transaction amount is too large.");
         return 0;
     }
     new const totalCost = pricePerUnit * amount;
     if (Character_GetPhysicalCashUsd(playerid) < totalCost)
     {
         new msg[160];
-        format(msg, sizeof(msg), "[Торговый зал]: Недостаточно наличных. Нужно $%d.", totalCost);
+        format(msg, sizeof(msg), "[Trading floor]: Not enough cash. Need $%d.", totalCost);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 0;
     }
@@ -1119,7 +1119,7 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
     new const bool:cashRemoved = Character_RemovePhysicalCashUsd(playerid, totalCost);
     if (!cashRemoved)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Не удалось списать наличные.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading room]: Failed to write off cash.");
         return 0;
     }
 
@@ -1130,7 +1130,7 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
     {
         Character_AddPhysicalCashUsd(playerid, totalCost, CASH_FLAG_CLEAN);
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Торговый зал]: Не удалось выдать товар (переполнен инвентарь). Деньги возвращены.");
+            "[Trading floor]: Failed to issue goods (inventory is full). The money has been returned.");
         return 0;
     }
 
@@ -1146,13 +1146,13 @@ static stock Internal_ExecuteMarketPurchase(playerid, order_slot, requestedAmoun
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Торговый зал]: Вы купили %s (количество: %d) за $%d.",
+        "[Trading Room]: You bought %s (quantity: %d) for $%d.",
         itemName, movedAmount, actualCost);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Покупка товара '%s' (кол-во: %d) в магазине предприятия #%d за $%d.",
+        "Purchase of product '%s' (quantity: %d) in the store of the company #%d for $%d.",
         itemName, movedAmount, Enterprise_GetDbId(enterpriseId), actualCost);
     Audit_Log(
         Character_GetId(playerid),
@@ -1169,7 +1169,7 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
 {
     if (order_slot < 0 || order_slot >= MAX_MARKET_ORDERS || !sMarketOrders[order_slot][E_ORDER_VALID])
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Ордер не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading floor]: Order not found.");
         return 0;
     }
 
@@ -1177,26 +1177,26 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
     new const itemDefId = sMarketOrders[order_slot][E_ORDER_ITEM_DEF_ID];
     if (sMarketOrders[order_slot][E_ORDER_TYPE] != MARKET_ORDER_BUY_RAW)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Этот ордер не принимает сырье.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Floor]: This order does not accept raw materials.");
         return 0;
     }
     if (!Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Подойдите вплотную к складу предприятия.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading floor]: Come close to the enterprise warehouse.");
         return 0;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(enterpriseId);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Торговый зал]: Склад еще загружается. Повторите через секунду.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Trading floor]: The warehouse is still loading. Repeat in a second.");
         return 0;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Room]: Inventory unavailable.");
         return 0;
     }
 
@@ -1215,14 +1215,14 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: У вас нет этого товара.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading room]: You do not have this product.");
         return 0;
     }
 
     new const pricePerUnit = sMarketOrders[order_slot][E_ORDER_PRICE_PER_UNIT_USD];
     if (pricePerUnit <= 0 || amount > (2000000000 / pricePerUnit))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Слишком большая сумма сделки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading room]: The transaction amount is too large.");
         return 0;
     }
     new const payout = pricePerUnit * amount;
@@ -1230,7 +1230,7 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
     {
         new msg[160];
         format(msg, sizeof(msg),
-            "[Торговый зал]: В кассе предприятия недостаточно средств. Нужно $%d, доступно $%d.",
+            "[Trading floor]: There are not enough funds in the company's cash register. Need $%d, available $%d.",
             payout, Enterprise_GetReserve(enterpriseId));
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 0;
@@ -1244,7 +1244,7 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
 
     if (movedAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Не удалось передать товар на склад.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading floor]: Failed to transfer the goods to the warehouse.");
         return 0;
     }
 
@@ -1258,13 +1258,13 @@ static stock Internal_ExecuteMarketSale(playerid, order_slot, requestedAmount)
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Торговый зал]: Вы продали %s (количество: %d) за $%d.",
+        "[Trading Room]: You sold %s (quantity: %d) for $%d.",
         itemName, movedAmount, actualPayout);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Продажа сырья '%s' (кол-во: %d) предприятию #%d за $%d.",
+        "Sale of raw materials '%s' (quantity: %d) to enterprise #%d for $%d.",
         itemName, movedAmount, Enterprise_GetDbId(enterpriseId), actualPayout);
     Audit_Log(
         Character_GetId(playerid),
@@ -1285,33 +1285,33 @@ static stock Internal_ExecuteAuctionBuyout(playerid, enterprise_id)
     }
     if (Enterprise_GetOwnership(enterprise_id) != ENTERPRISE_OWN_UNOWNED)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Предприятие уже имеет владельца.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: The enterprise already has an owner.");
         return 0;
     }
 
     new const price = Enterprise_GetAuctionPrice(enterprise_id);
     if (price <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Цена выкупа не установлена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: The redemption price has not been set.");
         return 0;
     }
     if (Character_GetPhysicalCashUsd(playerid) < price)
     {
         new msg[160];
-        format(msg, sizeof(msg), "[Аукцион]: Недостаточно наличных. Требуется $%d.", price);
+        format(msg, sizeof(msg), "[Auction]: Not enough cash. Requires $%d.", price);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 0;
     }
     if (!Character_RemovePhysicalCashUsd(playerid, price))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Не удалось списать наличные.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: Cash debit failed.");
         return 0;
     }
 
     if (!Enterprise_SetPrivateOwner(enterprise_id, Character_GetId(playerid)))
     {
         Character_AddPhysicalCashUsd(playerid, price, CASH_FLAG_CLEAN);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Ошибка оформления собственности. Деньги возвращены.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: Property registration error. The money has been returned.");
         return 0;
     }
 
@@ -1329,13 +1329,13 @@ static stock Internal_ExecuteAuctionBuyout(playerid, enterprise_id)
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Аукцион]: Поздравляем! Вы выкупили предприятие «%s» за $%d.",
+        "[Auction]: Congratulations! You purchased the enterprise “%s” for $%d.",
         enterpriseName, price);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Аукционный выкуп предприятия '%s' (#%d) за $%d в пользу казны штата.",
+        "Auction purchase of the enterprise '%s' (#%d) for $%d in favor of the state treasury.",
         enterpriseName, Enterprise_GetDbId(enterprise_id), price);
     Audit_Log(
         Character_GetId(playerid),
@@ -1358,12 +1358,12 @@ static stock Internal_CreateContractToDestination(
 {
     if (!Enterprise_IsValid(enterprise_id) || !Enterprise_IsOwnedByPlayer(playerid, enterprise_id))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
         return 0;
     }
     if (!Item_IsValid(item_def_id) || amount <= 0 || amount > 100000)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Некорректный груз для контракта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Incorrect cargo for the contract.");
         return 0;
     }
 
@@ -1376,7 +1376,7 @@ static stock Internal_CreateContractToDestination(
             Character_GetId(playerid)))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Предприятие]: Не удалось создать контракт (нет груза на складе или переполнен пул).");
+            "[Enterprise]: Failed to create contract (no cargo in warehouse or pool full).");
         return 0;
     }
 
@@ -1386,7 +1386,7 @@ static stock Internal_CreateContractToDestination(
     {
         Ports_GetPortNameRu(dest_id, destName, sizeof(destName));
         format(msg, sizeof(msg),
-            "[Предприятие]: Экспортный контракт создан: %s (количество: %d) -> %s.",
+            "[Enterprise]: Export contract created: %s (quantity: %d) -> %s.",
             itemName, amount, destName);
     }
     else
@@ -1398,10 +1398,10 @@ static stock Internal_CreateContractToDestination(
         }
         else
         {
-            format(destName, sizeof(destName), "Предприятие #%d", dest_id);
+            format(destName, sizeof(destName), "Enterprise #%d", dest_id);
         }
         format(msg, sizeof(msg),
-            "[Предприятие]: Контракт создан: %s (количество: %d) -> %s.",
+            "[Enterprise]: Contract created: %s (quantity: %d) -> %s.",
             itemName, amount, destName);
     }
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
@@ -1422,7 +1422,7 @@ static stock Internal_ShowContractDestinations(playerid, enterprise_id, item_def
         Enterprise_GetName(destEnterpriseSlot, destName);
         sEconomyContractDestType[playerid][sEconomyContractDestCount[playerid]] = LOGISTICS_DEST_ENTERPRISE;
         sEconomyContractDestId[playerid][sEconomyContractDestCount[playerid]] = Enterprise_GetDbId(destEnterpriseSlot);
-        format(rowLine, sizeof(rowLine), "Предприятие-покупатель: %s", destName);
+        format(rowLine, sizeof(rowLine), "Buying company: %s", destName);
         strcat(sEconomyDialogBuffer, rowLine, sizeof(sEconomyDialogBuffer));
         strcat(sEconomyDialogBuffer, "\n", sizeof(sEconomyDialogBuffer));
         sEconomyContractDestCount[playerid]++;
@@ -1443,7 +1443,7 @@ static stock Internal_ShowContractDestinations(playerid, enterprise_id, item_def
         Ports_GetPortNameRu(portId, portName, sizeof(portName));
         sEconomyContractDestType[playerid][sEconomyContractDestCount[playerid]] = LOGISTICS_DEST_PORT;
         sEconomyContractDestId[playerid][sEconomyContractDestCount[playerid]] = portId;
-        format(rowLine, sizeof(rowLine), "Порт: %s", portName);
+        format(rowLine, sizeof(rowLine), "Port: %s", portName);
         strcat(sEconomyDialogBuffer, rowLine, sizeof(sEconomyDialogBuffer));
         strcat(sEconomyDialogBuffer, "\n", sizeof(sEconomyDialogBuffer));
         sEconomyContractDestCount[playerid]++;
@@ -1452,7 +1452,7 @@ static stock Internal_ShowContractDestinations(playerid, enterprise_id, item_def
     if (sEconomyContractDestCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Предприятие]: Нет ни закупочного ордера, ни портовой котировки на этот товар.");
+            "[Enterprise]: There is no purchase order or port quotation for this product.");
         return 0;
     }
 
@@ -1475,10 +1475,10 @@ static stock Internal_ShowContractDestinations(playerid, enterprise_id, item_def
         playerid,
         DIALOG_ECONOMY_CONTRACT_DEST,
         DIALOG_STYLE_LIST,
-        "Куда доставить груз?",
+        "Where to deliver the goods?",
         sEconomyDialogBuffer,
-        "Создать контракт",
-        "Отмена");
+        "Create a contract",
+        "Cancel");
     return 1;
 }
 
@@ -1496,29 +1496,29 @@ static stock Internal_HandleInputAmount(playerid, amount)
         {
             if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return 0;
             }
             if (Character_GetPhysicalCashUsd(playerid) < amount)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Недостаточно наличных для пополнения кассы.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: There is not enough cash to replenish the cash register.");
                 return 0;
             }
             if (!Character_RemovePhysicalCashUsd(playerid, amount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Не удалось списать наличные.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Cash debit failed.");
                 return 0;
             }
             Enterprise_AddReserve(enterpriseId, amount);
 
             new msg[160];
-            format(msg, sizeof(msg), "[Предприятие]: Оборотный капитал пополнен на $%d. В кассе: $%d.",
+            format(msg, sizeof(msg), "[Enterprise]: Working capital replenished by $%d. At the box office: $%d.",
                 amount, Enterprise_GetReserve(enterpriseId));
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
             new auditDetails[160];
             format(auditDetails, sizeof(auditDetails),
-                "Пополнение оборотного капитала предприятия #%d на $%d.",
+                "Replenishment of working capital of the enterprise #%d by $%d.",
                 Enterprise_GetDbId(enterpriseId), amount);
             Audit_Log(
                 Character_GetId(playerid),
@@ -1535,30 +1535,30 @@ static stock Internal_HandleInputAmount(playerid, amount)
         {
             if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return 0;
             }
             if (Enterprise_GetReserve(enterpriseId) < amount)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: В кассе недостаточно средств.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: There are not enough funds in the cash register.");
                 return 0;
             }
             if (!Character_AddPhysicalCashUsd(playerid, amount, CASH_FLAG_CLEAN))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Предприятие]: Наличные не помещаются в инвентарь. Снимите меньшую сумму.");
+                    "[Enterprise]: Cash is not placed in inventory. Withdraw a smaller amount.");
                 return 0;
             }
             Enterprise_TakeReserve(enterpriseId, amount);
 
             new msg[160];
-            format(msg, sizeof(msg), "[Предприятие]: Вы сняли $%d из кассы. Остаток: $%d.",
+            format(msg, sizeof(msg), "[Enterprise]: You withdrew $%d from the cash register. Remaining: $%d.",
                 amount, Enterprise_GetReserve(enterpriseId));
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
             new auditDetails[160];
             format(auditDetails, sizeof(auditDetails),
-                "Снятие $%d из оборотного капитала предприятия #%d.",
+                "Withdrawal of $%d from the working capital of enterprise #%d.",
                 amount, Enterprise_GetDbId(enterpriseId));
             Audit_Log(
                 Character_GetId(playerid),
@@ -1575,19 +1575,19 @@ static stock Internal_HandleInputAmount(playerid, amount)
         {
             if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return 0;
             }
             Enterprise_SetWagePerKg(enterpriseId, amount);
 
             new msg[160];
-            format(msg, sizeof(msg), "[Предприятие]: Зарплата за 1 кг добычи установлена: $%d.",
+            format(msg, sizeof(msg), "[Enterprise]: Salary for 1 kg of production is set: $%d.",
                 Enterprise_GetWagePerKg(enterpriseId));
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
             new auditDetails[160];
             format(auditDetails, sizeof(auditDetails),
-                "Изменена зарплата за 1 кг на предприятии #%d: $%d.",
+                "The salary per 1 kg at the enterprise #%d has been changed: $%d.",
                 Enterprise_GetDbId(enterpriseId), Enterprise_GetWagePerKg(enterpriseId));
             Audit_Log(
                 Character_GetId(playerid),
@@ -1604,14 +1604,14 @@ static stock Internal_HandleInputAmount(playerid, amount)
         {
             if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return 0;
             }
             new const itemDefId = sEconomyPendingItem[playerid];
             if (!Item_IsValid(itemDefId) || amount <= 0 || amount > 100000)
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Предприятие]: Некорректный груз для контракта (допустимо от 1 до 100 000 единиц).");
+                    "[Enterprise]: Incorrect cargo for the contract (valid from 1 to 100,000 units).");
                 return 0;
             }
 
@@ -1622,12 +1622,12 @@ static stock Internal_HandleInputAmount(playerid, amount)
         {
             if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return 0;
             }
             if (!Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Подойдите вплотную к складу.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Get close to the warehouse.");
                 return 0;
             }
             new const itemDefId = sEconomyPendingItem[playerid];
@@ -1635,7 +1635,7 @@ static stock Internal_HandleInputAmount(playerid, amount)
             if (!Item_IsValid(itemDefId) || !Storage_IsValidSlot(warehouseSlot) ||
                 !Storage_AreItemsReady(warehouseSlot))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Склад недоступен.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Warehouse unavailable.");
                 return 0;
             }
 
@@ -1646,14 +1646,14 @@ static stock Internal_HandleInputAmount(playerid, amount)
             }
             if (amount <= 0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: На складе нет этого товара.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: This item is out of stock.");
                 return 0;
             }
 
             new const layer1Slot = Character_GetLayer1Slot(playerid);
             if (!Storage_IsValidSlot(layer1Slot))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Инвентарь недоступен.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Inventory unavailable.");
                 return 0;
             }
 
@@ -1672,7 +1672,7 @@ static stock Internal_HandleInputAmount(playerid, amount)
             if (amount <= 0)
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Предприятие]: Товар не помещается в инвентарь. Освободите место.");
+                    "[Enterprise]: Item does not fit into inventory. Make room.");
                 return 0;
             }
 
@@ -1680,20 +1680,20 @@ static stock Internal_HandleInputAmount(playerid, amount)
             Internal_MoveStorageItemToPlayer(playerid, warehouseSlot, itemDefId, amount, movedAmount);
             if (movedAmount <= 0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Не удалось получить товар со склада.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Failed to receive goods from warehouse.");
                 return 0;
             }
 
             new itemName[64], msg[192];
             Item_GetName(itemDefId, itemName);
             format(msg, sizeof(msg),
-                "[Предприятие]: Получено со склада: %s (количество: %d).",
+                "[Enterprise]: Received from warehouse: %s (Quantity: %d).",
                 itemName, movedAmount);
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
             new auditDetails[192];
             format(auditDetails, sizeof(auditDetails),
-                "Получение товара '%s' (кол-во: %d) со склада предприятия #%d владельцем.",
+                "Receipt of goods '%s' (quantity: %d) from the warehouse of enterprise #%d by the owner.",
                 itemName, movedAmount, Enterprise_GetDbId(enterpriseId));
             Audit_Log(
                 Character_GetId(playerid),
@@ -1733,7 +1733,7 @@ static stock Internal_FinishOrderCreation(playerid, targetAmount)
         price <= 0 || targetAmount <= 0 ||
         !Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Некорректные параметры ордера или нет прав владельца.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Incorrect order parameters or no owner rights.");
         return 0;
     }
 
@@ -1839,12 +1839,12 @@ CMD:enterprise(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Мертвый персонаж не может управлять бизнесом.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: A dead character cannot run a business.");
         return 1;
     }
 
@@ -1859,7 +1859,7 @@ CMD:enterprise(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Предприятие]: Подойдите к зданию предприятия, чтобы открыть панель управления.");
+            "[Enterprise]: Approach the enterprise building to open the control panel.");
         return 1;
     }
 
@@ -1874,12 +1874,12 @@ CMD:market(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Room]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Мертвый персонаж не может торговать.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading Hall]: A dead character cannot trade.");
         return 1;
     }
 
@@ -1887,7 +1887,7 @@ CMD:market(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Торговый зал]: Подойдите вплотную к складу магазина или предприятия.");
+            "[Shopping Hall]: Move close to the warehouse of a store or business.");
         return 1;
     }
 
@@ -1901,12 +1901,12 @@ CMD:auction(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: Your character has not yet been uploaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Мертвый персонаж не может участвовать в аукционе.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: A dead character cannot participate in the auction.");
         return 1;
     }
 
@@ -1914,27 +1914,27 @@ CMD:auction(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Аукцион]: Подойдите к выставленному на продажу предприятию.");
+            "[Auction]: Approach a business that is up for sale.");
         return 1;
     }
 
     if (Enterprise_GetOwnership(enterpriseId) != ENTERPRISE_OWN_UNOWNED)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Это предприятие уже имеет владельца.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: This business already has an owner.");
         return 1;
     }
 
     new const price = Enterprise_GetAuctionPrice(enterpriseId);
     if (price <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Аукцион]: Это предприятие не выставлено на аукцион.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Auction]: This business is not up for auction.");
         return 1;
     }
 
     new enterpriseName[64], body[512];
     Enterprise_GetName(enterpriseId, enterpriseName);
     format(body, sizeof(body),
-        "Предприятие: %s\nЦена выкупа: $%d\nВаши наличные: $%d\n\nПодтвердите покупку. Средства поступят в казну штата.",
+        "Enterprise: %s\nBuyout price: $%d\nYour cash: $%d\n\nConfirm your purchase. The funds will go to the state treasury.",
         enterpriseName,
         price,
         Character_GetPhysicalCashUsd(playerid));
@@ -1944,10 +1944,10 @@ CMD:auction(playerid, params[])
         playerid,
         DIALOG_ECONOMY_AUCTION,
         DIALOG_STYLE_MSGBOX,
-        "Аукцион предприятий",
+        "Auction of enterprises",
         body,
-        "Выкупить",
-        "Отмена");
+        "Redeem",
+        "Cancel");
     return 1;
 }
 
@@ -1994,7 +1994,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     if (!Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
                     {
                         SendClientMessage(playerid, COLOR_UI_ERROR,
-                            "[Торговый зал]: Подойдите вплотную к складу предприятия.");
+                            "[Trading floor]: Come close to the enterprise warehouse.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     Internal_ShowMarket(playerid, enterpriseId);
@@ -2003,14 +2003,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (action == ECON_ACTION_WITHDRAW_GOODS &&
                         !Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
                     {
                         SendClientMessage(playerid, COLOR_UI_ERROR,
-                            "[Предприятие]: Подойдите вплотную к складу, чтобы взять товар.");
+                            "[Enterprise]: Move close to the warehouse to pick up the goods.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     Internal_ShowItemSelection(playerid, enterpriseId, action);
@@ -2019,7 +2019,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     sEconomyPendingAction[playerid] = action;
@@ -2027,15 +2027,15 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new title[96];
                     if (action == ECON_ACTION_DEPOSIT)
                     {
-                        format(title, sizeof(title), "Пополнение кассы. Введите сумму в USD");
+                        format(title, sizeof(title), "Replenishment of the cash register. Enter amount in USD");
                     }
                     else if (action == ECON_ACTION_WITHDRAW)
                     {
-                        format(title, sizeof(title), "Снятие из кассы. Введите сумму в USD");
+                        format(title, sizeof(title), "Withdrawal from the cash register. Enter amount in USD");
                     }
                     else
                     {
-                        format(title, sizeof(title), "Зарплата за 1 кг добычи. Введите сумму в USD");
+                        format(title, sizeof(title), "Salary for 1 kg of production. Enter amount in USD");
                     }
 
                     ShowPlayerDialog(
@@ -2043,15 +2043,15 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         DIALOG_ECONOMY_INPUT_AMOUNT,
                         DIALOG_STYLE_INPUT,
                         title,
-                        "Введите целое положительное число:",
-                        "Подтвердить",
-                        "Отмена");
+                        "Enter a positive integer:",
+                        "Confirm",
+                        "Cancel");
                 }
                 case ECON_ACTION_MANAGE_ORDERS:
                 {
                     if (!Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     Internal_ShowOrdersManagement(playerid, enterpriseId);
@@ -2072,14 +2072,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (listitem < 0 || listitem >= sEconomyRowCount[playerid])
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Некорректный выбор товара.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Incorrect product selection.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new const enterpriseId = sEconomyPendingEnterprise[playerid];
             if (!Enterprise_IsValid(enterpriseId) || !Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2096,10 +2096,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     playerid,
                     DIALOG_ECONOMY_INPUT_AMOUNT,
                     DIALOG_STYLE_INPUT,
-                    "Контракт на перевозку",
-                    "Введите количество единиц груза для перевозки:",
-                    "Далее",
-                    "Отмена");
+                    "Contract of carriage",
+                    "Enter the number of cargo units to be transported:",
+                    "Next",
+                    "Cancel");
             }
             else if (sEconomyPendingAction[playerid] == ECON_ACTION_WITHDRAW_GOODS)
             {
@@ -2107,24 +2107,24 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     playerid,
                     DIALOG_ECONOMY_INPUT_AMOUNT,
                     DIALOG_STYLE_INPUT,
-                    "Получение товара со склада",
-                    "Введите количество единиц товара:",
-                    "Получить",
-                    "Отмена");
+                    "Receiving goods from the warehouse",
+                    "Enter the number of product units:",
+                    "Get",
+                    "Cancel");
             }
             else
             {
                 new itemName[64], title[128];
                 Item_GetName(itemDefId, itemName);
-                format(title, sizeof(title), "%s: цена за единицу", itemName);
+                format(title, sizeof(title), "%s: unit price", itemName);
                 ShowPlayerDialog(
                     playerid,
                     DIALOG_ECONOMY_INPUT_PRICE,
                     DIALOG_STYLE_INPUT,
                     title,
-                    "Введите цену за одну единицу в USD:",
-                    "Далее",
-                    "Отмена");
+                    "Enter the price per unit in USD:",
+                    "Next",
+                    "Cancel");
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }
@@ -2139,7 +2139,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new price = 0;
             if (!Internal_ParsePositiveInt(inputtext, price) || price <= 0 || price > 1000000)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Цена должна быть целым числом от 1 до 1 000 000.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Price must be an integer between 1 and 1,000,000.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2148,10 +2148,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 playerid,
                 DIALOG_ECONOMY_INPUT_TARGET,
                 DIALOG_STYLE_INPUT,
-                "Целевое количество",
-                "Введите, сколько единиц товара требуется купить или продать:",
-                "Создать ордер",
-                "Отмена");
+                "Target quantity",
+                "Enter how many units of the product you want to buy or sell:",
+                "Create order",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -2165,7 +2165,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new target = 0;
             if (!Internal_ParsePositiveInt(inputtext, target) || target <= 0 || target > 1000000)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Количество должно быть от 1 до 1 000 000.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Quantity must be between 1 and 1,000,000.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2183,7 +2183,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new amount = 0;
             if (!Internal_ParsePositiveInt(inputtext, amount) || amount <= 0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Введите целое положительное число.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: Enter a positive integer.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2205,7 +2205,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new const enterpriseId = sEconomyPendingEnterprise[playerid];
             if (!Enterprise_IsValid(enterpriseId) || !Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2216,7 +2216,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (sMarketOrders[orderSlot][E_ORDER_ENTERPRISE_ID] != enterpriseId)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Этот ордер принадлежит другому предприятию.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Enterprise]: This order belongs to another enterprise.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2231,7 +2231,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
             new auditDetails[160];
             format(auditDetails, sizeof(auditDetails),
-                "Удален ордер #%d предприятия #%d.",
+                "Order #%d of enterprise #%d has been removed.",
                 sMarketOrders[orderSlot][E_ORDER_DB_ID],
                 Enterprise_GetDbId(enterpriseId));
             Audit_Log(
@@ -2245,7 +2245,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
             Iter_Remove(MarketOrderIter, orderSlot);
             Internal_ResetMarketOrder(orderSlot);
-            SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Предприятие]: Ордер удален.");
+            SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Enterprise]: The order has been deleted.");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -2271,7 +2271,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (!Enterprise_IsPlayerNearWarehouse(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Торговый зал]: Вы слишком далеко от склада.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Trading floor]: You are too far from the warehouse.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2281,7 +2281,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new itemName[64], body[256];
             Item_GetName(sMarketOrders[orderSlot][E_ORDER_ITEM_DEF_ID], itemName);
             format(body, sizeof(body),
-                "Товар: %s\nЦена: $%d за единицу\nВведите количество:",
+                "Product: %s\nPrice: $%d per unit\nEnter quantity:",
                 itemName,
                 sMarketOrders[orderSlot][E_ORDER_PRICE_PER_UNIT_USD]);
 
@@ -2289,10 +2289,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 playerid,
                 DIALOG_ECONOMY_INPUT_AMOUNT,
                 DIALOG_STYLE_INPUT,
-                "Торговый зал",
+                "Trading room",
                 body,
-                "Подтвердить",
-                "Отмена");
+                "Confirm",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -2311,7 +2311,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new const enterpriseId = sEconomyPendingEnterprise[playerid];
             if (!Enterprise_IsValid(enterpriseId) || !Enterprise_IsOwnedByPlayer(playerid, enterpriseId))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Предприятие]: Вы не владелец этого предприятия.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Business]: You are not the owner of this business.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2364,7 +2364,7 @@ hook OnGameModeInit()
         sLastEconomyCommandTick[i] = 0;
     }
 
-    printf("%s [Systems/Economy] Модуль экономики запущен (ордеров: %d).",
+    printf("%s [Systems/Economy] Economy module launched (orders: %d).",
         SERVER_LOG_PREFIX, loadedOrders);
     return 1;
 }

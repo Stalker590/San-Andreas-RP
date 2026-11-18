@@ -126,12 +126,12 @@ static stock Internal_GetEvidenceTitleRu(E_EVIDENCE_TYPE:type, output[], len = s
 {
     switch (type)
     {
-        case EVIDENCE_BULLET_CASING:    format(output, len, "Стреляная гильза");
-        case EVIDENCE_BLOOD_DNA:        format(output, len, "Пятно крови");
-        case EVIDENCE_BROKEN_GLASS:     format(output, len, "Осколки разбитого стекла");
-        case EVIDENCE_LOCKPICK_SCRATCH: format(output, len, "Царапина от отмычки");
-        case EVIDENCE_FINGERPRINT:      format(output, len, "Отпечаток пальца");
-        default:                        format(output, len, "Неизвестная улика");
+        case EVIDENCE_BULLET_CASING:    format(output, len, "Spent cartridge case");
+        case EVIDENCE_BLOOD_DNA:        format(output, len, "Blood stain");
+        case EVIDENCE_BROKEN_GLASS:     format(output, len, "Shards of broken glass");
+        case EVIDENCE_LOCKPICK_SCRATCH: format(output, len, "Scratches from a pick");
+        case EVIDENCE_FINGERPRINT:      format(output, len, "Fingerprint");
+        default:                        format(output, len, "Unknown evidence");
     }
     return 1;
 }
@@ -158,44 +158,44 @@ static stock Internal_BuildEvidenceDetails(E_EVIDENCE_TYPE:type, suspect_char_id
         {
             if (weapon_serial > 0)
             {
-                format(output, len, "Сер. № %d", weapon_serial);
+                format(output, len, "Ser. No. %d", weapon_serial);
             }
             else
             {
-                format(output, len, "Серийный номер стерт");
+                format(output, len, "Serial number erased");
             }
         }
         case EVIDENCE_BLOOD_DNA:
         {
             if (suspect_char_id > 0)
             {
-                format(output, len, "ДНК подозреваемого #%d", suspect_char_id);
+                format(output, len, "Suspect DNA #%d", suspect_char_id);
             }
             else
             {
-                format(output, len, "ДНК не установлена");
+                format(output, len, "DNA not established");
             }
         }
         case EVIDENCE_LOCKPICK_SCRATCH:
         {
             if (suspect_char_id > 0)
             {
-                format(output, len, "След оставлен персонажем #%d", suspect_char_id);
+                format(output, len, "The trail was left by the character #%d", suspect_char_id);
             }
             else
             {
-                format(output, len, "След от инструмента");
+                format(output, len, "Tool mark");
             }
         }
         default:
         {
             if (suspect_char_id > 0)
             {
-                format(output, len, "Подозреваемый #%d", suspect_char_id);
+                format(output, len, "Suspect #%d", suspect_char_id);
             }
             else
             {
-                format(output, len, "Данные не установлены");
+                format(output, len, "Data not installed");
             }
         }
     }
@@ -264,7 +264,7 @@ static stock Internal_SpawnEvidenceVisuals(slot_id)
     }
 
     format(labelText, sizeof(labelText),
-        "Улика: %s\n%s\nСрок хранения: %d мин.\nОсмотр: /evidence",
+        "Evidence: %s\n%s\nRetention period: %d min.\nInspection: /evidence",
         title, details, (remainingSec + 59) / 60);
 
     sEvidence[slot_id][E_FE_LABEL] = CreateDynamic3DTextLabel(
@@ -409,7 +409,7 @@ stock Forensics_CreateEvidence(
     new const slot_id = Iter_Free(sEvidenceIter);
     if (slot_id == INVALID_ITERATOR_SLOT)
     {
-        printf("%s [Systems/Forensics] [WARN] Пул улик MAX_FORENSIC_EVIDENCE (%d) переполнен.",
+        printf("%s [Systems/Forensics] [WARN] Evidence pool MAX_FORENSIC_EVIDENCE (%d) is full.",
             SERVER_LOG_PREFIX, MAX_FORENSIC_EVIDENCE);
         return EVIDENCE_INVALID_SLOT;
     }
@@ -608,7 +608,7 @@ public OnForensicEvidenceLoadComplete()
         loaded++;
     }
 
-    printf("%s [Systems/Forensics] Загружено активных улик из БД: %d.",
+    printf("%s [Systems/Forensics] Loaded active evidence from the database: %d.",
         SERVER_LOG_PREFIX, loaded);
     return 1;
 }
@@ -642,15 +642,15 @@ static stock Internal_OpenEvidenceMenu(playerid)
 
     new body[512];
     format(body, sizeof(body),
-        "1. Осмотреть улики поблизости (%d)\n" \
-        "2. Пакет вещдоков (%d гильз, %d прочих)\n" \
-        "3. Сверить серийные номера стволов",
+        "1. Examine the evidence nearby (%d)\n" \
+        "2. Package of material evidence (%d cartridges, %d others)\n" \
+        "3. Check the serial numbers of the barrels",
         nearCount,
         sCollectedCount[playerid],
         sCollectedOtherCount[playerid]);
 
     ShowPlayerDialog(playerid, DIALOG_FORENSICS_MENU, DIALOG_STYLE_LIST,
-        "Криминалистический терминал", body, "Выбрать", "Закрыть");
+        "Forensic terminal", body, "Select", "Close");
     return 1;
 }
 
@@ -662,7 +662,7 @@ static stock Internal_OpenEvidenceScan(playerid)
     GetPlayerPos(playerid, px, py, pz);
 
     new body[4096];
-    format(body, sizeof(body), "Улика\tРасстояние\tДанные\n");
+    format(body, sizeof(body), "Evidence\tDistance\tData\n");
     sEvidenceRowCount[playerid] = 0;
 
     foreach (new slot : sEvidenceIter)
@@ -694,7 +694,7 @@ static stock Internal_OpenEvidenceScan(playerid)
             sEvidence[slot][E_FE_WEAPON_SERIAL],
             details, sizeof(details));
 
-        format(line, sizeof(line), "%s\t%.1f м\t%s\n", title, distance, details);
+        format(line, sizeof(line), "%s\t%.1f m\t%s\n", title, distance, details);
         strcat(body, line, sizeof(body));
 
         sEvidenceRowMap[playerid][sEvidenceRowCount[playerid]] = slot;
@@ -704,13 +704,13 @@ static stock Internal_OpenEvidenceScan(playerid)
     if (sEvidenceRowCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Криминалистика]: В радиусе 12 метров не обнаружено физических улик.");
+            "[Forensics]: No physical evidence was found within a 12 meter radius.");
         Internal_OpenEvidenceMenu(playerid);
         return 0;
     }
 
     ShowPlayerDialog(playerid, DIALOG_FORENSICS_SCAN, DIALOG_STYLE_TABLIST_HEADERS,
-        "Осмотр места происшествия", body, "Собрать", "Назад");
+        "Inspection of the scene of the incident", body, "Collect", "Back");
     return 1;
 }
 
@@ -719,36 +719,36 @@ static stock Internal_OpenCollectedEvidence(playerid)
     if (sCollectedCount[playerid] <= 0 && sCollectedOtherCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "[Криминалистика]: Ваш пакет вещдоков пока пуст.");
+            "[Forensics]: Your package of evidence is still empty.");
         return 0;
     }
 
     new body[2048];
     format(body, sizeof(body),
-        "{FFC800}Пакет вещдоков:{FFFFFF}\n" \
-        "• Гильз с серийными номерами: %d\n" \
-        "• Прочих улик: %d\n\n" \
-        "{FFC800}Серийные номера изъятых гильз:{FFFFFF}\n",
+        "{FFC800}Package of material evidence:{FFFFFF}\n" \
+        "• Sleeves with serial numbers: %d\n" \
+        "• Other evidence: %d\n\n" \
+        "{FFC800}Serial numbers of seized cartridges:{FFFFFF}\n",
         sCollectedCount[playerid],
         sCollectedOtherCount[playerid]);
 
     if (sCollectedCount[playerid] <= 0)
     {
-        strcat(body, "• Серийные номера не зафиксированы\n", sizeof(body));
+        strcat(body, "• Serial numbers are not recorded\n", sizeof(body));
     }
     else
     {
         for (new idx = 0; idx < sCollectedCount[playerid]; idx++)
         {
             new line[64];
-            format(line, sizeof(line), "• Серийный номер: %d\n", sCollectedSerials[playerid][idx]);
+            format(line, sizeof(line), "• Serial number: %d\n", sCollectedSerials[playerid][idx]);
             strcat(body, line, sizeof(body));
         }
     }
 
-    strcat(body, "\n{90A4AE}Сверка с изъятыми стволами: пункт 3 главного меню.{FFFFFF}", sizeof(body));
+    strcat(body, "\n{90A4AE}Checking with removed barrels: item 3 of the main menu.{FFFFFF}", sizeof(body));
     ShowPlayerDialog(playerid, DIALOG_FORENSICS_COLLECTED, DIALOG_STYLE_MSGBOX,
-        "Пакет вещдоков", body, "Понятно", "");
+        "Package of material evidence", body, "Understood", "");
     return 1;
 }
 
@@ -757,19 +757,19 @@ static stock Internal_OpenBallisticsCheck(playerid)
     if (sCollectedCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Криминалистика]: В пакете вещдоков нет гильз с серийными номерами для сверки.");
+            "[Forensics]: The package of evidence does not contain cartridges with serial numbers for verification.");
         return 0;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Криминалистика]: Ошибка доступа к вашему инвентарю.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Forensics]: Error accessing your inventory.");
         return 0;
     }
 
     new body[2048];
-    format(body, sizeof(body), "{FFC800}Баллистическая сверка:{FFFFFF}\n\n");
+    format(body, sizeof(body), "{FFC800}Ballistic verification:{FFFFFF}\n\n");
 
     new matches = 0;
     new checkedWeapons = 0;
@@ -789,7 +789,7 @@ static stock Internal_OpenBallisticsCheck(playerid)
                     new line[192];
                     Item_GetName(defId, itemName, sizeof(itemName));
                     format(line, sizeof(line),
-                        "{FF4444}СОВПАДЕНИЕ:{FFFFFF} ствол «%s» (сер. № %d) соответствует изъятой гильзе.\n",
+                        "{FF4444}MATCH:{FFFFFF} Barrel \"%s\" (Serial No. %d) matches the recovered cartridge case.\n",
                         itemName, serial);
                     strcat(body, line, sizeof(body));
                     matches++;
@@ -802,21 +802,21 @@ static stock Internal_OpenBallisticsCheck(playerid)
     if (checkedWeapons <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Криминалистика]: В вашем инвентаре нет оружия с читаемым серийным номером.");
+            "[Forensics]: There are no weapons with a readable serial number in your inventory.");
         return 0;
     }
 
     if (matches <= 0)
     {
-        strcat(body, "{66CC66}Совпадений не обнаружено.{FFFFFF}\n", sizeof(body));
+        strcat(body, "{66CC66}No matches found.{FFFFFF}\n", sizeof(body));
     }
 
     new summary[96];
-    format(summary, sizeof(summary), "\nПроверено стволов: %d. Совпадений: %d.", checkedWeapons, matches);
+    format(summary, sizeof(summary), "\nTrunks tested: %d. Matches: %d.", checkedWeapons, matches);
     strcat(body, summary, sizeof(body));
 
     ShowPlayerDialog(playerid, DIALOG_FORENSICS_BALLISTICS, DIALOG_STYLE_MSGBOX,
-        "Баллистическая экспертиза", body, "Понятно", "");
+        "Ballistic examination", body, "Understood", "");
     return 1;
 }
 
@@ -824,14 +824,14 @@ static stock Internal_CollectEvidence(playerid, slot_id)
 {
     if (slot_id < 0 || slot_id >= MAX_FORENSIC_EVIDENCE || !sEvidence[slot_id][E_FE_VALID])
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Криминалистика]: Улика уже недоступна.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Forensics]: The evidence is no longer available.");
         return 0;
     }
 
     if (sEvidence[slot_id][E_FE_VW] != GetPlayerVirtualWorld(playerid) ||
         sEvidence[slot_id][E_FE_INTERIOR] != GetPlayerInterior(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Криминалистика]: Улика находится в другом измерении.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Forensics]: The evidence is in another dimension.");
         return 0;
     }
 
@@ -841,7 +841,7 @@ static stock Internal_CollectEvidence(playerid, slot_id)
         sEvidence[slot_id][E_FE_X], sEvidence[slot_id][E_FE_Y], sEvidence[slot_id][E_FE_Z]) > FORENSIC_COLLECT_RADIUS)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Криминалистика]: Подойдите ближе (не более 5 метров), чтобы собрать улику.");
+            "[Forensics]: Move closer (no more than 5 meters) to collect evidence.");
         return 0;
     }
 
@@ -870,7 +870,7 @@ static stock Internal_CollectEvidence(playerid, slot_id)
 
     new message[224];
     format(message, sizeof(message),
-        "[Криминалистика]: Вы изъяли улику «%s» (%s) в пакет вещдоков.", title, details);
+        "[Forensics]: You have seized evidence “%s” (%s) in the evidence package.", title, details);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, message);
 
     // Автоматическая сверка гильзы со стволами, находящимися при криминалисте
@@ -889,7 +889,7 @@ static stock Internal_CollectEvidence(playerid, slot_id)
                     Item_GetName(defId, itemName, sizeof(itemName));
                     new matchMessage[224];
                     format(matchMessage, sizeof(matchMessage),
-                        "[Баллистика]: Серийный номер гильзы совпадает со стволом «%s» в вашем инвентаре!",
+                        "[Ballistics]: The serial number of the cartridge matches the barrel \"%s\" in your inventory!",
                         itemName);
                     SendClientMessage(playerid, COLOR_UI_ERROR, matchMessage);
                 }
@@ -900,7 +900,7 @@ static stock Internal_CollectEvidence(playerid, slot_id)
 
     new auditDetails[255];
     format(auditDetails, sizeof(auditDetails),
-        "Изъята улика '%s' (%s). Подозреваемый: %d, серийный номер: %d.",
+        "Evidence '%s' (%s) was seized. Suspect: %d, serial number: %d.",
         title, details, suspectId, serial);
     Audit_Log(Character_GetId(playerid), "EVIDENCE_COLLECT", "FORENSIC_EVIDENCE", "PLAYER_LAYER2",
         0, 1, auditDetails);
@@ -1012,7 +1012,7 @@ task Forensics_SecondTask[1000]()
 
             sBloodEvidenceCreated[playerid] = true;
             SendClientMessage(playerid, COLOR_UI_WARNING,
-                "[Криминалистика]: Кровотечение оставляет физический след на земле. Улика сохранится 30 минут.");
+                "[Forensics]: Bleeding leaves a physical mark on the ground. The evidence will be stored for 30 minutes.");
         }
         else if (!isBleeding)
         {
@@ -1057,14 +1057,14 @@ CMD:evidence(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Криминалистика]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Forensics]: Your character has not yet been loaded.");
         return 1;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sLastEvidenceCommandTick[playerid]) < FORENSIC_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Криминалистика]: Не так быстро.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Forensics]: Not so fast.");
         return 1;
     }
     sLastEvidenceCommandTick[playerid] = nowTick;
@@ -1072,7 +1072,7 @@ CMD:evidence(playerid, params[])
     if (!Internal_CanInvestigate(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Криминалистика]: Для осмотра улик нужен набор криминалиста или навык «Криминалистика» не ниже 300.");
+            "[Forensics]: To examine evidence, you need a forensics kit or a Forensics skill of at least 300.");
         return 1;
     }
 
@@ -1116,7 +1116,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!Internal_CanInvestigate(playerid))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Криминалистика]: У вас больше нет доступа к криминалистическому оборудованию.");
+                    "[Forensics]: You no longer have access to forensic equipment.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1154,7 +1154,7 @@ hook OnGameModeInit()
         sEvidenceRowCount[playerid] = 0;
     }
 
-    printf("%s [Systems/Forensics] Криминалистика инициализирована (TTL гильз: %d мин.). Загрузка активных улик отложена до готовности БД.",
+    printf("%s [Systems/Forensics] Forensics initialized (Case TTL: %d min.). Loading of active evidence is delayed until the database is ready.",
         SERVER_LOG_PREFIX, TTL_BULLET_CASING / 60);
 
     // Загрузка выполняется после завершения OnGameModeInit, когда mod_database

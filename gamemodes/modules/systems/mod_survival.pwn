@@ -324,7 +324,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             new Float:gain = Roles_HasPerk(roleId, PERK_NO_POISON) ? 55.0 : 45.0;
             Character_SetThirst(playerid, Character_GetThirst(playerid) + gain);
             ApplyAnimation(playerid, "VENDING", "VEND_Drink2_P", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Выживание]: Вы выпили питьевую воду (+45% к утолению жажды).");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Survival]: Drank drinking water (+45% thirst quencher).");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -338,7 +338,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             Character_SetHunger(playerid, Character_GetHunger(playerid) + hungerGain);
             Character_SetThirst(playerid, Character_GetThirst(playerid) + 15.0);
             ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Выживание]: Вы съели армейский сухпаек MRE (+60% сытости, +15% воды).");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Survival]: You ate MRE army rations (+60% hunger, +15% water).");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -351,7 +351,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             new Float:hungerGain = Roles_HasPerk(roleId, PERK_NO_POISON) ? 45.0 : 35.0;
             Character_SetHunger(playerid, Character_GetHunger(playerid) + hungerGain);
             ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Выживание]: Вы перекусили горячим бургером (+35% к сытости).");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Survival]: You snacked on a hot burger (+35% hunger).");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -366,7 +366,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             new currentDrunk = GetPlayerDrunkLevel(playerid);
             SetPlayerDrunkLevel(playerid, currentDrunk + 3000);
             ApplyAnimation(playerid, "VENDING", "VEND_Drink2_P", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_INFO, "[Выживание]: Вы выпили виски (-30% стресса, легкое опьянение).");
+            SendClientMessage(playerid, COLOR_INFO, "[Survival]: You drank whiskey (-30% stress, slight intoxication).");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -378,7 +378,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             }
             Character_SetStress(playerid, Character_GetStress(playerid) - 20.0);
             SetPlayerSpecialAction(playerid, SPECIAL_ACTION_SMOKE_CIGGY);
-            SendClientMessage(playerid, COLOR_INFO, "[Выживание]: Вы закурили сигарету (-20% уровня стресса).");
+            SendClientMessage(playerid, COLOR_INFO, "[Survival]: Light a cigarette (-20% stress level).");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -399,7 +399,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             if (hp > maxAllowedHp) hp = maxAllowedHp;
             SetPlayerHealth(playerid, hp);
             ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Медицина]: Кровотечение остановлено, рана перевязана.");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Medicine]: The bleeding has been stopped and the wound has been bandaged.");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -421,7 +421,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             SetPlayerHealth(playerid, hp);
             Skills_Add(playerid, SKILL_FIRST_AID, 5);
             ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.1, false, false, false, false, 0, SYNC_ALL);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Медицина]: Вы оказали себе медицинскую помощь и восстановили здоровье.");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Medicine]: You have provided yourself with medical care and restored your health.");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -443,7 +443,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
 
             Character_SetStress(playerid, Character_GetStress(playerid) - 45.0);
             Character_SetAddiction(playerid, Character_GetAddiction(playerid) + 6.0);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Медицина]: Вы ввели шприц-тюбик с морфином. Боль и симптомы ломки сняты.");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Medicine]: You administered a syringe tube of morphine. Pain and withdrawal symptoms are relieved.");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -473,11 +473,11 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
 
             if (Roles_HasPerk(roleId, PERK_DRUG_BOOST_25X))
             {
-                SendClientMessage(playerid, COLOR_WARNING, "[Химия]: Перк «Уличный Торчок» дал 2.5x приход! Здоровье повышено сверх нормы (до 135 HP).");
+                SendClientMessage(playerid, COLOR_WARNING, "[Chemistry]: The “Street Junkie” perk gave 2.5x income! Health increased above normal (up to 135 HP).");
             }
             else
             {
-                SendClientMessage(playerid, COLOR_WARNING, "[Химия]: Вы употребили вещество. Ломка и стресс отступили, но зависимость выросла.");
+                SendClientMessage(playerid, COLOR_WARNING, "[Chemistry]: You have consumed a substance. Withdrawal and stress subsided, but addiction grew.");
             }
             Survival_RecalculateEncumbrance(playerid);
             return true;
@@ -495,7 +495,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
                 targetArmour = (targetArmour * 1.2 > 120.0) ? 120.0 : (targetArmour * 1.2);
             }
             SetPlayerArmour(playerid, targetArmour);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Снаряжение]: Вы надели тяжелый бронежилет.");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Equipment]: You are wearing heavy body armor.");
             Survival_RecalculateEncumbrance(playerid);
             return true;
         }
@@ -511,7 +511,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
                         ShowPlayerNameTagForPlayer(i, playerid, false);
                     }
                 }
-                SendClientMessage(playerid, COLOR_INFO, "[Снаряжение]: Вы надели тактическую балаклаву. Ваше лицо скрыто.");
+                SendClientMessage(playerid, COLOR_INFO, "[Equipment]: You are wearing a tactical balaclava. Your face is hidden.");
             }
             else
             {
@@ -522,7 +522,7 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
                         ShowPlayerNameTagForPlayer(i, playerid, true);
                     }
                 }
-                SendClientMessage(playerid, COLOR_INFO, "[Снаряжение]: Вы сняли тактическую балаклаву.");
+                SendClientMessage(playerid, COLOR_INFO, "[Equipment]: You have removed your tactical balaclava.");
             }
             Internal_NotifyHudRefresh(playerid);
             return true;
@@ -532,12 +532,12 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
             if (sPlayerRadioFreqKhz[playerid] == 0)
             {
                 sPlayerRadioFreqKhz[playerid] = 104500;
-                SendClientMessage(playerid, COLOR_SUCCESS, "[Связь]: Портативная рация включена на частоте 104.500 МГц (104500 кГц).");
+                SendClientMessage(playerid, COLOR_SUCCESS, "[Communication]: The walkie-talkie is on 104.500 MHz (104500 kHz).");
             }
             else
             {
                 sPlayerRadioFreqKhz[playerid] = 0;
-                SendClientMessage(playerid, COLOR_INFO, "[Связь]: Портативная рация выключена.");
+                SendClientMessage(playerid, COLOR_INFO, "[Communication]: The walkie-talkie is turned off.");
             }
             Internal_NotifyHudRefresh(playerid);
             return true;
@@ -558,11 +558,11 @@ stock bool:Survival_UseInventoryItem(playerid, storage_slot, item_slot)
     if (Item_GetGtaWeaponId(defId) > 0)
     {
         Character_SyncLayer1Weapons(playerid);
-        SendClientMessage(playerid, COLOR_INFO, "[Оружие]: Экипировка оружия внешнего слоя синхронизирована.");
+        SendClientMessage(playerid, COLOR_INFO, "[Weapons]: Outer layer weapon equipment is synchronized.");
         return true;
     }
 
-    SendClientMessage(playerid, COLOR_GRAY, "[Инвентарь]: Этот предмет используется через специальное взаимодействие или крафт.");
+    SendClientMessage(playerid, COLOR_GRAY, "[Inventory]: This item is used through special interaction or crafting.");
     return false;
 }
 
@@ -661,28 +661,28 @@ task Survival_MinuteTask[60000]()
         if (Character_GetHunger(playerid) <= 0.0)
         {
             totalHpDamage += SURVIVAL_STARVATION_HP_DAMAGE;
-            SendClientMessage(playerid, COLOR_ERROR, "[Выживание]: Вы страдаете от крайнего истощения! Срочно найдите пищу.");
+            SendClientMessage(playerid, COLOR_ERROR, "[Survival]: You are suffering from extreme exhaustion! Find food quickly.");
         }
         else if (Character_GetHunger(playerid) < 15.0)
         {
-            SendClientMessage(playerid, COLOR_WARNING, "[Выживание]: Сильное чувство голода напоминает о себе.");
+            SendClientMessage(playerid, COLOR_WARNING, "[Survival]: A strong feeling of hunger reminds you.");
         }
 
         if (Character_GetThirst(playerid) <= 0.0)
         {
             totalHpDamage += SURVIVAL_DEHYDRATION_HP_DAMAGE;
-            SendClientMessage(playerid, COLOR_ERROR, "[Выживание]: Критическое обезвоживание организма! Срочно выпейте воды.");
+            SendClientMessage(playerid, COLOR_ERROR, "[Survival]: Critical dehydration! Drink water immediately.");
         }
         else if (Character_GetThirst(playerid) < 15.0)
         {
-            SendClientMessage(playerid, COLOR_WARNING, "[Выживание]: Вас мучает сильная жажда.");
+            SendClientMessage(playerid, COLOR_WARNING, "[Survival]: You are extremely thirsty.");
         }
 
         // Кровотечение
         if (sPlayerBleeding[playerid])
         {
             totalHpDamage += SURVIVAL_BLEEDING_HP_DAMAGE;
-            SendClientMessage(playerid, COLOR_ERROR, "[Медицина]: Вы теряете кровь! Используйте стерильный бинт или жгут.");
+            SendClientMessage(playerid, COLOR_ERROR, "[Medicine]: You're losing blood! Use a sterile bandage or tourniquet.");
         }
 
         // Таймер наркотической зависимости и ломки (каждые 40 минут без дозы)
@@ -696,11 +696,11 @@ task Survival_MinuteTask[60000]()
                 totalHpDamage += SURVIVAL_WITHDRAWAL_HP_DAMAGE;
                 Character_SetStress(playerid, Character_GetStress(playerid) + 4.0);
                 SetPlayerDrunkLevel(playerid, 4500);
-                SendClientMessage(playerid, COLOR_ERROR, "[Зависимость]: Началась тяжелая наркотическая ломка! Руки дрожат, здоровье падает.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Addiction]: Severe drug withdrawal has begun! Hands are shaking, health is declining.");
             }
             else if (sMinutesSinceLastDose[playerid] == SURVIVAL_WITHDRAWAL_MINUTES_LIMIT - 5)
             {
-                SendClientMessage(playerid, COLOR_WARNING, "[Зависимость]: Организм требует новую дозу. Через 5 минут начнется ломка.");
+                SendClientMessage(playerid, COLOR_WARNING, "[Addiction]: The body requires a new dose. In 5 minutes withdrawal will begin.");
             }
         }
         else
@@ -711,7 +711,7 @@ task Survival_MinuteTask[60000]()
         // Уведомление о стрессе в мегаполисе для Реднека
         if (Roles_HasPerk(roleId, PERK_FOREST_RUNNER) && Character_GetStress(playerid) >= 75.0)
         {
-            SendClientMessage(playerid, COLOR_WARNING, "[Психика]: Шум мегаполиса давит на вас (высокий стресс). Выберитесь за город в лес или округ.");
+            SendClientMessage(playerid, COLOR_WARNING, "[Psyche]: The noise of the metropolis puts pressure on you (high stress). Get out of the city into the forest or district.");
         }
 
         if (totalHpDamage > 0.0 && hp > 1.0)
@@ -742,10 +742,10 @@ hook OnGameModeInit()
     // W_max = 25000 + 21000 + 5000 = 51000 г (51.00 кг)
     new role13Bonus = Roles_GetWeightBonusGrams(13);
     new calcWMax = DEFAULT_PLAYER_LAYER1_WEIGHT_G + (600 * 35) + role13Bonus;
-    printf("%s [Systems/Survival] Модуль физиологии, перегруза и ломки инициализирован (Самопроверка W_max роли #13 = %d г: %s).",
+    printf("%s [Systems/Survival] Physiology, overload and withdrawal module initialized (Self-test W_max role #13 = %d r: %s).",
         SERVER_LOG_PREFIX,
         calcWMax,
-        (calcWMax == 51000) ? "ОК" : "ОШИБКА");
+        (calcWMax == 51000) ? "OK" : "ERROR");
     return 1;
 }
 
@@ -788,7 +788,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
                 new maxW = Survival_GetMaxCarryWeightGrams(playerid);
                 new msg[144];
                 format(msg, sizeof(msg),
-                    "[Перегруз]: Вес снаряжения (%d.%02d / %d.%02d кг) превышает лимит! Бег невозможен.",
+                    "[Overload]: Equipment weight (%d.%02d / %d.%02d kg) exceeds the limit! Running is impossible.",
                     curW / 1000, (curW % 1000) / 10,
                     maxW / 1000, (maxW % 1000) / 10);
                 SendClientMessage(playerid, COLOR_WARNING, msg);

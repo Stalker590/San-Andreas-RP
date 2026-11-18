@@ -132,9 +132,9 @@ static stock Internal_GetBleedingNameRu(E_BLEEDING_TYPE:type, output[], len = si
 {
     switch (type)
     {
-        case BLEEDING_VENOUS:   format(output, len, "венозное");
-        case BLEEDING_ARTERIAL: format(output, len, "артериальное");
-        default:                format(output, len, "отсутствует");
+        case BLEEDING_VENOUS:   format(output, len, "venous");
+        case BLEEDING_ARTERIAL: format(output, len, "arterial");
+        default:                format(output, len, "missing");
     }
     return 1;
 }
@@ -144,19 +144,19 @@ static stock Internal_BuildFractureText(fractureFlags, output[], len = sizeof(ou
     output[0] = EOS;
     if (fractureFlags == 0)
     {
-        format(output, len, "нет");
+        format(output, len, "No");
         return 1;
     }
 
-    if (fractureFlags & _:FRACTURE_LEFT_ARM)  strcat(output, "левая рука; ", len);
-    if (fractureFlags & _:FRACTURE_RIGHT_ARM) strcat(output, "правая рука; ", len);
-    if (fractureFlags & _:FRACTURE_LEFT_LEG)  strcat(output, "левая нога; ", len);
-    if (fractureFlags & _:FRACTURE_RIGHT_LEG) strcat(output, "правая нога; ", len);
-    if (fractureFlags & _:FRACTURE_RIBS)      strcat(output, "ребра; ", len);
+    if (fractureFlags & _:FRACTURE_LEFT_ARM)  strcat(output, "left hand;", len);
+    if (fractureFlags & _:FRACTURE_RIGHT_ARM) strcat(output, "right hand;", len);
+    if (fractureFlags & _:FRACTURE_LEFT_LEG)  strcat(output, "left leg;", len);
+    if (fractureFlags & _:FRACTURE_RIGHT_LEG) strcat(output, "right leg;", len);
+    if (fractureFlags & _:FRACTURE_RIBS)      strcat(output, "ribs;", len);
 
     if (output[0] == EOS)
     {
-        format(output, len, "нет");
+        format(output, len, "No");
     }
     return 1;
 }
@@ -352,13 +352,13 @@ static stock Internal_StartBleeding(playerid, E_BLEEDING_TYPE:type)
     {
         sInjuries[playerid][E_INJ_ARTERIAL_TIMER] = MED_ARTERIAL_DEATH_SECONDS;
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Медицина]: Артериальное кровотечение! У вас 90 секунд, чтобы наложить жгут, иначе наступит смерть.");
+            "[Medicine]: Arterial bleeding! You have 90 seconds to apply a tourniquet or die.");
     }
     else
     {
         sInjuries[playerid][E_INJ_ARTERIAL_TIMER] = 0;
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Медицина]: Открылось венозное кровотечение. Перевяжите рану бинтом или аптечкой.");
+            "[Medicine]: Venous bleeding has opened. Dress the wound with a bandage or first aid kit.");
     }
 
     Internal_SaveInjuries(playerid);
@@ -388,7 +388,7 @@ static stock Internal_NotifyFracture(playerid, const bodyName[])
 
     new message[160];
     format(message, sizeof(message),
-        "[Медицина]: У вас перелом (%s). Нужна хирургическая помощь (навык «Полевая хирургия» не ниже 300).",
+        "[Medicine]: You have a fracture (%s). Surgical assistance is needed (Field Surgery skill at least 300).",
         bodyName);
     SendClientMessage(playerid, COLOR_UI_ERROR, message);
     return 1;
@@ -438,7 +438,7 @@ static stock Internal_DropHeldWeapon(playerid)
     Survival_RecalculateEncumbrance(playerid);
 
     SendClientMessage(playerid, COLOR_UI_ERROR,
-        "[Медицина]: От болевого шока и перелома руки вы выронили оружие на землю.");
+        "[Medicine]: From the shock of pain and a broken arm, you dropped your weapon to the ground.");
     Internal_NotifyHud(playerid);
     return 1;
 }
@@ -469,7 +469,7 @@ static stock Internal_ApplyBodyPartDamage(playerid, bodypart, Float:damage)
                 (sInjuries[playerid][E_INJ_FRACTURES] & _:FRACTURE_LEFT_ARM) == 0)
             {
                 sInjuries[playerid][E_INJ_FRACTURES] |= _:FRACTURE_LEFT_ARM;
-                Internal_NotifyFracture(playerid, "левая рука");
+                Internal_NotifyFracture(playerid, "left hand");
                 Internal_DropHeldWeapon(playerid);
             }
         }
@@ -483,7 +483,7 @@ static stock Internal_ApplyBodyPartDamage(playerid, bodypart, Float:damage)
                 (sInjuries[playerid][E_INJ_FRACTURES] & _:FRACTURE_RIGHT_ARM) == 0)
             {
                 sInjuries[playerid][E_INJ_FRACTURES] |= _:FRACTURE_RIGHT_ARM;
-                Internal_NotifyFracture(playerid, "правая рука");
+                Internal_NotifyFracture(playerid, "right hand");
                 Internal_DropHeldWeapon(playerid);
             }
         }
@@ -497,7 +497,7 @@ static stock Internal_ApplyBodyPartDamage(playerid, bodypart, Float:damage)
                 (sInjuries[playerid][E_INJ_FRACTURES] & _:FRACTURE_LEFT_LEG) == 0)
             {
                 sInjuries[playerid][E_INJ_FRACTURES] |= _:FRACTURE_LEFT_LEG;
-                Internal_NotifyFracture(playerid, "левая нога");
+                Internal_NotifyFracture(playerid, "left leg");
             }
         }
         case (_:BODY_PART_RIGHT_LEG):
@@ -510,7 +510,7 @@ static stock Internal_ApplyBodyPartDamage(playerid, bodypart, Float:damage)
                 (sInjuries[playerid][E_INJ_FRACTURES] & _:FRACTURE_RIGHT_LEG) == 0)
             {
                 sInjuries[playerid][E_INJ_FRACTURES] |= _:FRACTURE_RIGHT_LEG;
-                Internal_NotifyFracture(playerid, "правая нога");
+                Internal_NotifyFracture(playerid, "right leg");
             }
         }
         default:
@@ -523,7 +523,7 @@ static stock Internal_ApplyBodyPartDamage(playerid, bodypart, Float:damage)
                 (sInjuries[playerid][E_INJ_FRACTURES] & _:FRACTURE_RIBS) == 0)
             {
                 sInjuries[playerid][E_INJ_FRACTURES] |= _:FRACTURE_RIBS;
-                Internal_NotifyFracture(playerid, "ребра");
+                Internal_NotifyFracture(playerid, "ribs");
             }
         }
     }
@@ -662,13 +662,13 @@ public Medical_CanUseMedicalItem(playerid, def_id)
         if (def_id == ITEM_ID_BANDAGE || def_id == ITEM_ID_FIRST_AID_KIT)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: Бинт или аптечка не остановят артериальное кровотечение. Наложите кровоостанавливающий жгут!");
+                "[Medicine]: A bandage or first aid kit will not stop arterial bleeding. Apply a hemostatic tourniquet!");
             return 0;
         }
         if (def_id == ITEM_ID_SURGICAL_KIT && !sInjuries[playerid][E_INJ_TOURNIQUET])
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: Перед хирургической стабилизацией сначала наложите кровоостанавливающий жгут!");
+                "[Medical]: Before surgical stabilization, apply a tourniquet first!");
             return 0;
         }
     }
@@ -691,7 +691,7 @@ public Medical_OnItemUsed(playerid, def_id)
             {
                 Internal_StopBleeding(playerid, false);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Вы остановили венозное кровотечение стерильным бинтом.");
+                    "[Medicine]: You stopped venous bleeding with a sterile bandage.");
             }
         }
         case ITEM_ID_TOURNIQUET:
@@ -703,12 +703,12 @@ public Medical_OnItemUsed(playerid, def_id)
                 if (wasArterial)
                 {
                     SendClientMessage(playerid, COLOR_UI_WARNING,
-                        "[Медицина]: Жгут наложен, кровотечение остановлено. Требуется хирургическая стабилизация (навык «Полевая хирургия» 300+).");
+                        "[Medicine]: A tourniquet has been applied and the bleeding has stopped. Requires surgical stabilization (Field Surgery skill 300+).");
                 }
                 else
                 {
                     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                        "[Медицина]: Вы наложили жгут и остановили кровотечение.");
+                        "[Medicine]: You applied a tourniquet and stopped the bleeding.");
                 }
             }
         }
@@ -718,7 +718,7 @@ public Medical_OnItemUsed(playerid, def_id)
             {
                 Internal_StopBleeding(playerid, false);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Вы остановили кровотечение и обработали рану аптечкой первой помощи.");
+                    "[Medicine]: You stopped the bleeding and treated the wound with a first aid kit.");
             }
         }
         case ITEM_ID_SURGICAL_KIT:
@@ -729,12 +729,12 @@ public Medical_OnItemUsed(playerid, def_id)
                 sInjuries[playerid][E_INJ_FRACTURES] = 0;
                 Internal_SaveInjuries(playerid);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Вы провели полевую операцию: кровотечение остановлено, переломы зафиксированы.");
+                    "[Medicine]: You performed a field operation: the bleeding was stopped, the fractures were fixed.");
             }
             else
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Медицина]: Для хирургической стабилизации нужен навык «Полевая хирургия» не ниже 300.");
+                    "[Medicine]: Surgical stabilization requires a Field Surgery skill of at least 300.");
             }
         }
         case ITEM_ID_MORPHINE_SYRINGE, ITEM_ID_HARD_DRUG_METH, ITEM_ID_WEED_PACK:
@@ -746,7 +746,7 @@ public Medical_OnItemUsed(playerid, def_id)
                 SetPlayerDrunkLevel(playerid, 0);
                 Internal_SaveInjuries(playerid);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Болевой шок снят. Действие препарата временное.");
+                    "[Medicine]: Pain shock relieved. The effect of the drug is temporary.");
             }
         }
     }
@@ -765,7 +765,7 @@ stock Medical_ShowTriageDialog(viewerid, targetid)
     if (!sInjuries[targetid][E_INJ_LOADED])
     {
         SendClientMessage(viewerid, COLOR_UI_WARNING,
-            "[Медицина]: Медицинская карта пациента еще загружается. Повторите команду через мгновение.");
+            "[Medical]: The patient's medical record is still loading. Repeat the command after a moment.");
         return 0;
     }
 
@@ -779,24 +779,24 @@ stock Medical_ShowTriageDialog(viewerid, targetid)
     Internal_BuildFractureText(sInjuries[targetid][E_INJ_FRACTURES], fractureText, sizeof(fractureText));
 
     new title[144];
-    format(title, sizeof(title), "Медицинский осмотр: %s", targetName);
+    format(title, sizeof(title), "Medical examination: %s", targetName);
 
     new body[1400];
     format(body, sizeof(body),
-        "{FFC800}Зональные повреждения:{FFFFFF}\n" \
-        "• Голова: %d%%\n" \
-        "• Туловище: %d%%\n" \
-        "• Левая рука: %d%%\n" \
-        "• Правая рука: %d%%\n" \
-        "• Левая нога: %d%%\n" \
-        "• Правая нога: %d%%\n\n" \
-        "{FFC800}Клиническая картина:{FFFFFF}\n" \
-        "• Кровотечение: %s\n" \
-        "• До летального исхода: %d сек.\n" \
-        "• Жгут наложен: %s\n" \
-        "• Болевой шок: %s\n" \
-        "• Переломы: %s\n\n" \
-        "{90A4AE}Лечение: /treat [id]. Для артериального кровотечения нужен жгут, затем хирургический набор.{FFFFFF}",
+        "{FFC800}Zonal damage:{FFFFFF}\n" \
+        "• Head: %d%%\n" \
+        "• Torso: %d%%\n" \
+        "• Left hand: %d%%\n" \
+        "• Right hand: %d%%\n" \
+        "• Left leg: %d%%\n" \
+        "• Right leg: %d%%\n\n" \
+        "{FFC800} Clinical picture: {FFFFFF}\n" \
+        "• Bleeding: %s\n" \
+        "• Before death: %d sec.\n" \
+        "• Tourniquet applied: %s\n" \
+        "• Pain shock: %s\n" \
+        "• Fractures: %s\n\n" \
+        "{90A4AE}Treat: /treat [id]. For arterial bleeding you need a tourniquet, then a surgical kit.{FFFFFF}",
         sInjuries[targetid][E_INJ_HEAD_HP],
         sInjuries[targetid][E_INJ_TORSO_HP],
         sInjuries[targetid][E_INJ_LEFT_ARM_HP],
@@ -805,11 +805,11 @@ stock Medical_ShowTriageDialog(viewerid, targetid)
         sInjuries[targetid][E_INJ_RIGHT_LEG_HP],
         bleedingName,
         sInjuries[targetid][E_INJ_ARTERIAL_TIMER],
-        sInjuries[targetid][E_INJ_TOURNIQUET] ? ("да") : ("нет"),
-        sInjuries[targetid][E_INJ_PAIN_SHOCK] ? ("да") : ("нет"),
+        sInjuries[targetid][E_INJ_TOURNIQUET] ? ("Yes") : ("No"),
+        sInjuries[targetid][E_INJ_PAIN_SHOCK] ? ("Yes") : ("No"),
         fractureText);
 
-    ShowPlayerDialog(viewerid, DIALOG_MEDICAL_TRIAGE, DIALOG_STYLE_MSGBOX, title, body, "Понятно", "");
+    ShowPlayerDialog(viewerid, DIALOG_MEDICAL_TRIAGE, DIALOG_STYLE_MSGBOX, title, body, "Understood", "");
     return 1;
 }
 
@@ -847,13 +847,13 @@ stock Medical_ApplyCharacterKill(playerid, actor_char_id, const reason[])
 
     new details[255];
     format(details, sizeof(details),
-        "Перманентная смерть персонажа %s (ID %d). Причина: %s. Аннулированы банковские счета и лицензии.",
+        "Permanent death of the character %s (ID %d). Reason: %s. Bank accounts and licenses were cancelled.",
         victimName, charDbId, reason);
     Audit_Log((actor_char_id > 0) ? actor_char_id : charDbId, "CHARACTER_KILL", "CHARACTER", "CHARACTER",
         0, 1, details);
 
     SendClientMessage(playerid, COLOR_UI_ERROR,
-        "[Перманентная смерть]: Ваш персонаж погиб навсегда. Банковские счета и лицензии аннулированы.");
+        "[Permanent Death]: Your character is dead forever. Bank accounts and licenses were cancelled.");
 
     defer Medical_CkKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
     return 1;
@@ -922,7 +922,7 @@ public OnMedicalInjuriesLoaded(playerid, sessionToken)
     if (sInjuries[playerid][E_INJ_BLEEDING] == BLEEDING_ARTERIAL)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Медицина]: Ваша медицинская карта загружена. У вас активно артериальное кровотечение!");
+            "[Medical]: Your medical record has been uploaded. You have active arterial bleeding!");
         if (sInjuries[playerid][E_INJ_ARTERIAL_TIMER] <= 0)
         {
             sInjuries[playerid][E_INJ_ARTERIAL_TIMER] = MED_ARTERIAL_DEATH_SECONDS;
@@ -1099,14 +1099,14 @@ hook OnPlayerDeath(playerid, killerid, reason)
             if (moved <= 0)
             {
                 SendClientMessage(playerid, COLOR_UI_WARNING,
-                    "[Смерть]: Ваш внешний слой инвентаря был пуст.");
+                    "[Death]: Your outer inventory layer was empty.");
             }
         }
     }
     else
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Смерть]: Не удалось создать контейнер трупа. Обратитесь к администрации.");
+            "[Death]: Failed to create corpse container. Contact the administration.");
     }
 
     Character_SyncLayer1Weapons(playerid);
@@ -1120,9 +1120,9 @@ hook OnPlayerDeath(playerid, killerid, reason)
     Character_MarkDirty(playerid);
 
     SendClientMessage(playerid, COLOR_UI_ERROR,
-        "[Смерть]: Вы погибли. Все предметы внешнего слоя остались в вашем трупе на 20 минут.");
+        "[Death]: You are dead. All outer layer items remain in your corpse for 20 minutes.");
     SendClientMessage(playerid, COLOR_UI_INFO,
-        "[Смерть]: Документы, телефон, банковская карта и потайной слой сохранены. Вы очнетесь в больнице Лос-Сантоса.");
+        "[Death]: Documents, phone, bank card and secret layer are saved. You will wake up in a Los Santos hospital.");
 
     defer Medical_HospitalRespawn(playerid, Config_GetPlayerSessionToken(playerid));
     return 1;
@@ -1185,7 +1185,7 @@ timer Medical_HospitalRelocate[750](playerid, expectedToken)
     Character_MarkDirty(playerid);
 
     SendClientMessage(playerid, COLOR_UI_INFO,
-        "[Больница]: Вас стабилизировали. Здоровье восстановлено, внешний слой инвентаря утерян.");
+        "[Hospital]: You have been stabilized. Health is restored, the outer layer of inventory is lost.");
     Internal_NotifyHud(playerid);
 }
 
@@ -1242,13 +1242,13 @@ task Medical_SecondTask[1000]()
                 if (sInjuries[playerid][E_INJ_ARTERIAL_TIMER] == MED_ARTERIAL_WARNING_SECONDS)
                 {
                     SendClientMessage(playerid, COLOR_UI_ERROR,
-                        "[Медицина]: До смерти от артериального кровотечения осталось 30 секунд! Срочно наложите жгут!");
+                        "[Medicine]: 30 seconds left until death from arterial bleeding! Apply a tourniquet immediately!");
                 }
 
                 if (sInjuries[playerid][E_INJ_ARTERIAL_TIMER] <= 0)
                 {
                     SendClientMessage(playerid, COLOR_UI_ERROR,
-                        "[Медицина]: Артериальное кровотечение оказалось смертельным. Вы истекли кровью.");
+                        "[Medicine]: Arterial bleeding proved fatal. You bled to death.");
                     SetPlayerHealth(playerid, 0.0);
                     continue;
                 }
@@ -1270,7 +1270,7 @@ task Medical_SecondTask[1000]()
             sPainShockApplied[playerid] = true;
             SetPlayerDrunkLevel(playerid, 3500);
             SendClientMessage(playerid, COLOR_UI_WARNING,
-                "[Медицина]: Болевой шок. Руки дрожат, изображение плывет. Используйте шприц с морфином.");
+                "[Medicine]: Painful shock. Hands are shaking, the image is floating. Use the morphine syringe.");
         }
 
         sInjurySaveTick[playerid]++;
@@ -1320,7 +1320,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
     if ((newkeys & KEY_SPRINT) && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
     {
         ApplyAnimation(playerid, "PED", "WALK_player", 4.1, false, true, true, false, 600, SYNC_ALL);
-        Internal_NotifyFracture(playerid, "нога");
+        Internal_NotifyFracture(playerid, "leg");
     }
 
     if ((newkeys & KEY_JUMP) && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
@@ -1328,7 +1328,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
         TogglePlayerControllable(playerid, false);
         defer Medical_LegFractureJumpBlock(playerid, Config_GetPlayerSessionToken(playerid));
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Медицина]: Перелом ноги не позволяет прыгать. Дождитесь помощи хирурга.");
+            "[Medicine]: A broken leg prevents me from jumping. Wait for the surgeon's help.");
     }
     return 1;
 }
@@ -1348,7 +1348,7 @@ static stock Internal_ParseTarget(playerid, const params[], &targetid)
     new const parsedId = strval(params);
     if (parsedId < 0 || parsedId >= MAX_PLAYERS || !IsPlayerConnected(parsedId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Указанный игрок не найден на сервере.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medicine]: The specified player was not found on the server.");
         return 0;
     }
     targetid = parsedId;
@@ -1360,7 +1360,7 @@ static stock bool:Internal_CheckMedicalCommandCooldown(playerid)
     new const nowTick = GetTickCount();
     if ((nowTick - sLastMedicalCommandTick[playerid]) < 400)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Медицина]: Не так быстро. Подождите мгновение.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Medicine]: Not so fast. Wait a moment.");
         return false;
     }
     sLastMedicalCommandTick[playerid] = nowTick;
@@ -1371,7 +1371,7 @@ CMD:triage(playerid, params[])
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medicine]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Internal_CheckMedicalCommandCooldown(playerid))
@@ -1386,12 +1386,12 @@ CMD:triage(playerid, params[])
     }
     if (!Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Персонаж указанного игрока еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medicine]: The specified player's character has not yet been loaded.");
         return 1;
     }
     if (targetid != playerid && Utils_GetDistanceBetweenPlayers(playerid, targetid) > STORAGE_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Пациент находится слишком далеко (максимум 3.5 метра).");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medical]: The patient is too far away (maximum 3.5 meters).");
         return 1;
     }
 
@@ -1403,7 +1403,7 @@ CMD:treat(playerid, params[])
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medicine]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Internal_CheckMedicalCommandCooldown(playerid))
@@ -1418,12 +1418,12 @@ CMD:treat(playerid, params[])
     }
     if (!Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Персонаж указанного игрока еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medicine]: The specified player's character has not yet been loaded.");
         return 1;
     }
     if (targetid != playerid && Utils_GetDistanceBetweenPlayers(playerid, targetid) > STORAGE_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Пациент находится слишком далеко (максимум 3.5 метра).");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medical]: The patient is too far away (maximum 3.5 meters).");
         return 1;
     }
 
@@ -1434,14 +1434,14 @@ CMD:treat(playerid, params[])
         !Internal_HasItemInLayer1(playerid, ITEM_ID_FIRST_AID_KIT))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Медицина]: Для лечения других людей нужен навык «Первая медицинская помощь» 100+ или аптечка первой помощи.");
+            "[Medicine]: To treat other people, you need a First Aid skill of 100+ or a first aid kit.");
         return 1;
     }
 
     Medical_EnsureInjuriesLoaded(targetid);
     if (!sInjuries[targetid][E_INJ_LOADED])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Медицина]: Медицинская карта пациента еще загружается.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Medical]: The patient's medical record is still loading.");
         return 1;
     }
 
@@ -1449,7 +1449,7 @@ CMD:treat(playerid, params[])
     GetPlayerHealth(targetid, targetHp);
     if (targetHp <= 0.0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Медицина]: Пациент мертв. Обычные медикаменты ему уже не помогут.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Medical]: The patient is dead. Conventional medications will no longer help him.");
         return 1;
     }
 
@@ -1467,17 +1467,17 @@ CMD:treat(playerid, params[])
                 Internal_StopBleeding(targetid, true);
                 treatmentApplied = true;
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Вы наложили кровоостанавливающий жгут. Кровотечение остановлено.");
+                    "[Medicine]: You have applied a tourniquet. The bleeding has stopped.");
                 if (targetid != playerid)
                 {
                     SendClientMessage(targetid, COLOR_UI_INFO,
-                        "[Медицина]: Вам наложили жгут. Требуется хирургическая стабилизация.");
+                        "[Medicine]: A tourniquet has been applied to you. Surgical stabilization is required.");
                 }
             }
             else
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Медицина]: Для артериального кровотечения требуется кровоостанавливающий жгут!");
+                    "[Medicine]: Arterial bleeding requires a tourniquet!");
             }
         }
 
@@ -1486,7 +1486,7 @@ CMD:treat(playerid, params[])
             if (Skills_Get(playerid, SKILL_SURGERY) < MED_SURGERY_SKILL_REQUIRED)
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Медицина]: Для хирургической стабилизации нужен навык «Полевая хирургия» не ниже 300.");
+                    "[Medicine]: Surgical stabilization requires a Field Surgery skill of at least 300.");
             }
             else if (Internal_ConsumeItem(playerid, ITEM_ID_SURGICAL_KIT))
             {
@@ -1498,17 +1498,17 @@ CMD:treat(playerid, params[])
                 surgeryApplied = true;
                 Skills_Add(playerid, SKILL_SURGERY, 8);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "[Медицина]: Вы стабилизировали пациента хирургическим набором. Сосудистое кровотечение полностью остановлено.");
+                    "[Medical]: You stabilized a patient with a surgical kit. Vascular bleeding has completely stopped.");
                 if (targetid != playerid)
                 {
                     SendClientMessage(targetid, COLOR_UI_SUCCESS,
-                        "[Медицина]: Хирург стабилизировал ваше состояние и восстановил здоровье.");
+                        "[Medicine]: The surgeon has stabilized your condition and restored your health.");
                 }
             }
             else
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Медицина]: Для стабилизации требуется полевой хирургический набор.");
+                    "[Medical]: A field surgical kit is required for stabilization.");
             }
         }
     }
@@ -1521,7 +1521,7 @@ CMD:treat(playerid, params[])
             Internal_HealPlayer(targetid, 15.0);
             treatmentApplied = true;
             SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                "[Медицина]: Вы перевязали венозное кровотечение стерильным бинтом.");
+                "[Medicine]: You bandaged a venous bleed with a sterile bandage.");
         }
         else if (Internal_ConsumeItem(playerid, ITEM_ID_FIRST_AID_KIT))
         {
@@ -1529,12 +1529,12 @@ CMD:treat(playerid, params[])
             Internal_HealPlayer(targetid, 45.0);
             treatmentApplied = true;
             SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                "[Медицина]: Вы остановили кровотечение и обработали рану аптечкой первой помощи.");
+                "[Medicine]: You stopped the bleeding and treated the wound with a first aid kit.");
         }
         else
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: Для остановки венозного кровотечения нужен бинт или аптечка первой помощи.");
+                "[Medicine]: To stop venous bleeding, you need a bandage or first aid kit.");
         }
     }
 
@@ -1549,7 +1549,7 @@ CMD:treat(playerid, params[])
             Internal_SaveInjuries(targetid);
             treatmentApplied = true;
             SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                "[Медицина]: Вы сняли болевой шок у пациента шприц-тюбиком с морфином.");
+                "[Medicine]: You relieved a patient's pain shock with a syringe tube of morphine.");
         }
     }
 
@@ -1559,7 +1559,7 @@ CMD:treat(playerid, params[])
         if (Skills_Get(playerid, SKILL_SURGERY) < MED_SURGERY_SKILL_REQUIRED)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: Переломы лечит только хирург с навыком «Полевая хирургия» 300+.");
+                "[Medicine]: Fractures can only be treated by a surgeon with a Field Surgery skill of 300+.");
         }
         else if (Internal_ConsumeItem(playerid, ITEM_ID_SURGICAL_KIT))
         {
@@ -1570,12 +1570,12 @@ CMD:treat(playerid, params[])
             surgeryApplied = true;
             Skills_Add(playerid, SKILL_SURGERY, 8);
             SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                "[Медицина]: Вы провели хирургическую фиксацию переломов. Пациент может нормально передвигаться.");
+                "[Medicine]: You performed surgical fixation of fractures. The patient can move normally.");
         }
         else
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: Для фиксации переломов требуется полевой хирургический набор.");
+                "[Medical]: A field surgical kit is required to fix fractures.");
         }
     }
 
@@ -1586,12 +1586,12 @@ CMD:treat(playerid, params[])
             !sInjuries[targetid][E_INJ_PAIN_SHOCK])
         {
             SendClientMessage(playerid, COLOR_UI_INFO,
-                "[Медицина]: У пациента нет травм, требующих немедленного лечения.");
+                "[Medical]: The patient has no injuries requiring immediate treatment.");
         }
         else
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Медицина]: В вашем инвентаре нет подходящих медикаментов для лечения этих травм.");
+                "[Medicine]: There are no suitable medications in your inventory to treat these injuries.");
         }
         return 1;
     }
@@ -1602,8 +1602,8 @@ CMD:treat(playerid, params[])
     new targetName[MAX_PLAYER_NAME + 1];
     Character_GetRpName(targetid, targetName, sizeof(targetName));
     format(details, sizeof(details),
-        "Медицинская помощь пациенту %s (ID %d). Хирургия: %s.",
-        targetName, Character_GetId(targetid), surgeryApplied ? ("да") : ("нет"));
+        "Medical care for patient %s (ID %d). Surgery: %s.",
+        targetName, Character_GetId(targetid), surgeryApplied ? ("Yes") : ("No"));
     Audit_Log(doctorCharId, "MEDICAL_TREAT", "CHARACTER", "CHARACTER", 0, 0, details);
 
     Internal_NotifyHud(targetid);
@@ -1616,7 +1616,7 @@ CMD:ck(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Перманентная смерть]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Permanent Death]: Your character has not yet been loaded.");
         return 1;
     }
 
@@ -1624,13 +1624,13 @@ CMD:ck(playerid, params[])
         playerid,
         DIALOG_MEDICAL_CK_CONFIRM,
         DIALOG_STYLE_INPUT,
-        "{FF4444}Перманентная смерть персонажа (CK)",
-        "ВНИМАНИЕ! Это действие необратимо.\n\n" \
-        "Персонаж будет удален навсегда: банковские счета и лицензии аннулируются,\n" \
-        "а войти этим персонажем больше будет невозможно.\n\n" \
-        "Для подтверждения введите слово: ПОДТВЕРЖДАЮ",
-        "Умереть навсегда",
-        "Отмена");
+        "{FF4444}Permanent character death (CK)",
+        "ATTENTION! This action is irreversible.\n\n" \
+        "The character will be deleted permanently: bank accounts and licenses will be cancelled,\n" \
+        "and it will no longer be possible to log in with this character.\n\n" \
+        "To confirm, enter the word: CONFIRM",
+        "Die forever",
+        "Cancel");
     return 1;
 }
 
@@ -1649,18 +1649,18 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 SendClientMessage(playerid, COLOR_UI_INFO,
-                    "[Перманентная смерть]: Вы отказались от процедуры CK. Персонаж сохранен.");
+                    "[Permanent Death]: You have refused the CK procedure. The character is saved.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
-            if (strcmp(inputtext, "ПОДТВЕРЖДАЮ", true) != 0)
+            if (strcmp(inputtext, "CONFIRM", true) != 0)
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "[Перманентная смерть]: Неверное подтверждение. Введите слово ПОДТВЕРЖДАЮ заглавными буквами.");
+                    "[Permanent Death]: Incorrect confirmation. Enter the word CONFIRM in capital letters.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
-            Medical_ApplyCharacterKill(playerid, 0, "Добровольная перманентная смерть по команде /ck");
+            Medical_ApplyCharacterKill(playerid, 0, "Voluntary permanent death by command /ck");
             return Y_HOOKS_BREAK_RETURN_1;
         }
     }
@@ -1678,7 +1678,7 @@ hook OnGameModeInit()
         Internal_ResetRuntime(playerid);
     }
 
-    printf("%s [Systems/Medical] Модуль зональных травм, PK/CK и кровотечений инициализирован (порог артериального кровотечения: %d сек.).",
+    printf("%s [Systems/Medical] Zone Trauma, PK/CK and Bleeding Module initialized (Arterial Bleeding Threshold: %d sec).",
         SERVER_LOG_PREFIX, MED_ARTERIAL_DEATH_SECONDS);
     return 1;
 }

@@ -187,7 +187,7 @@ static stock bool:Internal_CommandAllowed(playerid)
     if ((nowTick - sPhoneLastCommandTick[playerid]) < TELECOM_COMMAND_COOLDOWN_MS)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Не так быстро: дождитесь завершения предыдущей операции.");
+            "Not so fast: Wait for the previous operation to complete.");
         return false;
     }
     sPhoneLastCommandTick[playerid] = nowTick;
@@ -391,11 +391,11 @@ static stock Internal_FormatCallerIdentity(playerid, const phone[], bool:isLegal
 
     if (isLegal && ssn[0] != EOS)
     {
-        format(output, len, "%s, телефон %s, SSN %s", name, phone, ssn);
+        format(output, len, "%s, phone %s, SSN %s", name, phone, ssn);
     }
     else
     {
-        format(output, len, "анонимный абонент, телефон %s", phone);
+        format(output, len, "anonymous caller, phone %s", phone);
     }
     return 1;
 }
@@ -429,13 +429,13 @@ static stock Internal_LogCall(
     if (caller_legal && caller_ssn[0] != EOS)
     {
         format(logDetails, sizeof(logDetails),
-            "Абонент %s (SSN %s) -> %s. %s",
+            "Subscriber %s (SSN %s) -> %s. %s",
             caller_phone, caller_ssn, target_phone, details);
     }
     else
     {
         format(logDetails, sizeof(logDetails),
-            "Анонимный абонент %s -> %s. SSN=ANONYMOUS. %s",
+            "Anonymous subscriber %s -> %s. SSN=ANONYMOUS. %s",
             caller_phone, target_phone, details);
     }
     Audit_Log(actor_char_id, action_type, caller_phone, target_phone, 0, 0, logDetails);
@@ -456,17 +456,17 @@ static stock Internal_PlaceCall(playerid, const number[])
         simItem, phoneItem, callerLegal, callerSsn, sizeof(callerSsn)))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Нет активной SIM-карты. Вставьте SIM в телефон через /phone.");
+            "There is no active SIM card. Insert SIM into your phone via /phone.");
         return 0;
     }
     if (strlen(number) != 12)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Номер телефона должен содержать 12 символов в формате 555-123-4567.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The phone number must contain 12 characters in the format 555-123-4567.");
         return 0;
     }
     if (Internal_FindSimByPhone(number) < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Абонент с таким номером не найден в сети.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The subscriber with this number was not found on the network.");
         return 0;
     }
 
@@ -474,12 +474,12 @@ static stock Internal_PlaceCall(playerid, const number[])
     new const targetPlayer = Internal_FindPlayerByPhone(number, targetCharId);
     if (targetPlayer == INVALID_PLAYER_ID)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Аппарат абонента выключен или находится вне зоны действия сети.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The subscriber's device is turned off or is out of network coverage.");
         return 0;
     }
     if (targetPlayer == playerid)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя позвонить самому себе.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You can't call yourself.");
         return 0;
     }
 
@@ -487,26 +487,26 @@ static stock Internal_PlaceCall(playerid, const number[])
     Internal_FormatCallerIdentity(playerid, callerPhone, callerLegal, callerSsn, callerIdentity, sizeof(callerIdentity));
 
     new msg[256];
-    format(msg, sizeof(msg), "[Телефон] Вам звонит: %s.", callerIdentity);
+    format(msg, sizeof(msg), "[Phone] Calling you: %s.", callerIdentity);
     SendClientMessage(targetPlayer, COLOR_UI_INFO, msg);
-    format(msg, sizeof(msg), "[Телефон] Вы набрали номер %s. Абонент отвечает.", number);
+    format(msg, sizeof(msg), "[Phone] You have dialed number %s. The subscriber answers.", number);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Internal_LogCall(Character_GetId(playerid), "CALL", callerPhone, number,
-        callerLegal, callerSsn, "Телефонный звонок");
+        callerLegal, callerSsn, "Phone call");
 
     new callerSim = Internal_FindSimByPhone(callerPhone);
     new targetSim = Internal_FindSimByPhone(number);
     if (callerSim >= 0 && sSims[callerSim][E_SIM_IS_WIRETAPPED])
     {
         new tapMsg[256];
-        format(tapMsg, sizeof(tapMsg), "[Прослушка] %s -> %s.", callerIdentity, number);
+        format(tapMsg, sizeof(tapMsg), "[Whisper] %s -> %s.", callerIdentity, number);
         Internal_NotifyWiretap(sSims[callerSim][E_SIM_WIRETAP_ORG_ID], tapMsg);
     }
     if (targetSim >= 0 && sSims[targetSim][E_SIM_IS_WIRETAPPED])
     {
         new tapMsg[256];
-        format(tapMsg, sizeof(tapMsg), "[Прослушка] Входящий на %s от %s.", number, callerIdentity);
+        format(tapMsg, sizeof(tapMsg), "[Whisper] Incoming to %s from %s.", number, callerIdentity);
         Internal_NotifyWiretap(sSims[targetSim][E_SIM_WIRETAP_ORG_ID], tapMsg);
     }
     return 1;
@@ -520,7 +520,7 @@ static stock Internal_SendSms(playerid, const number[], const text[])
     }
     if (text[0] == EOS)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Текст сообщения не может быть пустым.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The message text cannot be empty.");
         return 0;
     }
 
@@ -531,7 +531,7 @@ static stock Internal_SendSms(playerid, const number[], const text[])
         simItem, phoneItem, callerLegal, callerSsn, sizeof(callerSsn)))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Нет активной SIM-карты. Вставьте SIM в телефон через /phone.");
+            "There is no active SIM card. Insert SIM into your phone via /phone.");
         return 0;
     }
 
@@ -539,12 +539,12 @@ static stock Internal_SendSms(playerid, const number[], const text[])
     new const targetPlayer = Internal_FindPlayerByPhone(number, targetCharId);
     if (targetPlayer == INVALID_PLAYER_ID)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Абонент недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The subscriber is unavailable.");
         return 0;
     }
     if (targetPlayer == playerid)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя отправить SMS самому себе.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot send SMS to yourself.");
         return 0;
     }
 
@@ -554,7 +554,7 @@ static stock Internal_SendSms(playerid, const number[], const text[])
     new msg[256];
     format(msg, sizeof(msg), "[SMS] %s: %s", callerIdentity, text);
     SendClientMessage(targetPlayer, COLOR_UI_INFO, msg);
-    format(msg, sizeof(msg), "[SMS] Сообщение отправлено на %s.", number);
+    format(msg, sizeof(msg), "[SMS] Message sent to %s.", number);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Internal_LogCall(Character_GetId(playerid), "SMS", callerPhone, number,
@@ -565,13 +565,13 @@ static stock Internal_SendSms(playerid, const number[], const text[])
     if (callerSim >= 0 && sSims[callerSim][E_SIM_IS_WIRETAPPED])
     {
         new tapMsg[256];
-        format(tapMsg, sizeof(tapMsg), "[Прослушка SMS] %s -> %s: %s", callerIdentity, number, text);
+        format(tapMsg, sizeof(tapMsg), "[SMS Listening] %s -> %s: %s", callerIdentity, number, text);
         Internal_NotifyWiretap(sSims[callerSim][E_SIM_WIRETAP_ORG_ID], tapMsg);
     }
     if (targetSim >= 0 && sSims[targetSim][E_SIM_IS_WIRETAPPED])
     {
         new tapMsg[256];
-        format(tapMsg, sizeof(tapMsg), "[Прослушка SMS] Входящее на %s от %s: %s", number, callerIdentity, text);
+        format(tapMsg, sizeof(tapMsg), "[SMS Wiretapping] Incoming to %s from %s: %s", number, callerIdentity, text);
         Internal_NotifyWiretap(sSims[targetSim][E_SIM_WIRETAP_ORG_ID], tapMsg);
     }
     return 1;
@@ -583,7 +583,7 @@ static stock Internal_InsertSim(playerid)
     new phoneStorage = INVALID_STORAGE_SLOT;
     if (!Internal_GetPhoneItem(playerid, phoneItem, phoneStorage))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет мобильного телефона.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You don't have a mobile phone.");
         return 0;
     }
 
@@ -591,7 +591,7 @@ static stock Internal_InsertSim(playerid)
     Storage_GetItemMetaStr(phoneItem, currentNumber, sizeof(currentNumber));
     if (currentNumber[0] != EOS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "В телефоне уже установлена SIM-карта.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The phone already has a SIM card installed.");
         return 0;
     }
 
@@ -599,7 +599,7 @@ static stock Internal_InsertSim(playerid)
     new simStorage = INVALID_STORAGE_SLOT;
     if (!Internal_GetFirstFreeSimItem(playerid, simItem, simStorage))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В инвентаре нет SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no SIM card in inventory.");
         return 0;
     }
 
@@ -610,7 +610,7 @@ static stock Internal_InsertSim(playerid)
     Storage_SetItemMetaInt2(phoneItem, 0);
 
     new msg[192];
-    format(msg, sizeof(msg), "SIM-карта %s установлена в телефон.", simNumber);
+    format(msg, sizeof(msg), "SIM card %s is installed in the phone.", simNumber);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     return 1;
 }
@@ -621,7 +621,7 @@ static stock Internal_EjectSim(playerid)
     new phoneStorage = INVALID_STORAGE_SLOT;
     if (!Internal_GetPhoneItem(playerid, phoneItem, phoneStorage))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет мобильного телефона.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You don't have a mobile phone.");
         return 0;
     }
 
@@ -629,14 +629,14 @@ static stock Internal_EjectSim(playerid)
     Storage_GetItemMetaStr(phoneItem, currentNumber, sizeof(currentNumber));
     if (currentNumber[0] == EOS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "В телефоне нет SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The phone does not have a SIM card.");
         return 0;
     }
 
     Storage_SetItemMetaStr(phoneItem, "");
     Storage_SetItemMetaInt1(phoneItem, 0);
     Storage_SetItemMetaInt2(phoneItem, 0);
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "SIM-карта извлечена из телефона.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "The SIM card has been removed from the phone.");
     return 1;
 }
 
@@ -646,7 +646,7 @@ static stock Internal_ShowPhoneMenu(playerid)
     new phoneStorage = INVALID_STORAGE_SLOT;
     if (!Internal_GetPhoneItem(playerid, phoneItem, phoneStorage))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет мобильного телефона.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You don't have a mobile phone.");
         return 0;
     }
 
@@ -656,20 +656,20 @@ static stock Internal_ShowPhoneMenu(playerid)
     new count = 0;
     new body[512];
     body[0] = '\0';
-    strcat(body, "Позвонить абоненту\n", sizeof(body));
+    strcat(body, "Call subscriber\n", sizeof(body));
     sPhoneMenuAction[playerid][count++] = PHONE_MENU_CALL;
-    strcat(body, "Отправить SMS\n", sizeof(body));
+    strcat(body, "Send SMS\n", sizeof(body));
     sPhoneMenuAction[playerid][count++] = PHONE_MENU_SMS;
     if (phoneNumber[0] == EOS)
     {
-        strcat(body, "Вставить SIM-карту\n", sizeof(body));
+        strcat(body, "Insert SIM card\n", sizeof(body));
         sPhoneMenuAction[playerid][count++] = PHONE_MENU_INSERT_SIM;
     }
     else
     {
-        strcat(body, "Извлечь SIM-карту\n", sizeof(body));
+        strcat(body, "Remove SIM card\n", sizeof(body));
         sPhoneMenuAction[playerid][count++] = PHONE_MENU_EJECT_SIM;
-        strcat(body, "Информация об абоненте\n", sizeof(body));
+        strcat(body, "Subscriber information\n", sizeof(body));
         sPhoneMenuAction[playerid][count++] = PHONE_MENU_INFO;
     }
     sPhoneMenuActionCount[playerid] = count;
@@ -677,15 +677,15 @@ static stock Internal_ShowPhoneMenu(playerid)
     new caption[160];
     if (phoneNumber[0] == EOS)
     {
-        format(caption, sizeof(caption), "{FFC800}Телефон {FFFFFF}| SIM-карта не установлена");
+        format(caption, sizeof(caption), "{FFC800}Phone {FFFFFF}| SIM card not installed");
     }
     else
     {
-        format(caption, sizeof(caption), "{FFC800}Телефон {FFFFFF}| Номер: %s", phoneNumber);
+        format(caption, sizeof(caption), "{FFC800}Phone {FFFFFF}| Number: %s", phoneNumber);
     }
 
     ShowPlayerDialog(playerid, DIALOG_PHONE_MAIN, DIALOG_STYLE_LIST, caption, body,
-        "Выбрать", "Закрыть");
+        "Select", "Close");
     return 1;
 }
 
@@ -697,22 +697,22 @@ static stock Internal_ShowPhoneInfo(playerid)
     if (!Internal_ActivePhone(playerid, phoneNumber, sizeof(phoneNumber),
         simItem, phoneItem, isLegal, ssn, sizeof(ssn)))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нет активной SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no active SIM card.");
         return 0;
     }
 
     new body[384];
     format(body, sizeof(body),
-        "{FFC800}Номер:{FFFFFF} %s\n" \
-        "{FFC800}Тип SIM:{FFFFFF} %s\n" \
-        "{FFC800}Регистрация:{FFFFFF} %s\n" \
-        "{FFC800}Абонент:{FFFFFF} %s",
+        "{FFC800}Number:{FFFFFF} %s\n" \
+        "{FFC800}SIM type:{FFFFFF} %s\n" \
+        "{FFC800}Registration:{FFFFFF} %s\n" \
+        "{FFC800}Subscriber:{FFFFFF} %s",
         phoneNumber,
-        isLegal ? ("Легальная, привязана к SSN") : ("Одноразовая анонимная SIM-карта"),
-        isLegal ? (ssn[0] != EOS ? ssn : "данные отсутствуют") : ("анонимно"),
-        (isLegal ? ("раскрывается при биллинге ФБР") : ("полностью анонимна")));
+        isLegal ? ("Legal, linked to SSN") : ("Disposable anonymous SIM card"),
+        isLegal ? (ssn[0] != EOS ? ssn : "no data available") : ("anonymously"),
+        (isLegal ? ("disclosed in FBI billing") : ("completely anonymous")));
     ShowPlayerDialog(playerid, DIALOG_PHONE_INFO, DIALOG_STYLE_MSGBOX,
-        "{FFC800}Информация об абоненте", body, "Понятно", "Закрыть");
+        "{FFC800}Subscriber information", body, "Understood", "Close");
     return 1;
 }
 
@@ -721,20 +721,20 @@ static stock Internal_BuySimDialog(playerid)
     if (!Internal_PlayerNearTelecomShop(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Купить SIM-карту можно в салоне сотовой связи.");
+            "You can buy a SIM card at a mobile phone store.");
         return 0;
     }
 
     new body[384];
     format(body, sizeof(body),
-        "Легальная SIM-карта — %d USD\n" \
-        "Привязывается к вашему SSN. Звонки видны в биллинге ФБР.\n\n" \
-        "Одноразовая анонимная SIM-карта — %d USD\n" \
-        "Регистрация не требуется. Полностью анонимна, можно выбросить после использования.",
+        "Legal SIM card – %d USD\n" \
+        "Linked to your SSN. Calls are visible in FBI billing.\n\n" \
+        "Disposable anonymous SIM card - %d USD\n" \
+        "No registration required. Completely anonymous and can be thrown away after use.",
         TELECOM_LEGAL_SIM_PRICE_USD,
         TELECOM_BURNER_SIM_PRICE_USD);
     ShowPlayerDialog(playerid, DIALOG_SIM_BUY, DIALOG_STYLE_LIST,
-        "{FFC800}Салон сотовой связи", body, "Купить", "Отмена");
+        "{FFC800}Cellular communication salon", body, "Buy", "Cancel");
     return 1;
 }
 
@@ -742,7 +742,7 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
 {
     if (!Internal_PlayerNearTelecomShop(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы отошли от салона сотовой связи.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You have walked away from the cell phone store.");
         return 0;
     }
 
@@ -752,13 +752,13 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
         if (Character_GetCitizenship(playerid) != CITIZENSHIP_CITIZEN)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Легальная SIM-карта оформляется только гражданам США при наличии SSN.");
+                "A legal SIM card is issued only to US citizens with an SSN.");
             return 0;
         }
         Character_GetSSN(playerid, ssn, sizeof(ssn));
         if (ssn[0] == EOS)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось определить ваш SSN.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "Your SSN could not be determined.");
             return 0;
         }
     }
@@ -770,12 +770,12 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
     new const price = legal ? TELECOM_LEGAL_SIM_PRICE_USD : TELECOM_BURNER_SIM_PRICE_USD;
     if (Character_GetPhysicalCashUsd(playerid) < price)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно наличных для покупки SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is not enough cash to purchase a SIM card.");
         return 0;
     }
     if (!Character_RemovePhysicalCashUsd(playerid, price))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить SIM-карту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay for SIM card.");
         return 0;
     }
 
@@ -788,7 +788,7 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
     if (!Storage_IsValidSlot(targetStorage))
     {
         Character_AddPhysicalCashUsd(playerid, price);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В инвентаре нет места для SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no room for a SIM card in the inventory.");
         return 0;
     }
 
@@ -822,7 +822,7 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
     if (result != STORAGE_RES_OK)
     {
         Character_AddPhysicalCashUsd(playerid, price);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В инвентаре нет места для SIM-карты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no room for a SIM card in the inventory.");
         return 0;
     }
 
@@ -849,12 +849,12 @@ static stock Internal_PurchaseSim(playerid, bool:legal)
 
     new msg[224];
     format(msg, sizeof(msg),
-        "SIM-карта %s приобретена. Тип: %s. Вставьте её в телефон через /phone.",
-        phone, legal ? ("легальная") : ("одноразовая Burner"));
+        "SIM card %s purchased. Type: %s. Insert it into your phone via /phone.",
+        phone, legal ? ("legal") : ("disposable Burner"));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), legal ? "SIM_BUY_LEGAL" : "SIM_BUY_BURNER",
-        "CASH", "SIM", 0, price, legal ? "Покупка легальной SIM-карты" : "Покупка анонимной SIM-карты");
+        "CASH", "SIM", 0, price, legal ? "Buying a legal SIM card" : "Buying an anonymous SIM card");
     return 1;
 }
 
@@ -866,7 +866,7 @@ static stock Internal_LoadSimsSync()
 {
     if (!DB_IsConnected())
     {
-        printf("%s [Systems/Telecom] База недоступна: SIM-карты будут создаваться при покупке.",
+        printf("%s [Systems/Telecom] Database not available: SIM cards will be created upon purchase.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -916,7 +916,7 @@ hook OnGameModeInit()
     for (new i = 0; i < TELECOM_SHOP_COUNT; i++)
     {
         sTelecomShopLabel[i] = CreateDynamic3DTextLabel(
-            "Салон сотовой связи\nSIM-карты: /sim",
+            "Mobile phone store\nSIM cards: /sim",
             COLOR_UI_INFO,
             sTelecomShops[i][0],
             sTelecomShops[i][1],
@@ -930,7 +930,7 @@ hook OnGameModeInit()
     }
 
     Internal_LoadSimsSync();
-    printf("%s [Systems/Telecom] Загружено SIM-карт: %d.", SERVER_LOG_PREFIX, Iter_Count(SimIter));
+    printf("%s [Systems/Telecom] Loaded SIM cards: %d.", SERVER_LOG_PREFIX, Iter_Count(SimIter));
     return 1;
 }
 
@@ -1020,18 +1020,18 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case PHONE_MENU_CALL:
                 {
                     ShowPlayerDialog(playerid, DIALOG_PHONE_CALL_NUMBER, DIALOG_STYLE_INPUT,
-                        "{FFC800}Исходящий вызов",
-                        "Введите номер абонента в формате 555-123-4567.",
-                        "Позвонить",
-                        "Отмена");
+                        "{FFC800}Outgoing call",
+                        "Enter the subscriber's number in the format 555-123-4567.",
+                        "Call",
+                        "Cancel");
                 }
                 case PHONE_MENU_SMS:
                 {
                     ShowPlayerDialog(playerid, DIALOG_PHONE_SMS_NUMBER, DIALOG_STYLE_INPUT,
-                        "{FFC800}Отправка SMS",
-                        "Введите номер абонента в формате 555-123-4567.",
-                        "Далее",
-                        "Отмена");
+                        "{FFC800}Sending SMS",
+                        "Enter the subscriber's number in the format 555-123-4567.",
+                        "Next",
+                        "Cancel");
                 }
                 case PHONE_MENU_INSERT_SIM:
                 {
@@ -1071,10 +1071,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             format(sPhonePendingNumber[playerid], PHONE_NUMBER_LEN, "%s", inputtext);
             ShowPlayerDialog(playerid, DIALOG_PHONE_SMS_TEXT, DIALOG_STYLE_INPUT,
-                "{FFC800}Текст SMS",
-                "Введите текст сообщения (до 128 символов).",
-                "Отправить",
-                "Отмена");
+                "{FFC800}SMS text",
+                "Enter your message text (up to 128 characters).",
+                "Send",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -1181,7 +1181,7 @@ CMD:call(playerid, params[])
     }
     if (strlen(params) == 0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /call [номер в формате 555-123-4567]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /call [number in the format 555-123-4567]");
         return 1;
     }
     Internal_PlaceCall(playerid, params);
@@ -1204,7 +1204,7 @@ CMD:sms(playerid, params[])
     if (strlen(params) < 14)
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "Использование: /sms [номер 555-123-4567] [текст сообщения]");
+            "Usage: /sms [number 555-123-4567] [message text]");
         return 1;
     }
 
@@ -1217,7 +1217,7 @@ CMD:sms(playerid, params[])
     strmid(text, params, start, strlen(params), sizeof(text));
     if (text[0] == EOS)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Текст сообщения не может быть пустым.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The message text cannot be empty.");
         return 1;
     }
     Internal_SendSms(playerid, number, text);
@@ -1238,7 +1238,7 @@ CMD:wiretap(playerid, params[])
         Organizations_GetPlayerRankOrder(playerid) < TELECOM_WIRETAP_MIN_RANK)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Прослушка доступна только агентам ФБР или ЦРУ с флагом WIRETAP.");
+            "Wiretapping is only available to FBI or CIA agents with the WIRETAP flag.");
         return 1;
     }
 
@@ -1249,7 +1249,7 @@ CMD:wiretap(playerid, params[])
     // Разбор формата: /wiretap 555-123-4567 1
     if (len < 15)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /wiretap [номер] [1 включить / 0 выключить]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /wiretap [number] [1 enable / 0 disable]");
         return 1;
     }
     strmid(phone, params, 0, 12, sizeof(phone));
@@ -1264,14 +1264,14 @@ CMD:wiretap(playerid, params[])
     }
     if (action < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /wiretap [номер] [1 включить / 0 выключить]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /wiretap [number] [1 enable / 0 disable]");
         return 1;
     }
 
     new const simSlot = Internal_FindSimByPhone(phone);
     if (simSlot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "SIM-карта с таким номером не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "No SIM card with this number was found.");
         return 1;
     }
 
@@ -1298,10 +1298,10 @@ CMD:wiretap(playerid, params[])
     }
 
     new msg[192];
-    format(msg, sizeof(msg), "Прослушка номера %s %s.", phone, (action == 1) ? ("включена") : ("выключена"));
+    format(msg, sizeof(msg), "Wiretap number %s %s.", phone, (action == 1) ? ("included") : ("off"));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     Audit_Log(Character_GetId(playerid), action == 1 ? "WIRETAP_ON" : "WIRETAP_OFF",
-        "ORG", "SIM", 0, action, "Управление прослушкой телефонного номера");
+        "ORG", "SIM", 0, action, "Manage wiretapping of a telephone number");
     return 1;
 }
 
@@ -1317,19 +1317,19 @@ CMD:radioscan(playerid, params[])
     }
     if (!Internal_PlayerHasWalkieTalkie(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Для сканирования нужна портативная рация.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "To scan, you need a walkie-talkie.");
         return 1;
     }
     if (!Organizations_HasCharterFlag(Character_GetOrgId(playerid), FLAG_WIRETAP))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сканирование частот доступно только агентам с флагом WIRETAP.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Frequency scanning is only available to agents with the WIRETAP flag.");
         return 1;
     }
 
     new freq = 0;
     if (!Internal_ParseNumber(params, freq) || freq < TELECOM_RADIO_MIN_FREQ_KHZ || freq > TELECOM_RADIO_MAX_FREQ_KHZ)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /radioscan [частота в кГц, например 104500]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /radioscan [frequency in kHz, for example 104500]");
         return 1;
     }
 
@@ -1351,7 +1351,7 @@ CMD:radioscan(playerid, params[])
 
         new name[MAX_PLAYER_NAME + 1], msg[192];
         Character_GetRpName(target, name, sizeof(name));
-        format(msg, sizeof(msg), "[Сканер] Абонент %s работает на частоте %d.%03d МГц.",
+        format(msg, sizeof(msg), "[Scanner] Subscriber %s operates on the frequency %d.%03d MHz.",
             name, freq / 1000, freq % 1000);
         SendClientMessage(playerid, COLOR_UI_WARNING, msg);
         found++;
@@ -1359,17 +1359,17 @@ CMD:radioscan(playerid, params[])
 
     if (found == 0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "На указанной частоте никто не обнаружен.");
+        SendClientMessage(playerid, COLOR_UI_INFO, "No one was detected on the specified frequency.");
     }
     else
     {
         new summary[128];
-        format(summary, sizeof(summary), "[Сканер] Обнаружено абонентов: %d.", found);
+        format(summary, sizeof(summary), "[Scanner] Subscribers detected: %d.", found);
         SendClientMessage(playerid, COLOR_UI_INFO, summary);
     }
 
     Audit_Log(Character_GetId(playerid), "RADIO_SCAN", "ORG", "RADIO", 0, freq,
-        "Сканирование радиочастоты");
+        "Radio Frequency Scanning");
     return 1;
 }
 
@@ -1381,25 +1381,25 @@ CMD:r(playerid, params[])
     }
     if (!Internal_PlayerHasWalkieTalkie(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В Слое 1 нет портативной рации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no walkie talkie in Layer 1.");
         return 1;
     }
     if (params[0] == EOS)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /r [сообщение в рацию]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /r [message to radio]");
         return 1;
     }
 
     new const freq = Survival_GetRadioFreqKhz(playerid);
     if (freq <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рация выключена. Настройте частоту командой /radio.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The radio is turned off. Set the frequency with the /radio command.");
         return 1;
     }
 
     new name[MAX_PLAYER_NAME + 1], msg[256];
     Character_GetRpName(playerid, name, sizeof(name));
-    format(msg, sizeof(msg), "[Рация %d.%03d] %s: %s", freq / 1000, freq % 1000, name, params);
+    format(msg, sizeof(msg), "[Talkie %d.%03d] %s: %s", freq / 1000, freq % 1000, name, params);
 
     new listeners = 0;
     foreach (new target : Player)
@@ -1421,7 +1421,7 @@ CMD:r(playerid, params[])
     }
 
     new ownMsg[256];
-    format(ownMsg, sizeof(ownMsg), "[Рация %d.%03d] Вы: %s (слышат: %d)",
+    format(ownMsg, sizeof(ownMsg), "[Talkie %d.%03d] You: %s (hear: %d)",
         freq / 1000, freq % 1000, params, listeners);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, ownMsg);
     return 1;

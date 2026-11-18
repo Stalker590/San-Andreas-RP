@@ -209,7 +209,7 @@ timer Account_DelayedKickTimer[450](playerid, expectedToken)
 static stock Internal_KickWithReasonDialog(playerid, dialogId, const title[], const body[])
 {
     sPlayerAccounts[playerid][E_ACC_STATE] = ACC_STATE_KICK_PENDING;
-    ShowPlayerDialog(playerid, dialogId, DIALOG_STYLE_MSGBOX, title, body, "Закрыть", "");
+    ShowPlayerDialog(playerid, dialogId, DIALOG_STYLE_MSGBOX, title, body, "Close", "");
     defer Account_DelayedKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
 }
 
@@ -221,11 +221,7 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
     if (errorNotice[0] != EOS)
     {
         format(body, sizeof(body),
-            "{FFFFFF}Добро пожаловать в штат Сан-Андреас, {FFC800}%s{FFFFFF}!\n\n\
-            Данное имя персонажа свободно для регистрации.\n\
-            Проект построен на принципах честной экономики, физического веса и полной свободы действий.\n\n\
-            {FF4444}Ошибка: %s{FFFFFF}\n\n\
-            Придумайте надежный пароль для защиты вашего аккаунта (от %d до %d символов):",
+            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on fair economy, physical weight and complete freedom of action.\n\n{FF4444}Error: %s{FFFFFF}\n\nCreate a strong password to protect your account (from %d to %d characters):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             errorNotice,
             ACCOUNT_PASSWORD_MIN_LEN,
@@ -234,10 +230,7 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}Добро пожаловать в штат Сан-Андреас, {FFC800}%s{FFFFFF}!\n\n\
-            Данное имя персонажа свободно для регистрации.\n\
-            Проект построен на принципах честной экономики, физического веса и полной свободы действий.\n\n\
-            Придумайте надежный пароль для защиты вашего аккаунта (от %d до %d символов):",
+            "{FFFFFF}Welcome to the State of San Andreas, {FFC800}%s{FFFFFF}!\n\nThis character name is available for registration.\nThe project is built on fair economy, physical weight and complete freedom of action.\n\n{FF4444}Error: %s{FFFFFF}\n\nCreate a strong password to protect your account (from %d to %d characters):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             ACCOUNT_PASSWORD_MIN_LEN,
             ACCOUNT_PASSWORD_MAX_LEN);
@@ -247,10 +240,10 @@ static stock Internal_ShowRegisterPasswordDialog(playerid, const errorNotice[] =
         playerid,
         DIALOG_ACC_REGISTER_PASSWORD,
         DIALOG_STYLE_PASSWORD,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Регистрация аккаунта (Шаг 1/2)",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Account Registration (Step 1/2)",
         body,
-        "Далее",
-        "Выход");
+        "Next",
+        "Exit");
 }
 
 static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = "")
@@ -261,19 +254,14 @@ static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = ""
     if (errorNotice[0] != EOS)
     {
         format(body, sizeof(body),
-            "{FFFFFF}Укажите адрес электронной почты (E-Mail) для восстановления доступа к аккаунту {FFC800}%s{FFFFFF}.\n\
-            Если вы не хотите привязывать почту сейчас, нажмите кнопку «Пропустить».\n\n\
-            {FF4444}Ошибка: %s{FFFFFF}\n\n\
-            Введите корректный E-Mail (например: player@example.com):",
+            "{FFFFFF}Enter an email address (E-Mail) to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email now, press the \"Skip\" button.\n\n{FF4444}Error: %s{FFFFFF}\n\nEnter a valid E-Mail (for example: player@example.com):",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             errorNotice);
     }
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}Укажите адрес электронной почты (E-Mail) для восстановления доступа к аккаунту {FFC800}%s{FFFFFF}.\n\
-            Если вы не хотите привязывать почту сейчас, нажмите кнопку «Пропустить».\n\n\
-            Введите ваш E-Mail (например: player@example.com):",
+            "{FFFFFF}Enter an email address (E-Mail) to recover access to your account {FFC800}%s{FFFFFF}.\nIf you do not want to link an email now, press the \"Skip\" button.\n\n{FF4444}Error: %s{FFFFFF}\n\nEnter a valid E-Mail (for example: player@example.com):",
             sPlayerAccounts[playerid][E_ACC_USERNAME]);
     }
 
@@ -281,10 +269,10 @@ static stock Internal_ShowRegisterEmailDialog(playerid, const errorNotice[] = ""
         playerid,
         DIALOG_ACC_REGISTER_EMAIL,
         DIALOG_STYLE_INPUT,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Привязка E-Mail (Шаг 2/2)",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Email Linking (Step 2/2)",
         body,
-        "Готово",
-        "Пропустить");
+        "Done",
+        "Skip");
 }
 
 static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = "")
@@ -297,10 +285,7 @@ static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = ""
     if (errorNotice[0] != EOS)
     {
         format(body, sizeof(body),
-            "{FFFFFF}С возвращением в штат Сан-Андреас, {FFC800}%s{FFFFFF}!\n\
-            Аккаунт зарегистрирован в федеральной базе данных штата.\n\n\
-            {FF4444}%s (осталось попыток: %d из %d){FFFFFF}\n\n\
-            Введите пароль от вашего аккаунта для авторизации:",
+            "{FFFFFF}Welcome back to the State of San Andreas, {FFC800}%s{FFFFFF}!\nYour account is registered in the state database.\n\n{FF4444}%s (attempts left: %d of %d){FFFFFF}\n\nEnter your account password to log in:",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             errorNotice,
             remainingAttempts,
@@ -309,9 +294,7 @@ static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = ""
     else
     {
         format(body, sizeof(body),
-            "{FFFFFF}С возвращением в штат Сан-Андреас, {FFC800}%s{FFFFFF}!\n\
-            Аккаунт зарегистрирован в федеральной базе данных штата.\n\n\
-            Введите пароль от вашего аккаунта для авторизации (доступно попыток: %d):",
+            "{FFFFFF}Welcome back to the State of San Andreas, {FFC800}%s{FFFFFF}!\nYour account is registered in the state database.\n\n{FF4444}%s (attempts left: %d of %d){FFFFFF}\n\nEnter your account password to log in:",
             sPlayerAccounts[playerid][E_ACC_USERNAME],
             remainingAttempts);
     }
@@ -320,10 +303,10 @@ static stock Internal_ShowLoginPasswordDialog(playerid, const errorNotice[] = ""
         playerid,
         DIALOG_ACC_LOGIN_PASSWORD,
         DIALOG_STYLE_PASSWORD,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Авторизация",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Login",
         body,
-        "Войти",
-        "Выход");
+        "Log In",
+        "Exit");
 }
 
 static stock Internal_FindRamAccountSlot(const username[])
@@ -457,8 +440,8 @@ static stock Internal_StartSessionRecord(playerid, bool:isNewRegistration)
     }
 
     new details[160];
-    format(details, sizeof(details), "%s аккаунта %s (ID: %d, IP: %s)",
-        isNewRegistration ? ("Регистрация") : ("Вход"),
+    format(details, sizeof(details), "%s of account %s (ID: %d, IP: %s)",
+        isNewRegistration ? ("Registration") : ("Login"),
         sPlayerAccounts[playerid][E_ACC_USERNAME],
         accountDbId,
         sPlayerAccounts[playerid][E_ACC_IP]);
@@ -551,18 +534,14 @@ public OnAccountLookupCompleted(playerid, sessionToken)
             }
             else
             {
-                format(banReasonText, sizeof(banReasonText), "Нарушение правил сервера");
+                format(banReasonText, sizeof(banReasonText), "Violation of server rules");
             }
 
             if (banExpiresUnix > nowUnix)
             {
                 new const hoursLeft = ((banExpiresUnix - nowUnix) / 3600) + 1;
                 format(banMsg, sizeof(banMsg),
-                    "{FF4444}Доступ к серверу временно ограничен!{FFFFFF}\n\n\
-                    Аккаунт: {FFC800}%s{FFFFFF}\n\
-                    Причина блокировки: {FFAA00}%s{FFFFFF}\n\
-                    До окончания срока: {88CCFF}~%d ч.{FFFFFF}\n\
-                    Ваш IP-адрес: {AFAFAF}%s{FFFFFF}",
+                    "{FF4444}Access to the server is temporarily restricted!{FFFFFF}\n\nAccount: {FFC800}%s{FFFFFF}\nBan reason: {FFAA00}%s{FFFFFF}\nTime remaining: {88CCFF}~%d h.{FFFFFF}\nYour IP address: {AFAFAF}%s{FFFFFF}",
                     sPlayerAccounts[playerid][E_ACC_USERNAME],
                     banReasonText,
                     hoursLeft,
@@ -571,10 +550,7 @@ public OnAccountLookupCompleted(playerid, sessionToken)
             else
             {
                 format(banMsg, sizeof(banMsg),
-                    "{FF4444}Ваш аккаунт или оборудование заблокированы бессрочно!{FFFFFF}\n\n\
-                    Аккаунт: {FFC800}%s{FFFFFF}\n\
-                    Причина блокировки: {FFAA00}%s{FFFFFF}\n\
-                    Ваш IP-адрес: {AFAFAF}%s{FFFFFF}",
+                    "{FF4444}Your account or hardware has been permanently blocked!{FFFFFF}\n\nAccount: {FFC800}%s{FFFFFF}\nBan reason: {FFAA00}%s{FFFFFF}\nYour IP address: {AFAFAF}%s{FFFFFF}",
                     sPlayerAccounts[playerid][E_ACC_USERNAME],
                     banReasonText,
                     sPlayerAccounts[playerid][E_ACC_IP]);
@@ -583,7 +559,7 @@ public OnAccountLookupCompleted(playerid, sessionToken)
             Internal_KickWithReasonDialog(
                 playerid,
                 DIALOG_ACC_BAN_NOTICE,
-                "{FF4444}SAN ANDREAS RP {FFFFFF}| Блокировка доступа",
+                "{FF4444}SAN ANDREAS RP {FFFFFF}| Access Blocked",
                 banMsg);
             return 1;
         }
@@ -618,8 +594,8 @@ public OnAccountPasswordHashed(playerid, sessionToken)
     if (strlen(sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH]) < 55)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Произошла системная ошибка криптографического хеширования пароля. Повторите попытку.");
-        Internal_ShowRegisterPasswordDialog(playerid, "Ошибка генерации bcrypt-хеша.");
+            "A system error occurred while hashing your password. Please try again.");
+        Internal_ShowRegisterPasswordDialog(playerid, "bcrypt hash generation error.");
         return 1;
     }
 
@@ -655,7 +631,7 @@ public OnAccountPasswordHashed(playerid, sessionToken)
         sPlayerAccounts[playerid][E_ACC_DB_ID] = ++sSyntheticAccountIdSeq;
         Internal_SaveRamAccountCache(playerid);
         SendClientMessage(playerid, COLOR_UI_SUCCESS,
-            "Ваш аккаунт успешно зарегистрирован! Переходим к созданию персонажа...");
+            "Your account has been registered successfully! Moving on to character creation...");
         Internal_StartSessionRecord(playerid, true);
     }
     return 1;
@@ -674,7 +650,7 @@ public OnAccountRegisteredInDb(playerid, sessionToken)
     Internal_SaveRamAccountCache(playerid);
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "Ваш аккаунт успешно зарегистрирован в базе данных штата! Переходим к созданию персонажа...");
+        "Your account has been successfully registered in the state database! Moving on to character creation...");
     Internal_StartSessionRecord(playerid, true);
     return 1;
 }
@@ -694,9 +670,7 @@ public OnAccountPasswordVerified(playerid, bool:success, sessionToken)
         {
             new kickBody[384];
             format(kickBody, sizeof(kickBody),
-                "{FF4444}Превышен лимит неверных попыток ввода пароля (%d из %d).{FFFFFF}\n\n\
-                Соединение с сервером разорвано в целях защиты аккаунта {FFC800}%s{FFFFFF}.\n\
-                Попытка несанкционированного входа зафиксирована в журнале безопасности.",
+                "{FF4444}The limit of incorrect password attempts has been exceeded (%d of %d).{FFFFFF}\n\nThe connection to the server has been closed to protect account {FFC800}%s{FFFFFF}.\nThe unauthorized login attempt has been recorded in the security log.",
                 sPlayerAccounts[playerid][E_ACC_LOGIN_ATTEMPTS],
                 ACCOUNT_MAX_LOGIN_ATTEMPTS,
                 sPlayerAccounts[playerid][E_ACC_USERNAME]);
@@ -708,22 +682,22 @@ public OnAccountPasswordVerified(playerid, bool:success, sessionToken)
                 sPlayerAccounts[playerid][E_ACC_IP],
                 0,
                 sPlayerAccounts[playerid][E_ACC_LOGIN_ATTEMPTS],
-                "Отключение за 3 неверных ввода пароля подряд");
+                "Disconnected after 3 failed password attempts in a row");
 
             Internal_KickWithReasonDialog(
                 playerid,
                 DIALOG_ACC_BAN_NOTICE,
-                "{FF4444}SAN ANDREAS RP {FFFFFF}| Защита аккаунта",
+                "{FF4444}SAN ANDREAS RP {FFFFFF}| Account Protection",
                 kickBody);
             return 1;
         }
 
-        Internal_ShowLoginPasswordDialog(playerid, "Неверный пароль!");
+        Internal_ShowLoginPasswordDialog(playerid, "Incorrect password!");
         return 1;
     }
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "Авторизация успешно пройдена! Загружаем данные вашего персонажа...");
+        "Login successful! Loading your character data...");
     Internal_StartSessionRecord(playerid, false);
     return 1;
 }
@@ -893,9 +867,9 @@ hook OnGameModeInit()
     new const bool:validSample = Internal_ValidateRpNickFormat("Donald_Trump");
     new const bool:invalidSample = !Internal_ValidateRpNickFormat("bad_nick_123");
 
-    printf("%s [Entities/Account] Модуль аккаунтов и сессий инициализирован (Regex RP-ника: %s, bcrypt cost = %d).",
+    printf("%s [Entities/Account] Account and session module initialized (RP nickname regex: %s, bcrypt cost = %d).",
         SERVER_LOG_PREFIX,
-        (validSample && invalidSample) ? ("ОК") : ("ОШИБКА"),
+        (validSample && invalidSample) ? ("OK") : ("ERROR"),
         BCRYPT_WORK_FACTOR);
     return 1;
 }
@@ -918,24 +892,20 @@ hook OnPlayerConnect(playerid)
         SendClientMessage(playerid, -1, " ");
     }
     SendClientMessage(playerid, COLOR_SERVER_GOLD,
-        "Добро пожаловать на сервер SAN ANDREAS RP | Свободный рынок, честная физика и выживание!");
+        "Welcome to SAN ANDREAS RP | Fair market, honest physics and survival!");
 
     // 1. Валидация формата RP-ника First_Last через Pawn.Regex
     if (!Internal_ValidateRpNickFormat(sPlayerAccounts[playerid][E_ACC_USERNAME]))
     {
         new rejectMsg[512];
         format(rejectMsg, sizeof(rejectMsg),
-            "{FF4444}Недопустимый формат ролевого имени (Non-RP никнейм)!{FFFFFF}\n\n\
-            Ваш текущий никнейм: {FFC800}%s{FFFFFF}\n\n\
-            На сервере действует строгий стандарт американских имен в формате {66CC66}Имя_Фамилия{FFFFFF} латиницей.\n\
-            Примеры правильных имен: {88CCFF}Donald_Trump{FFFFFF}, {88CCFF}John_Gotti{FFFFFF}, {88CCFF}Arthur_Morgan{FFFFFF}.\n\n\
-            Пожалуйста, смените имя в окне лаунчера SA-MP / open.mp и переподключитесь.",
+            "{FF4444}Invalid roleplay name format (Non-RP nickname)!{FFFFFF}\n\nYour current nickname: {FFC800}%s{FFFFFF}\n\nThe server enforces a strict American name standard in the format {66CC66}First_Last{FFFFFF} using Latin characters.\nExamples of valid names: {88CCFF}Donald_Trump{FFFFFF}, {88CCFF}John_Gotti{FFFFFF}, {88CCFF}Arthur_Morgan{FFFFFF}.\n\nPlease change your name in the SA-MP / open.mp launcher and reconnect.",
             sPlayerAccounts[playerid][E_ACC_USERNAME]);
 
         Internal_KickWithReasonDialog(
             playerid,
             DIALOG_ACC_NONRP_NICK,
-            "{FF4444}SAN ANDREAS RP {FFFFFF}| Формат имени персонажа",
+            "{FF4444}SAN ANDREAS RP {FFFFFF}| Character Name Format",
             rejectMsg);
         return 1;
     }
@@ -1051,7 +1021,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 SendClientMessage(playerid, COLOR_UI_WARNING,
-                    "Вы отказались от регистрации аккаунта. До встречи в штате Сан-Андреас!");
+                    "You declined account registration. See you in the State of San Andreas!");
                 defer Account_DelayedKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
                 return Y_HOOKS_BREAK_RETURN_1;
             }
@@ -1061,7 +1031,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 Internal_ShowRegisterPasswordDialog(
                     playerid,
-                    "Длина пароля должна составлять от 6 до 32 символов!");
+                    "Password length must be between 6 and 32 characters!");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1071,7 +1041,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     Internal_ShowRegisterPasswordDialog(
                         playerid,
-                        "Пароль не должен содержать пробелов или управляющих символов!");
+                        "The password must not contain spaces or control characters!");
                     return Y_HOOKS_BREAK_RETURN_1;
                 }
             }
@@ -1102,7 +1072,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 Internal_ShowRegisterEmailDialog(
                     playerid,
-                    "Указан некорректный формат электронной почты!");
+                    "Invalid email address format!");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1116,14 +1086,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!response)
             {
                 SendClientMessage(playerid, COLOR_UI_WARNING,
-                    "Вы прервали процедуру авторизации. Соединение закрыто.");
+                    "You interrupted the login procedure. The connection has been closed.");
                 defer Account_DelayedKickTimer(playerid, Config_GetPlayerSessionToken(playerid));
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
             if (strlen(inputtext) < 1)
             {
-                Internal_ShowLoginPasswordDialog(playerid, "Поле ввода пароля не может быть пустым!");
+                Internal_ShowLoginPasswordDialog(playerid, "The password field cannot be empty!");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 

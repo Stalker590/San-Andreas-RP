@@ -107,55 +107,55 @@ enum E_SKILL_META_INFO
 static stock const sSkillMetaTable[TOTAL_SKILL_TYPES][E_SKILL_META_INFO] =
 {
     // 1. Оружейные навыки (0..17)
-    { SKILL_MELEE_BLUNT,        "melee_blunt",      "Дробящее оружие",              "Оружие",       0,   -1 },
-    { SKILL_MELEE_BLADED,       "melee_bladed",     "Клинковое оружие",             "Оружие",       0,   -1 },
-    { SKILL_HEAVY_TOOLS,        "heavy_tools",      "Тяжелый инструмент",           "Оружие",       0,   -1 },
-    { SKILL_PISTOL,             "pistol",           "Пистолет 9mm",                 "Оружие",       0,   0  },
-    { SKILL_PISTOL_SILENCED,    "pistol_silenced",  "Пистолет с глушителем",        "Оружие",       0,   1  },
-    { SKILL_DESERT_EAGLE,       "desert_eagle",     "Пистолет Desert Eagle",        "Оружие",       0,   2  },
-    { SKILL_SHOTGUN,            "shotgun",          "Помповый дробовик",            "Оружие",       0,   3  },
-    { SKILL_SAWNOFF_SHOTGUN,    "sawnoff_shotgun",  "Обрез двустволки",             "Оружие",       0,   4  },
-    { SKILL_SPAS12_SHOTGUN,     "spas12_shotgun",   "Боевой дробовик SPAS-12",      "Оружие",       0,   5  },
-    { SKILL_MICRO_UZI,          "micro_uzi",        "Пистолет-пулемет Micro Uzi",   "Оружие",       0,   6  },
-    { SKILL_TEC9,               "tec9_skill",       "Пистолет-пулемет Tec-9",       "Оружие",       0,   -1 },
-    { SKILL_MP5,                "mp5",              "Пистолет-пулемет MP5",         "Оружие",       0,   7  },
-    { SKILL_AK47,               "ak47",             "Автомат AK-47",                "Оружие",       0,   8  },
-    { SKILL_M4,                 "m4",               "Штурмовая винтовка M4",        "Оружие",       0,   9  },
-    { SKILL_COUNTRY_RIFLE,      "country_rifle",    "Охотничья винтовка",           "Оружие",       0,   -1 },
-    { SKILL_SNIPER_RIFLE,       "sniper_rifle",     "Снайперская винтовка",         "Оружие",       0,   10 },
-    { SKILL_HEAVY_ORDNANCE,     "heavy_ordnance",   "Тяжелое вооружение",           "Оружие",       0,   -1 },
-    { SKILL_THROWABLES,         "throwables",       "Метательное и спецсредства",   "Оружие",       0,   -1 },
+    { SKILL_MELEE_BLUNT,        "melee_blunt",      "Blunt Weapons",              "Weapons",       0,   -1 },
+    { SKILL_MELEE_BLADED,       "melee_bladed",     "Bladed Weapons",             "Weapons",       0,   -1 },
+    { SKILL_HEAVY_TOOLS,        "heavy_tools",      "Heavy Tools",           "Weapons",       0,   -1 },
+    { SKILL_PISTOL,             "pistol",           "9mm Pistol",                 "Weapons",       0,   0  },
+    { SKILL_PISTOL_SILENCED,    "pistol_silenced",  "Silenced Pistol",        "Weapons",       0,   1  },
+    { SKILL_DESERT_EAGLE,       "desert_eagle",     "Desert Eagle",        "Weapons",       0,   2  },
+    { SKILL_SHOTGUN,            "shotgun",          "Pump Shotgun",            "Weapons",       0,   3  },
+    { SKILL_SAWNOFF_SHOTGUN,    "sawnoff_shotgun",  "Sawed-off Shotgun",             "Weapons",       0,   4  },
+    { SKILL_SPAS12_SHOTGUN,     "spas12_shotgun",   "Combat Shotgun SPAS-12",      "Weapons",       0,   5  },
+    { SKILL_MICRO_UZI,          "micro_uzi",        "Micro Uzi",   "Weapons",       0,   6  },
+    { SKILL_TEC9,               "tec9_skill",       "Tec-9",       "Weapons",       0,   -1 },
+    { SKILL_MP5,                "mp5",              "MP5",         "Weapons",       0,   7  },
+    { SKILL_AK47,               "ak47",             "AK-47",                "Weapons",       0,   8  },
+    { SKILL_M4,                 "m4",               "M4",        "Weapons",       0,   9  },
+    { SKILL_COUNTRY_RIFLE,      "country_rifle",    "Hunting Rifle",           "Weapons",       0,   -1 },
+    { SKILL_SNIPER_RIFLE,       "sniper_rifle",     "Sniper Rifle",         "Weapons",       0,   10 },
+    { SKILL_HEAVY_ORDNANCE,     "heavy_ordnance",   "Heavy Ordnance",           "Weapons",       0,   -1 },
+    { SKILL_THROWABLES,         "throwables",       "Throwables & Tactical Gear",   "Weapons",       0,   -1 },
 
     // 2. Физические и транспортные навыки (18..24)
-    { SKILL_STAMINA,            "stamina",          "Выносливость",                 "Физиология",   100, -1 },
-    { SKILL_MUSCLE,             "muscle",           "Мускулатура и сила",           "Физиология",   100, -1 },
-    { SKILL_DRIVING,            "driving_skill",    "Вождение автомобиля",          "Транспорт",    100, -1 },
-    { SKILL_BIKE,               "bike_skill",       "Управление мотоциклом",        "Транспорт",    100, -1 },
-    { SKILL_CYCLING,            "cycling_skill",    "Управление велосипедом",       "Транспорт",    100, -1 },
-    { SKILL_FLYING,             "flying_skill",     "Пилотирование авиации",        "Транспорт",    0,   -1 },
-    { SKILL_LUNG_CAPACITY,      "lung_capacity",    "Объем легких под водой",       "Физиология",   100, -1 },
+    { SKILL_STAMINA,            "stamina",          "Stamina",                 "Physiology",   100, -1 },
+    { SKILL_MUSCLE,             "muscle",           "Muscle",           "Physiology",   100, -1 },
+    { SKILL_DRIVING,            "driving_skill",    "Driving",          "Vehicle",    100, -1 },
+    { SKILL_BIKE,               "bike_skill",       "Motorcycle",        "Vehicle",    100, -1 },
+    { SKILL_CYCLING,            "cycling_skill",    "Cycling",       "Vehicle",    100, -1 },
+    { SKILL_FLYING,             "flying_skill",     "Flying",        "Vehicle",    0,   -1 },
+    { SKILL_LUNG_CAPACITY,      "lung_capacity",    "Lung Capacity",       "Physiology",   100, -1 },
 
     // 3. Криминальные навыки (25..30)
-    { SKILL_LOCKPICKING,        "lockpicking",      "Взлом замков отмычками",       "Криминал",     0,   -1 },
-    { SKILL_HOTWIRING,          "hotwiring",        "Угон и скрутка проводов",      "Криминал",     0,   -1 },
-    { SKILL_SAFE_CRACKING,      "safe_cracking",    "Медвежатник (взлом сейфов)",   "Криминал",     0,   -1 },
-    { SKILL_PICKPOCKETING,      "pickpocketing",    "Карманные кражи",              "Криминал",     0,   -1 },
-    { SKILL_DEMOLITIONS,        "demolitions",      "Подрывное дело и СВУ",         "Криминал",     0,   -1 },
-    { SKILL_STEALTH,            "stealth",          "Скрытность и маскировка",      "Криминал",     0,   -1 },
+    { SKILL_LOCKPICKING,        "lockpicking",      "Lockpicking",       "Criminal",     0,   -1 },
+    { SKILL_HOTWIRING,          "hotwiring",        "Hotwiring",      "Criminal",     0,   -1 },
+    { SKILL_SAFE_CRACKING,      "safe_cracking",    "Safe Cracking",   "Criminal",     0,   -1 },
+    { SKILL_PICKPOCKETING,      "pickpocketing",    "Pickpocketing",              "Criminal",     0,   -1 },
+    { SKILL_DEMOLITIONS,        "demolitions",      "Demolitions",         "Criminal",     0,   -1 },
+    { SKILL_STEALTH,            "stealth",          "Stealth",      "Criminal",     0,   -1 },
 
     // 4. Ремесло и техника (31..35)
-    { SKILL_MECHANICS,          "mechanics",        "Автомеханика и ремонт",        "Ремесло",      0,   -1 },
-    { SKILL_GUNSMITHING,        "gunsmithing",      "Оружейное ремесло",            "Ремесло",      0,   -1 },
-    { SKILL_CHEMISTRY,          "chemistry",        "Химия и фармацевтика",         "Ремесло",      0,   -1 },
-    { SKILL_MINING_LOGGING,     "mining_logging",   "Горное дело и лесоповал",      "Ремесло",      0,   -1 },
-    { SKILL_METALLURGY,         "metallurgy",       "Металлургия и прокат",         "Ремесло",      0,   -1 },
+    { SKILL_MECHANICS,          "mechanics",        "Mechanics",        "Crafting",      0,   -1 },
+    { SKILL_GUNSMITHING,        "gunsmithing",      "Gunsmithing",            "Crafting",      0,   -1 },
+    { SKILL_CHEMISTRY,          "chemistry",        "Chemistry",         "Crafting",      0,   -1 },
+    { SKILL_MINING_LOGGING,     "mining_logging",   "Mining & Logging",      "Crafting",      0,   -1 },
+    { SKILL_METALLURGY,         "metallurgy",       "Metallurgy",         "Crafting",      0,   -1 },
 
     // 5. Медицина и выживание (36..40)
-    { SKILL_FIRST_AID,          "first_aid",        "Первая медицинская помощь",    "Медицина",     0,   -1 },
-    { SKILL_SURGERY,            "surgery",          "Полевая хирургия",             "Медицина",     0,   -1 },
-    { SKILL_SURVIVALISM,        "survivalism",      "Автономное выживание",         "Выживание",    0,   -1 },
-    { SKILL_FORENSICS,          "forensics",        "Криминалистика и улики",       "Следствие",    0,   -1 },
-    { SKILL_CHARISMA_BARTER,    "charisma_barter",  "Харизма и торговля",           "Социум",       0,   -1 }
+    { SKILL_FIRST_AID,          "first_aid",        "First Aid",    "Medical",     0,   -1 },
+    { SKILL_SURGERY,            "surgery",          "Surgery",             "Medical",     0,   -1 },
+    { SKILL_SURVIVALISM,        "survivalism",      "Survivalism",         "Survival",    0,   -1 },
+    { SKILL_FORENSICS,          "forensics",        "Forensics",       "Investigation",    0,   -1 },
+    { SKILL_CHARISMA_BARTER,    "charisma_barter",  "Charisma & Barter",           "Social",       0,   -1 }
 };
 
 static stock sPlayerSkills[MAX_PLAYERS][TOTAL_SKILL_TYPES];
@@ -194,12 +194,12 @@ static stock Internal_FormatFightingStyleRu(FIGHT_STYLE:style, output[], len = s
 {
     switch (style)
     {
-        case FIGHT_STYLE_BOXING:    format(output, len, "Классический бокс");
-        case FIGHT_STYLE_KUNGFU:    format(output, len, "Кунг-фу");
-        case FIGHT_STYLE_KNEEHEAD:  format(output, len, "Уличный клинч (колено в голову)");
-        case FIGHT_STYLE_GRABKICK:  format(output, len, "Захват и добивание ногой");
-        case FIGHT_STYLE_ELBOW:     format(output, len, "Удары локтями");
-        default:                    format(output, len, "Стандартный уличный бой");
+        case FIGHT_STYLE_BOXING:    format(output, len, "Boxing");
+        case FIGHT_STYLE_KUNGFU:    format(output, len, "Kung Fu");
+        case FIGHT_STYLE_KNEEHEAD:  format(output, len, "Street Clinch (Knee Strike)");
+        case FIGHT_STYLE_GRABKICK:  format(output, len, "Grab Kick");
+        case FIGHT_STYLE_ELBOW:     format(output, len, "Elbow Strikes");
+        default:                    format(output, len, "Standard Street Fighting");
     }
 }
 
@@ -469,7 +469,7 @@ stock Skills_Add(playerid, E_SKILL_TYPE:skill, delta)
     {
         new msg[144];
         format(msg, sizeof(msg),
-            "Навык «%s» повышен до %d / %d ед.",
+            "The skill “%s” has been increased to %d / %d units.",
             sSkillMetaTable[_:skill][E_SMETA_NAME_RU],
             newVal,
             maxCap);
@@ -517,7 +517,7 @@ stock Skills_GetNameRu(E_SKILL_TYPE:skill, output[], len = sizeof(output))
 {
     if (_:skill < 0 || _:skill >= _:MAX_SKILL_TYPES)
     {
-        format(output, len, "Неизвестный навык");
+        format(output, len, "Unknown Skill");
         return 0;
     }
     format(output, len, "%s", sSkillMetaTable[_:skill][E_SMETA_NAME_RU]);
@@ -528,7 +528,7 @@ stock Skills_GetCategoryRu(E_SKILL_TYPE:skill, output[], len = sizeof(output))
 {
     if (_:skill < 0 || _:skill >= _:MAX_SKILL_TYPES)
     {
-        format(output, len, "Общее");
+        format(output, len, "General");
         return 0;
     }
     format(output, len, "%s", sSkillMetaTable[_:skill][E_SMETA_CATEGORY_RU]);
@@ -660,7 +660,7 @@ stock Skills_BuildDialogBody(playerid, output[], len = sizeof(output))
     }
 
     new used = format(output, len,
-        "Навык персонажа\tКатегория\tУровень / Потолок\n");
+        "Character Skill\tCategory\tLevel/Ceiling\n");
 
     new rowLine[192];
     new addedRows = 0;
@@ -719,10 +719,10 @@ stock Skills_ShowDialog(playerid)
     new const rows = Skills_BuildDialogBody(playerid, sSkillsDialogBuffer, sizeof(sSkillsDialogBuffer));
     if (rows != TOTAL_SKILL_TYPES)
     {
-        printf("%s [Entities/Skills] [ERROR] Диалог /skills сформирован не полностью: %d из %d строк.",
+        printf("%s [Entities/Skills] [ERROR] The /skills dialog is not fully formed: %d from %d lines.",
             SERVER_LOG_PREFIX, rows, TOTAL_SKILL_TYPES);
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Не удалось сформировать полный список навыков. Сообщите администрации.");
+            "It was not possible to generate a complete list of skills. Notify the administration.");
         return 0;
     }
 
@@ -730,9 +730,9 @@ stock Skills_ShowDialog(playerid)
         playerid,
         DIALOG_SKILLS_OVERVIEW,
         DIALOG_STYLE_TABLIST_HEADERS,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Навыки персонажа",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Character Skills",
         sSkillsDialogBuffer,
-        "Закрыть",
+        "Close",
         "");
     return 1;
 }
@@ -762,18 +762,18 @@ hook OnGameModeInit()
         strfind(sSkillsDialogBuffer,
             sSkillMetaTable[_:SKILL_CHARISMA_BARTER][E_SMETA_NAME_RU], true) != -1);
 
-    printf("%s [Entities/Skills] Матрица %d навыков инициализирована (тест AK47=%d, LOCKPICKING=%d: %s).",
+    printf("%s [Entities/Skills] Skill matrix %d is initialized (test AK47=%d, LOCKPICKING=%d: %s).",
         SERVER_LOG_PREFIX,
         _:MAX_SKILL_TYPES,
         akCheck,
         lockCheck,
-        (akCheck == 950 && lockCheck == 750) ? ("УСПЕШНО") : ("ОШИБКА"));
-    printf("%s [Entities/Skills] Диалог /skills: строк %d из %d, длина %d символов, последний навык: %s.",
+        (akCheck == 950 && lockCheck == 750) ? ("SUCCESS") : ("ERROR"));
+    printf("%s [Entities/Skills] Dialog /skills: lines %d from %d, length %d characters, last skill: %s.",
         SERVER_LOG_PREFIX,
         dialogRows,
         TOTAL_SKILL_TYPES,
         strlen(sSkillsDialogBuffer),
-        (dialogRows == TOTAL_SKILL_TYPES && dialogTailOk) ? ("ОК") : ("ОШИБКА"));
+        (dialogRows == TOTAL_SKILL_TYPES && dialogTailOk) ? ("OK") : ("ERROR"));
     return 1;
 }
 
@@ -809,13 +809,13 @@ CMD:skills(playerid, params[])
     if (!Account_IsLogged(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для просмотра матрицы навыков необходимо авторизоваться на сервере.");
+            "To view the skills matrix, you must log in to the server.");
         return 1;
     }
     if (!Character_IsLoaded(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Сначала завершите создание и загрузку персонажа.");
+            "First, complete character creation and uploading.");
         return 1;
     }
     Skills_ShowDialog(playerid);

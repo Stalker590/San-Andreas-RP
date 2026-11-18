@@ -239,7 +239,7 @@ stock Utils_FormatWeightGrams(weightGrams, output[], len = sizeof(output))
     new const safeGrams = (weightGrams < 0) ? 0 : weightGrams;
     new const kgWhole = GRAMS_TO_KG(safeGrams);
     new const kgHundredths = (GRAMS_REMAINDER(safeGrams) / 10);
-    format(output, len, "%d.%02d êã", kgWhole, kgHundredths);
+    format(output, len, "%d.%02d kg", kgWhole, kgHundredths);
     return 1;
 }
 
@@ -249,7 +249,7 @@ stock Utils_FormatVolumeMl(volumeMl, output[], len = sizeof(output))
     new const safeMl = (volumeMl < 0) ? 0 : volumeMl;
     new const litersWhole = ML_TO_LITERS(safeMl);
     new const litersHundredths = (ML_REMAINDER(safeMl) / 10);
-    format(output, len, "%d.%02d ë", litersWhole, litersHundredths);
+    format(output, len, "%d.%02d l", litersWhole, litersHundredths);
     return 1;
 }
 
@@ -324,9 +324,9 @@ hook OnGameModeInit()
         !strcmp(moneyStr, "$1,250,000", false)
     );
 
-    printf("%s [Core/Utils] Ãåíåðàòîðû ïðîâåðåíû (%s): SSN=%s, VIN=%s, IBAN=%s, Serial=%d, Money=%s.",
+    printf("%s [Core/Utils] Generators checked (%s): SSN=%s, VIN=%s, IBAN=%s, Serial=%d, Money=%s.",
         SERVER_LOG_PREFIX,
-        testsPassed ? ("ÓÑÏÅØÍÎ") : ("ÎØÈÁÊÀ"),
+        testsPassed ? ("SUCCESS") : ("ERROR"),
         ssn1, vin1, iban1, serial1, moneyStr);
     return 1;
 }

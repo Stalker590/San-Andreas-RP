@@ -169,20 +169,20 @@ static stock STREAMER_TAG_3D_TEXT_LABEL:sDealershipLabel[VEHICLE_DEALERSHIP_COUN
 
 static stock const sVehicleCatalog[VEHICLE_CATALOG_SIZE][E_VEHICLE_CATALOG_DATA] =
 {
-    { 400, "Лендсталкер",       25000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 410, "Манана",            18000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 429, "Банши",             95000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 411, "Инфернус",          250000, FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 522, "Мотоцикл NRG-500",  60000,  FUEL_REGULAR, 40000 },
-    { 461, "Мотоцикл PCJ-600",  45000,  FUEL_REGULAR, 40000 },
-    { 466, "Глендейл",          20000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 492, "Гринвуд",           22000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 500, "Меса",              35000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
-    { 554, "Йосемити",          40000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
-    { 403, "Грузовик Лайнер",   120000, FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
-    { 414, "Фургон Мул",        90000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
-    { 456, "Фургон Янки",       80000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
-    { 514, "Топливная цистерна",180000, FUEL_DIESEL,  VEHICLE_TANKER_MAX_FUEL_ML }
+    { 400, "Landstalker",       25000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 410, "Manana",            18000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 429, "Banshee",             95000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 411, "Infernus",          250000, FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 522, "Motorcycle NRG-500",  60000,  FUEL_REGULAR, 40000 },
+    { 461, "Motorcycle PCJ-600",  45000,  FUEL_REGULAR, 40000 },
+    { 466, "Glendale",          20000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 492, "Greenwood",           22000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 500, "Mesa",              35000,  FUEL_REGULAR, VEHICLE_DEFAULT_MAX_FUEL_ML },
+    { 554, "Yosemite",          40000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
+    { 403, "Truck Liner",   120000, FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
+    { 414, "Van Mule",        90000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
+    { 456, "Yankee Van",       80000,  FUEL_DIESEL,  VEHICLE_TRUCK_MAX_FUEL_ML },
+    { 514, "Fuel tank",180000, FUEL_DIESEL,  VEHICLE_TANKER_MAX_FUEL_ML }
 };
 
 static stock const Float:sVehicleDealerships[VEHICLE_DEALERSHIP_COUNT][3] =
@@ -238,10 +238,10 @@ static stock Internal_GetFuelTitleRu(E_FUEL_TYPE:fuelType, output[], len = sizeo
 {
     switch (fuelType)
     {
-        case FUEL_REGULAR:  format(output, len, "Бензин (Regular)");
-        case FUEL_DIESEL:   format(output, len, "Дизельное топливо");
-        case FUEL_JET_FUEL: format(output, len, "Авиационный керосин");
-        default:            format(output, len, "Неизвестное топливо");
+        case FUEL_REGULAR:  format(output, len, "Gasoline (Regular)");
+        case FUEL_DIESEL:   format(output, len, "Diesel fuel");
+        case FUEL_JET_FUEL: format(output, len, "Aviation kerosene");
+        default:            format(output, len, "Unknown fuel");
     }
     return 1;
 }
@@ -284,7 +284,7 @@ static stock Internal_GetCatalogName(model_id, output[], len = sizeof(output))
             return 1;
         }
     }
-    format(output, len, "Транспортное средство (модель %d)", model_id);
+    format(output, len, "Vehicle (Model %d)", model_id);
     return 0;
 }
 
@@ -842,7 +842,7 @@ static stock bool:Internal_IssueKey(playerid, slot, bool:notify)
     if (result == STORAGE_RES_OK && notify)
     {
         SendClientMessage(playerid, COLOR_UI_SUCCESS,
-            "Ключи от транспортного средства выданы и помещены в инвентарь.");
+            "Vehicle keys are issued and placed in inventory.");
     }
     return (result == STORAGE_RES_OK);
 }
@@ -984,7 +984,7 @@ static stock Internal_CommandAllowed(playerid)
     if ((nowTick - sVehicleLastCommandTick[playerid]) < VEHICLE_COMMAND_COOLDOWN_MS)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Не так быстро: дождитесь завершения предыдущей операции.");
+            "Not so fast: Wait for the previous operation to complete.");
         return false;
     }
     sVehicleLastCommandTick[playerid] = nowTick;
@@ -1136,12 +1136,12 @@ stock Vehicle_CreateForPlayer(playerid, model_id, price_usd, bool:chargePlayer =
         Character_GetPhysicalCashUsd(playerid) < price_usd)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Недостаточно средств: оплата возможна с банковского счета или наличными.");
+            "Insufficient funds: payment can be made from a bank account or in cash.");
         return -1;
     }
     if (Iter_Free(VehicleDataIter) == INVALID_ITERATOR_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Пул транспорта переполнен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The vehicle pool is full.");
         return -1;
     }
 
@@ -1194,14 +1194,14 @@ stock Vehicle_CreateForPlayer(playerid, model_id, price_usd, bool:chargePlayer =
 
     if (chargePlayer && price_usd > 0)
     {
-        if (!Banking_DebitAccount(playerid, price_usd, "Покупка транспортного средства"))
+        if (!Banking_DebitAccount(playerid, price_usd, "Purchasing a vehicle"))
         {
             if (!Character_RemovePhysicalCashUsd(playerid, price_usd))
             {
                 Internal_ResetVehicleSlot(slot);
                 Iter_Remove(VehicleDataIter, slot);
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Недостаточно средств: оплата возможна с банковского счета или наличными.");
+                    "Insufficient funds: payment can be made from a bank account or in cash.");
                 return -1;
             }
         }
@@ -1216,19 +1216,19 @@ stock Vehicle_CreateForPlayer(playerid, model_id, price_usd, bool:chargePlayer =
     if (keyIssued)
     {
         format(msg, sizeof(msg),
-            "Вы приобрели «%s» с номером %s. Ключи находятся в инвентаре.",
+            "You purchased \"%s\" with the number %s. The keys are in inventory.",
             modelName, sVehicles[slot][E_VEH_PLATE]);
     }
     else
     {
         format(msg, sizeof(msg),
-            "Вы приобрели «%s» с номером %s. В инвентаре нет места для ключей: изготовьте их через /vkey.",
+            "You purchased \"%s\" with the number %s. There is no room for keys in your inventory: craft them via /vkey.",
             modelName, sVehicles[slot][E_VEH_PLATE]);
     }
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "VEHICLE_BUY", "BANK", "VEHICLE", 0, price_usd,
-        "Покупка личного транспортного средства");
+        "Buying a personal vehicle");
     return slot;
 }
 
@@ -1321,7 +1321,7 @@ static stock Internal_OpenBuyDialog(playerid)
     if (!Internal_PlayerNearDealership(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Автосалон находится в другом районе. Подойдите к стойке продаж.");
+            "The car dealership is located in another area. Go to the sales counter.");
         return 0;
     }
 
@@ -1346,10 +1346,10 @@ static stock Internal_OpenBuyDialog(playerid)
         playerid,
         DIALOG_VEHICLE_BUY,
         DIALOG_STYLE_LIST,
-        "{FFC800}Автосалон Сан-Андреаса {FFFFFF}| Каталог транспорта",
+        "{FFC800}San Andreas Auto Show {FFFFFF}| Vehicle catalog",
         body,
-        "Купить",
-        "Отмена");
+        "Buy",
+        "Cancel");
     return 1;
 }
 
@@ -1363,14 +1363,14 @@ static stock Internal_StartRefuel(playerid)
     if (!atStation && !hasCanister)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для заправки нужна АЗС или канистра с топливом в инвентаре.");
+            "To refuel, you need a gas station or a canister of fuel in your inventory.");
         return 0;
     }
 
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, VEHICLE_INTERACT_RADIUS, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства для заправки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby for refueling.");
         return 0;
     }
 
@@ -1380,11 +1380,11 @@ static stock Internal_StartRefuel(playerid)
 
     new body[512];
     format(body, sizeof(body),
-        "Текущий уровень топлива: %d / %d мл.\n" \
-        "Выберите тип топлива. Неверный тип повредит двигатель!\n\n" \
-        "Бензин Regular — %d USD/л\n" \
-        "Дизельное топливо — %d USD/л\n" \
-        "Авиационный керосин — %d USD/л",
+        "Current fuel level: %d / %d ml.\n" \
+        "Select fuel type. Wrong type will damage the motor!\n\n" \
+        "Gasoline Regular — %d USD/l\n" \
+        "Diesel fuel — %d USD/l\n" \
+        "Aviation kerosene – %d USD/l",
         sVehicles[slot][E_VEH_FUEL_ML],
         sVehicles[slot][E_VEH_MAX_FUEL_ML],
         VEHICLE_FUEL_PRICE_REGULAR_USD,
@@ -1395,10 +1395,10 @@ static stock Internal_StartRefuel(playerid)
         playerid,
         DIALOG_VEHICLE_REFUEL_TYPE,
         DIALOG_STYLE_LIST,
-        "{FFC800}Заправка транспортного средства",
+        "{FFC800}Refueling a vehicle",
         body,
-        "Выбрать",
-        "Отмена");
+        "Select",
+        "Cancel");
     return 1;
 }
 
@@ -1406,14 +1406,14 @@ static stock Internal_ApplyRefuel(playerid, liters)
 {
     if (liters <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Количество литров должно быть положительным.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The number of liters must be positive.");
         return 0;
     }
 
     new const slot = sVehicleRefuelSlot[playerid];
     if (!Vehicle_IsValidSlot(slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Транспортное средство больше недоступно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The vehicle is no longer available.");
         return 0;
     }
 
@@ -1422,7 +1422,7 @@ static stock Internal_ApplyRefuel(playerid, liters)
     new const currentFuel = sVehicles[slot][E_VEH_FUEL_ML];
     if (currentFuel >= maxFuel)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Топливный бак уже полон.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The fuel tank is already full.");
         return 0;
     }
 
@@ -1460,7 +1460,7 @@ static stock Internal_ApplyRefuel(playerid, liters)
 
             new msg[192];
             format(msg, sizeof(msg),
-                "Вы залили %d л топлива из канистры. В баке: %d / %d мл.",
+                "You filled %d liters of fuel from a canister. In tank: %d / %d ml.",
                 fromCanister, sVehicles[slot][E_VEH_FUEL_ML], maxFuel);
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
             return 1;
@@ -1471,20 +1471,20 @@ static stock Internal_ApplyRefuel(playerid, liters)
     new const station = sVehicleRefuelStation[playerid];
     if (station == VEHICLE_INVALID_ENTERPRISE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Автозаправочная станция недоступна.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Gas station is not available.");
         return 0;
     }
 
     new const warehouse = sVehicleRefuelWarehouse[playerid];
     if (!Storage_IsValidSlot(warehouse))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Склад автозаправочной станции недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Gas station warehouse is not available.");
         return 0;
     }
     if (Storage_CountItemInTree(warehouse, ITEM_ID_REFINED_FUEL) < acceptedLiters)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "На автозаправочной станции закончилось топливо. Сообщите владельцу предприятия.");
+            "The gas station ran out of fuel. Notify the business owner.");
         return 0;
     }
 
@@ -1492,19 +1492,19 @@ static stock Internal_ApplyRefuel(playerid, liters)
     new const totalCost = acceptedLiters * price;
     if (Character_GetPhysicalCashUsd(playerid) < totalCost)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно наличных для оплаты заправки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Not enough cash to pay for gas.");
         return 0;
     }
 
     if (!Character_RemovePhysicalCashUsd(playerid, totalCost))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить заправку.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay for gas.");
         return 0;
     }
     if (Storage_RemoveItemInTree(warehouse, ITEM_ID_REFINED_FUEL, acceptedLiters) <= 0)
     {
         Character_AddPhysicalCashUsd(playerid, totalCost);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось списать топливо со склада АЗС.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "It was not possible to write off fuel from the gas station warehouse.");
         return 0;
     }
 
@@ -1515,12 +1515,12 @@ static stock Internal_ApplyRefuel(playerid, liters)
 
     new msg[224];
     format(msg, sizeof(msg),
-        "Заправка выполнена: %d л за %d USD. В баке: %d / %d мл.",
+        "Refueling completed: %d l for %d USD. In tank: %d / %d ml.",
         acceptedLiters, totalCost, sVehicles[slot][E_VEH_FUEL_ML], maxFuel);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "VEHICLE_REFUEL", "CASH", "ENTERPRISE_WAREHOUSE",
-        ITEM_ID_REFINED_FUEL, totalCost, "Заправка транспортного средства на АЗС");
+        ITEM_ID_REFINED_FUEL, totalCost, "Refueling a vehicle at a gas station");
     return 1;
 }
 
@@ -1540,9 +1540,9 @@ static stock Internal_HandleWrongFuel(playerid, slot, E_FUEL_TYPE:usedFuel)
     Internal_ApplyVehicleParams(slot);
 
     SendClientMessage(playerid, COLOR_UI_ERROR,
-        "Вы залили неподходящее топливо! Двигатель поврежден, автомобиль заглох.");
+        "You have filled in with the wrong fuel! The engine was damaged and the car stalled.");
     Audit_Log(Character_GetId(playerid), "VEHICLE_WRONG_FUEL", "FUEL", "VEHICLE",
-        0, 0, "Заправка двигателя неподходящим типом топлива");
+        0, 0, "Filling the engine with the wrong type of fuel");
     return 1;
 }
 
@@ -1550,7 +1550,7 @@ static stock Internal_ShowHotwireDialog(playerid)
 {
     if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Для скрутки проводов нужно сидеть за рулем.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "To twist the wires you need to sit behind the wheel.");
         return 0;
     }
 
@@ -1558,19 +1558,19 @@ static stock Internal_ShowHotwireDialog(playerid)
     new const slot = Internal_FindSlotByRuntime(vid);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Этот транспорт не поддается скрутке проводов.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "This vehicle cannot be twisted.");
         return 0;
     }
     if (Internal_PlayerHasVehicleKey(playerid, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "У вас есть ключ: скрутка проводов не требуется.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "You have the key: no twisting of wires required.");
         return 0;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sVehicleLastHotwireTick[playerid]) < VEHICLE_HOTWIRE_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Провода остывают: подождите несколько секунд.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The wires are getting cold: wait a few seconds.");
         return 0;
     }
 
@@ -1579,13 +1579,13 @@ static stock Internal_ShowHotwireDialog(playerid)
         playerid,
         DIALOG_VEHICLE_HOTWIRE,
         DIALOG_STYLE_LIST,
-        "{FFC800}Скрутка проводов зажигания",
-        "Соединить красный и желтый провода\n" \
-        "Соединить синий и зеленый провода\n" \
-        "Соединить черный и оранжевый провода\n" \
-        "Соединить белый и коричневый провода",
-        "Попробовать",
-        "Отмена");
+        "{FFC800}Twisting ignition wires",
+        "Connect the red and yellow wires\n" \
+        "Connect blue and green wires\n" \
+        "Connect black and orange wires\n" \
+        "Connect the white and brown wires",
+        "Try it",
+        "Cancel");
     return 1;
 }
 
@@ -1594,28 +1594,28 @@ static stock Internal_ExecuteChop(playerid)
     new const enterprise = sVehicleChopEnterprise[playerid];
     if (enterprise == VEHICLE_INVALID_ENTERPRISE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы находитесь не на авторазборке.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are not at a car wrecker.");
         return 0;
     }
 
     new const slot = sVehicleChopVehicle[playerid];
     if (!Vehicle_IsValidSlot(slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Транспортное средство не найдено.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Vehicle not found.");
         return 0;
     }
 
     new const vid = sVehicles[slot][E_VEH_RUNTIME_ID];
     if (vid == INVALID_VEHICLE_ID || !IsValidVehicle(vid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Транспортное средство уже недоступно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The vehicle is no longer available.");
         return 0;
     }
 
     new const warehouse = sVehicleChopWarehouse[playerid];
     if (!Storage_IsValidSlot(warehouse))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Склад авторазборки недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The auto dismantling warehouse is not available.");
         return 0;
     }
 
@@ -1660,7 +1660,7 @@ static stock Internal_ExecuteChop(playerid)
                 Storage_AddItem(drop, ITEM_ID_BEARINGS, bearingsLeft, 0, 100.0, 0, 0, "", outItem);
         }
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Склад авторазборки переполнен: часть деталей выгружена на землю.");
+            "The auto dismantling warehouse is full: some of the parts have been unloaded onto the ground.");
     }
 
     new const dbId = sVehicles[slot][E_VEH_DB_ID];
@@ -1706,12 +1706,12 @@ static stock Internal_ExecuteChop(playerid)
 
     new msg[256];
     format(msg, sizeof(msg),
-        "Автомобиль %s разобран. Получено: стальной прокат — %d, пружины — %d, подшипники — %d.",
+        "Car %s has been disassembled. Received: rolled steel - %d, springs - %d, bearings - %d.",
         plate, steel, springs, bearings);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "VEHICLE_CHOP", "VEHICLE", "ENTERPRISE_WAREHOUSE",
-        0, steel + springs + bearings, "Разборка угнанного транспорта на запчасти");
+        0, steel + springs + bearings, "Dismantling stolen vehicles for parts");
     return 1;
 }
 
@@ -1844,7 +1844,7 @@ static stock Internal_LoadVehiclesSync()
 {
     if (!DB_IsConnected())
     {
-        printf("%s [Entities/Vehicles] База недоступна: транспорт будет создаваться по мере покупки.",
+        printf("%s [Entities/Vehicles] The database is not available: vehicles will be created as they are purchased.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -1946,7 +1946,7 @@ hook OnGameModeInit()
     for (new i = 0; i < VEHICLE_DEALERSHIP_COUNT; i++)
     {
         sDealershipLabel[i] = CreateDynamic3DTextLabel(
-            "Автосалон Сан-Андреаса\nКаталог: /vbuy",
+            "San Andreas Auto Show\nCatalogue: /vbuy",
             COLOR_UI_INFO,
             sVehicleDealerships[i][0],
             sVehicleDealerships[i][1],
@@ -1960,7 +1960,7 @@ hook OnGameModeInit()
     }
 
     Internal_LoadVehiclesSync();
-    printf("%s [Entities/Vehicles] Загружено транспортных средств: %d.",
+    printf("%s [Entities/Vehicles] Vehicles loaded: %d.",
         SERVER_LOG_PREFIX, Iter_Count(VehicleDataIter));
     return 1;
 }
@@ -2029,12 +2029,12 @@ hook OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
         {
             if (sVehicles[slot][E_VEH_FUEL_ML] <= 0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "В топливном баке нет топлива.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "There is no fuel in the fuel tank.");
                 sVehicles[slot][E_VEH_ENGINE_ON] = false;
             }
             else if (sVehicles[slot][E_VEH_ENGINE_HP] <= 0.0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Двигатель вышел из строя. Требуется ремонт.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The engine has failed. Needs renovation.");
                 sVehicles[slot][E_VEH_ENGINE_ON] = false;
             }
             else
@@ -2046,7 +2046,7 @@ hook OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
         {
             sVehicles[slot][E_VEH_ENGINE_ON] = false;
             SendClientMessage(playerid, COLOR_UI_WARNING,
-                "Ключа нет: двигатель не заводится. Скрутите провода командой /hotwire.");
+                "No key: engine won't start. Twist the wires with the /hotwire command.");
         }
         Internal_ApplyVehicleParams(slot);
     }
@@ -2117,7 +2117,7 @@ task Tick_VehicleSecond[1000]()
                 sVehicles[slot][E_VEH_ENGINE_ON] = false;
                 Internal_ApplyVehicleParams(slot);
                 SendClientMessage(driver, COLOR_UI_ERROR,
-                    "Двигатель заглох: нет физического ключа и скрутки проводов.");
+                    "The engine has stalled: there is no physical key and no twist of wires.");
             }
         }
 
@@ -2162,7 +2162,7 @@ task Tick_VehicleSecond[1000]()
                     {
                         sVehicles[slot][E_VEH_FUEL_WARNED] = true;
                         SendClientMessage(driver, COLOR_UI_ERROR,
-                            "Топливо закончилось. Двигатель заглох. Заправьтесь на АЗС.");
+                            "The fuel has run out. The engine stalled. Fuel up at a gas station.");
                     }
                 }
                 else
@@ -2177,7 +2177,7 @@ task Tick_VehicleSecond[1000]()
                     sVehicles[slot][E_VEH_ENGINE_ON] = false;
                     Internal_ApplyVehicleParams(slot);
                     SendClientMessage(driver, COLOR_UI_ERROR,
-                        "Двигатель полностью изношен. Требуется ремонт в автомастерской.");
+                        "The engine is completely worn out. Needs repairs at an auto repair shop.");
                 }
             }
 
@@ -2222,14 +2222,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (!Internal_PlayerNearDealership(playerid))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Вы отошли от автосалона.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "You walked away from the car dealership.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             new const price = sVehicleCatalog[listitem][E_VC_PRICE_USD];
             if (Banking_GetBalance(playerid) < price &&
                 Character_GetPhysicalCashUsd(playerid) < price)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно средств для покупки.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Insufficient funds for purchase.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             Vehicle_CreateForPlayer(playerid, sVehicleCatalog[listitem][E_VC_MODEL], price, true);
@@ -2246,7 +2246,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new const slot = sVehicleRefuelSlot[playerid];
             if (!Vehicle_IsValidSlot(slot))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Транспортное средство недоступно.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The vehicle is unavailable.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -2254,16 +2254,16 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             Internal_GetFuelTitleRu(sVehicleRefuelType[playerid], fuelTitle, sizeof(fuelTitle));
             new body[320];
             format(body, sizeof(body),
-                "Топливо: %s\n" \
-                "Цена: %d USD за литр\n" \
-                "В баке: %d / %d мл\n\n" \
-                "Введите количество литров для заправки.",
+                "Fuel: %s\n" \
+                "Price: %d USD per liter\n" \
+                "In tank: %d / %d ml\n\n" \
+                "Enter the number of liters to fill.",
                 fuelTitle,
                 Internal_GetFuelPriceUsd(sVehicleRefuelType[playerid]),
                 sVehicles[slot][E_VEH_FUEL_ML],
                 sVehicles[slot][E_VEH_MAX_FUEL_ML]);
             ShowPlayerDialog(playerid, DIALOG_VEHICLE_REFUEL_AMOUNT, DIALOG_STYLE_INPUT,
-                "{FFC800}Количество топлива", body, "Заправить", "Отмена");
+                "{FFC800}Fuel quantity", body, "Refuel", "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -2276,7 +2276,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new liters = 0;
             if (!Internal_ParsePositiveInt(inputtext, liters))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректное количество литров.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter the correct number of liters.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             Internal_ApplyRefuel(playerid, liters);
@@ -2291,7 +2291,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Вы уже не за рулем.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "You are no longer driving.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             new const vid = GetPlayerVehicleID(playerid);
@@ -2309,9 +2309,9 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 Internal_ApplyVehicleParams(slot);
                 Skills_Add(playerid, SKILL_HOTWIRING, 2);
                 SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                    "Провода соединены! Двигатель завелся, можно ехать.");
+                    "Wires connected! The engine has started, you can drive.");
                 Audit_Log(Character_GetId(playerid), "VEHICLE_HOTWIRE", "VEHICLE", "CHARACTER",
-                    0, 1, "Успешная скрутка проводов зажигания");
+                    0, 1, "Successful twisting of ignition wires");
             }
             else
             {
@@ -2320,7 +2320,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 SetPlayerHealth(playerid, health - 10.0);
                 Skills_Add(playerid, SKILL_HOTWIRING, 1);
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Вас ударило током! Провода соединены неверно, попробуйте другую комбинацию.");
+                    "You've been electrocuted! The wires are not connected correctly, try a different combination.");
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }
@@ -2346,16 +2346,16 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new Float:x, Float:y, Float:z, Float:a;
             if (!Properties_GetExteriorPos(propertyDbId, x, y, z, a))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось определить адрес гаража.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The garage address could not be determined.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (Vehicle_RetrieveFromGarage(slot, x + 3.0, y + 3.0, z, a))
             {
-                SendClientMessage(playerid, COLOR_UI_SUCCESS, "Транспорт выехал из гаража.");
+                SendClientMessage(playerid, COLOR_UI_SUCCESS, "The vehicle left the garage.");
             }
             else
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось выгнать транспорт из гаража.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to get the vehicle out of the garage.");
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }
@@ -2394,7 +2394,7 @@ CMD:vstats(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 8.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
 
@@ -2402,16 +2402,16 @@ CMD:vstats(playerid, params[])
     Internal_GetCatalogName(sVehicles[slot][E_VEH_MODEL], modelName, sizeof(modelName));
     switch (sVehicles[slot][E_VEH_OWNER_TYPE])
     {
-        case VEHICLE_OWNER_CHARACTER:    format(ownerName, sizeof(ownerName), "персонаж #%d", sVehicles[slot][E_VEH_OWNER_ID]);
-        case VEHICLE_OWNER_ORGANIZATION: format(ownerName, sizeof(ownerName), "организация #%d", sVehicles[slot][E_VEH_OWNER_ID]);
-        default:                         format(ownerName, sizeof(ownerName), "государственный автопарк");
+        case VEHICLE_OWNER_CHARACTER:    format(ownerName, sizeof(ownerName), "character #%d", sVehicles[slot][E_VEH_OWNER_ID]);
+        case VEHICLE_OWNER_ORGANIZATION: format(ownerName, sizeof(ownerName), "organization #%d", sVehicles[slot][E_VEH_OWNER_ID]);
+        default:                         format(ownerName, sizeof(ownerName), "state vehicle fleet");
     }
 
     new fuelTitle[32];
     Internal_GetFuelTitleRu(sVehicles[slot][E_VEH_FUEL_TYPE], fuelTitle, sizeof(fuelTitle));
     new msg[256];
     format(msg, sizeof(msg),
-        "[Транспорт] %s | Номер: %s | Владелец: %s | Топливо: %d / %d мл (%s) | Двигатель: %.0f ед. | Кузов: %.0f ед.",
+        "[Vehicle] %s | Plate: %s | Owner: %s | Fuel: %d / %d ml (%s) | Engine: %.0f units | Body: %.0f units",
         modelName, sVehicles[slot][E_VEH_PLATE], ownerName,
         sVehicles[slot][E_VEH_FUEL_ML], sVehicles[slot][E_VEH_MAX_FUEL_ML], fuelTitle,
         sVehicles[slot][E_VEH_ENGINE_HP], sVehicles[slot][E_VEH_BODY_HP]);
@@ -2434,7 +2434,7 @@ CMD:vkey(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 8.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
 
@@ -2443,36 +2443,36 @@ CMD:vkey(playerid, params[])
         sVehicles[slot][E_VEH_OWNER_ID] == Character_GetId(playerid));
     if (!hasKey && !isOwner)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы не владелец и не имеете ключа от этого транспорта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are not the owner and do not have a key to this vehicle.");
         return 1;
     }
     if (!Internal_PlayerHasItemDef(playerid, ITEM_ID_WRENCH_KIT) &&
         Skills_Get(playerid, SKILL_MECHANICS) < 300)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для изготовления дубликата нужен ящик автомеханика или навык механики не ниже 300.");
+            "To make a duplicate, you need a car mechanic's box or a mechanic skill of at least 300.");
         return 1;
     }
     if (Character_GetPhysicalCashUsd(playerid) < VEHICLE_KEY_COPY_COST_USD)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно наличных для оплаты дубликата ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is not enough cash to pay for duplicate keys.");
         return 1;
     }
     if (!Character_RemovePhysicalCashUsd(playerid, VEHICLE_KEY_COPY_COST_USD))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить изготовление ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay for key production.");
         return 1;
     }
 
     if (Internal_IssueKey(playerid, slot, true))
     {
         Audit_Log(Character_GetId(playerid), "VEHICLE_KEY_COPY", "CHARACTER", "VEHICLE",
-            0, VEHICLE_KEY_COPY_COST_USD, "Изготовление дубликата ключей");
+            0, VEHICLE_KEY_COPY_COST_USD, "Making duplicate keys");
     }
     else
     {
         Character_AddPhysicalCashUsd(playerid, VEHICLE_KEY_COPY_COST_USD);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В инвентаре нет места для дубликата ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no space in the inventory for duplicate keys.");
     }
     return 1;
 }
@@ -2492,12 +2492,12 @@ CMD:vlock(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 8.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
     if (!Internal_PlayerHasVehicleKey(playerid, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Для управления замком нужен физический ключ.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "A physical key is required to operate the lock.");
         return 1;
     }
 
@@ -2507,11 +2507,11 @@ CMD:vlock(playerid, params[])
 
     if (sVehicles[slot][E_VEH_LOCKED])
     {
-        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Вы заперли транспортное средство.");
+        SendClientMessage(playerid, COLOR_UI_SUCCESS, "You have locked the vehicle.");
     }
     else
     {
-        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Вы отперли транспортное средство.");
+        SendClientMessage(playerid, COLOR_UI_SUCCESS, "You have unlocked the vehicle.");
     }
     return 1;
 }
@@ -2525,7 +2525,7 @@ CMD:vengine(playerid, params[])
     }
     if (!IsPlayerInAnyVehicle(playerid) || GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы должны сидеть за рулем.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You must be driving.");
         return 1;
     }
 
@@ -2537,17 +2537,17 @@ CMD:vengine(playerid, params[])
     }
     if (!Internal_PlayerHasVehicleKey(playerid, slot) && !sVehicles[slot][E_VEH_HOTWIRED])
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нет ключа. Двигатель не заводится.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "No key. The engine will not start.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_FUEL_ML] <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В баке нет топлива.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no fuel in the tank.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_ENGINE_HP] <= 0.0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Двигатель вышел из строя.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The engine has failed.");
         return 1;
     }
 
@@ -2555,11 +2555,11 @@ CMD:vengine(playerid, params[])
     Internal_ApplyVehicleParams(slot);
     if (sVehicles[slot][E_VEH_ENGINE_ON])
     {
-        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Двигатель заведен.");
+        SendClientMessage(playerid, COLOR_UI_SUCCESS, "The engine is started.");
     }
     else
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Двигатель заглушен.");
+        SendClientMessage(playerid, COLOR_UI_INFO, "The engine is switched off.");
     }
     return 1;
 }
@@ -2574,18 +2574,18 @@ CMD:trunk(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 5.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_LOCKED] && !Internal_PlayerHasVehicleKey(playerid, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Багажник заперт. Нужен ключ или взлом.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The trunk is locked. Need a key or a hack.");
         return 1;
     }
     new const trunk = Vehicle_GetTrunkSlot(slot);
     if (!Storage_IsValidSlot(trunk))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Багажник недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The trunk is inaccessible.");
         return 1;
     }
     Dialogs_OpenExternalContainer(playerid, trunk);
@@ -2602,18 +2602,18 @@ CMD:glovebox(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 5.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_LOCKED] && !Internal_PlayerHasVehicleKey(playerid, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Бардачок заперт. Нужен ключ.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The glove compartment is locked. Need a key.");
         return 1;
     }
     new const glovebox = Vehicle_GetGloveboxSlot(slot);
     if (!Storage_IsValidSlot(glovebox))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Бардачок недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The glove compartment is inaccessible.");
         return 1;
     }
     Dialogs_OpenExternalContainer(playerid, glovebox);
@@ -2650,17 +2650,17 @@ CMD:repair(playerid, params[])
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, 5.0, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
     if (!Internal_PlayerHasItemDef(playerid, ITEM_ID_WRENCH_KIT))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Для ремонта нужен ящик автомеханика с ключами.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "For repairs you need a mechanic's box with keys.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_ENGINE_HP] >= 1000.0 && sVehicles[slot][E_VEH_BODY_HP] >= 1000.0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Транспорт не нуждается в ремонте.");
+        SendClientMessage(playerid, COLOR_UI_INFO, "The vehicle does not need repairs.");
         return 1;
     }
 
@@ -2689,11 +2689,11 @@ CMD:repair(playerid, params[])
 
     new msg[192];
     format(msg, sizeof(msg),
-        "Ремонт выполнен. Двигатель: %.0f ед., кузов: %.0f ед.",
+        "The repair has been completed. Engine: %.0f units, body: %.0f units.",
         sVehicles[slot][E_VEH_ENGINE_HP], sVehicles[slot][E_VEH_BODY_HP]);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     Audit_Log(Character_GetId(playerid), "VEHICLE_REPAIR", "CHARACTER", "VEHICLE",
-        0, repairAmount, "Полевой ремонт транспортного средства");
+        0, repairAmount, "Field repair of a vehicle");
     return 1;
 }
 
@@ -2714,12 +2714,12 @@ CMD:lockpick(playerid, params[])
     {
         if (!sVehicles[slot][E_VEH_LOCKED])
         {
-            SendClientMessage(playerid, COLOR_UI_WARNING, "Замок этого транспорта уже открыт.");
+            SendClientMessage(playerid, COLOR_UI_WARNING, "The lock of this vehicle is already open.");
             return 1;
         }
         if (Internal_PlayerHasVehicleKey(playerid, slot))
         {
-            SendClientMessage(playerid, COLOR_UI_WARNING, "У вас есть ключ: взлом не требуется.");
+            SendClientMessage(playerid, COLOR_UI_WARNING, "You have the key: no hacking required.");
             return 1;
         }
 
@@ -2736,9 +2736,9 @@ CMD:lockpick(playerid, params[])
             Internal_ApplyVehicleParams(slot);
             Skills_Add(playerid, SKILL_LOCKPICKING, 2);
             SendClientMessage(playerid, COLOR_UI_SUCCESS,
-                "Замок двери вскрыт! Теперь можно проникнуть в салон и скрутить провода.");
+                "The door lock has been opened! Now you can get into the interior and twist the wires.");
             Audit_Log(Character_GetId(playerid), "VEHICLE_LOCKPICK", "VEHICLE", "CHARACTER",
-                0, 1, "Успешное вскрытие замка транспортного средства");
+                0, 1, "Successfully opening a vehicle lock");
         }
         else
         {
@@ -2747,7 +2747,7 @@ CMD:lockpick(playerid, params[])
             Forensics_CreateLockpickScratch(Character_GetId(playerid), vx, vy, vz, 0, 0);
             Skills_Add(playerid, SKILL_LOCKPICKING, 1);
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Замок не поддался, на двери остались следы отмычки.");
+                "The lock did not budge; traces of a master key remained on the door.");
         }
         return 1;
     }
@@ -2770,19 +2770,19 @@ CMD:breakwindow(playerid, params[])
     }
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Выйдите из транспорта перед разбитием стекла.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Get out of the vehicle before breaking the glass.");
         return 1;
     }
 
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, VEHICLE_INTERACT_RADIUS, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no vehicle nearby.");
         return 1;
     }
     if (sVehicles[slot][E_VEH_WINDOW_BROKEN])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Стекло этого автомобиля уже разбито.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The glass of this car is already broken.");
         return 1;
     }
 
@@ -2796,9 +2796,9 @@ CMD:breakwindow(playerid, params[])
     Forensics_CreateBloodDna(Character_GetId(playerid), vx, vy, vz, 0, 0);
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "Вы разбили стекло и открыли дверь изнутри. На месте остались осколки и следы крови.");
+        "You broke the glass and opened the door from the inside. There were fragments and traces of blood left at the scene.");
     Audit_Log(Character_GetId(playerid), "VEHICLE_BREAK_WINDOW", "VEHICLE", "CHARACTER",
-        0, 1, "Разбитие стекла транспортного средства");
+        0, 1, "Breaking vehicle glass");
     return 1;
 }
 
@@ -2829,19 +2829,19 @@ CMD:chop(playerid, params[])
     new warehouse = INVALID_STORAGE_SLOT;
     if (!Vehicles_FindChopShop(playerid, VEHICLE_CHOP_RADIUS, enterprise, warehouse))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы находитесь не на нелегальной авторазборке.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are not at an illegal car wrecker.");
         return 1;
     }
 
     new runtimeVehicle, slot;
     if (!Internal_GetNearestVehicle(playerid, VEHICLE_INTERACT_RADIUS, runtimeVehicle, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет угнанного транспорта для разборки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are no stolen vehicles nearby to be dismantled.");
         return 1;
     }
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Выйдите из автомобиля перед разборкой.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Exit the vehicle before disassembling.");
         return 1;
     }
 
@@ -2853,12 +2853,12 @@ CMD:chop(playerid, params[])
     Internal_GetCatalogName(sVehicles[slot][E_VEH_MODEL], modelName, sizeof(modelName));
     new body[360];
     format(body, sizeof(body),
-        "Вы собираетесь разобрать «%s» (номер %s) на запчасти.\n\n" \
-        "Транспорт будет уничтожен, а детали поступят на склад авторазборки.\n" \
-        "Продолжить?",
+        "You are going to disassemble \"%s\" (number %s) for parts.\n\n" \
+        "The vehicle will be destroyed and the parts will be sent to the auto dismantling warehouse.\n" \
+        "Continue?",
         modelName, sVehicles[slot][E_VEH_PLATE]);
     ShowPlayerDialog(playerid, DIALOG_VEHICLE_CHOP_CONFIRM, DIALOG_STYLE_MSGBOX,
-        "{FFC800}Подтверждение разборки транспорта", body, "Разобрать", "Отмена");
+        "{FFC800}Confirmation of dismantling of vehicle", body, "Disassemble", "Cancel");
     return 1;
 }
 
@@ -2875,7 +2875,7 @@ CMD:vpark(playerid, params[])
     }
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Выйдите из транспорта перед постановкой в гараж.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Get out of the vehicle before parking it in the garage.");
         return 1;
     }
 
@@ -2883,19 +2883,19 @@ CMD:vpark(playerid, params[])
     if (!Properties_GetNearestOwnedGarage(playerid, propertyDbId, garageCapacity))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Вы должны находиться у собственного гаража или дома с гаражом.");
+            "You must be located at your own garage or home with a garage.");
         return 1;
     }
     if (Vehicle_CountInGarage(propertyDbId) >= garageCapacity)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Гараж переполнен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The garage is full.");
         return 1;
     }
 
     new slot = -1;
     if (!Internal_GetNearestOwnedVehicle(playerid, VEHICLE_GARAGE_RADIUS, slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет вашего транспортного средства.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your vehicle is not nearby.");
         return 1;
     }
 
@@ -2903,10 +2903,10 @@ CMD:vpark(playerid, params[])
     format(plate, sizeof(plate), "%s", sVehicles[slot][E_VEH_PLATE]);
     Vehicle_StoreInGarage(slot, propertyDbId);
     new msg[192];
-    format(msg, sizeof(msg), "Транспорт %s помещен в гараж.", plate);
+    format(msg, sizeof(msg), "Vehicle %s is placed in the garage.", plate);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     Audit_Log(Character_GetId(playerid), "VEHICLE_GARAGE_STORE", "VEHICLE", "PROPERTY",
-        0, 1, "Помещение транспорта в гараж");
+        0, 1, "Placing vehicles in the garage");
     return 1;
 }
 
@@ -2926,7 +2926,7 @@ CMD:vunpark(playerid, params[])
     if (!Properties_GetNearestOwnedGarage(playerid, propertyDbId, garageCapacity))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Вы должны находиться у собственного гаража или дома с гаражом.");
+            "You must be located at your own garage or home with a garage.");
         return 1;
     }
 
@@ -2934,7 +2934,7 @@ CMD:vunpark(playerid, params[])
     new const count = Vehicle_GetGarageList(propertyDbId, Character_GetId(playerid), rows, 32);
     if (count <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "В этом гараже нет вашего транспорта.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "This garage does not contain your vehicle.");
         return 1;
     }
 
@@ -2948,7 +2948,7 @@ CMD:vunpark(playerid, params[])
         sVehicleUnparkRowMap[playerid][i] = rows[i];
         new modelName[VEHICLE_MODEL_NAME_LEN], row[128];
         Internal_GetCatalogName(sVehicles[rows[i]][E_VEH_MODEL], modelName, sizeof(modelName));
-        format(row, sizeof(row), "%s | номер %s\n", modelName, sVehicles[rows[i]][E_VEH_PLATE]);
+        format(row, sizeof(row), "%s | number %s\n", modelName, sVehicles[rows[i]][E_VEH_PLATE]);
         if ((strlen(body) + strlen(row)) >= sizeof(body))
         {
             break;
@@ -2957,7 +2957,7 @@ CMD:vunpark(playerid, params[])
     }
 
     ShowPlayerDialog(playerid, DIALOG_VEHICLE_UNPARK, DIALOG_STYLE_LIST,
-        "{FFC800}Транспорт в гараже", body, "Выехать", "Отмена");
+        "{FFC800}Vehicles in the garage", body, "Check out", "Cancel");
     return 1;
 }
 

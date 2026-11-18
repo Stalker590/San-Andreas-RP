@@ -46,129 +46,129 @@ INSERT INTO `item_definitions` (
 -- -----------------------------------------------------------------------------
 --  А. Ближний бой и инструменты (ID 1..12)
 -- -----------------------------------------------------------------------------
-(1,  'MELEE_BRASS_KNUCKLES', 'Кастет',                        'MELEE',            300,   200,   0, 1,    1,  0,    0,     0,     1),
-(2,  'MELEE_GOLF_CLUB',      'Клюшка для гольфа',             'MELEE',            900,   1500,  0, 1,    2,  0,    0,     0,     0),
-(3,  'MELEE_NIGHTSTICK',     'Полицейская дубинка',           'MELEE',            700,   800,   0, 1,    3,  0,    0,     0,     0),
-(4,  'MELEE_KNIFE',          'Боевой нож',                    'MELEE',            400,   300,   0, 1,    4,  0,    0,     0,     1),
-(5,  'MELEE_BASEBALL_BAT',   'Бейсбольная бита',              'MELEE',            1200,  2000,  0, 1,    5,  0,    0,     0,     0),
-(6,  'MELEE_SHOVEL',         'Штыковая лопата',               'MELEE',            2500,  4000,  0, 1,    6,  0,    0,     0,     0),
-(7,  'MELEE_POOL_CUE',       'Бильярдный кий',                'MELEE',            600,   1500,  0, 1,    7,  0,    0,     0,     0),
-(8,  'MELEE_KATANA',         'Катана',                        'MELEE',            1800,  2500,  0, 1,    8,  0,    0,     0,     0),
-(9,  'MELEE_CHAINSAW',       'Бензопила',                     'MELEE',            6500,  7000,  0, 1,    9,  0,    0,     0,     0),
-(10, 'MELEE_CANE',           'Трость',                        'MELEE',            800,   1200,  0, 1,    15, 0,    0,     0,     0),
-(11, 'MELEE_FLOWERS',        'Букет цветов',                  'MELEE',            300,   1000,  0, 1,    14, 0,    0,     0,     0),
-(12, 'MELEE_DILDO',          'Игрушка из секс-шопа',          'MELEE',            500,   500,   0, 1,    10, 0,    0,     0,     0),
+(1,  'MELEE_BRASS_KNUCKLES', 'Brass Knuckles',                        'MELEE',            300,   200,   0, 1,    1,  0,    0,     0,     1),
+(2,  'MELEE_GOLF_CLUB',      'Golf Club',             'MELEE',            900,   1500,  0, 1,    2,  0,    0,     0,     0),
+(3,  'MELEE_NIGHTSTICK',     'Police Nightstick',           'MELEE',            700,   800,   0, 1,    3,  0,    0,     0,     0),
+(4,  'MELEE_KNIFE',          'Combat Knife',                    'MELEE',            400,   300,   0, 1,    4,  0,    0,     0,     1),
+(5,  'MELEE_BASEBALL_BAT',   'Baseball Bat',              'MELEE',            1200,  2000,  0, 1,    5,  0,    0,     0,     0),
+(6,  'MELEE_SHOVEL',         'Shovel',               'MELEE',            2500,  4000,  0, 1,    6,  0,    0,     0,     0),
+(7,  'MELEE_POOL_CUE',       'Pool Cue',                'MELEE',            600,   1500,  0, 1,    7,  0,    0,     0,     0),
+(8,  'MELEE_KATANA',         'Katana',                        'MELEE',            1800,  2500,  0, 1,    8,  0,    0,     0,     0),
+(9,  'MELEE_CHAINSAW',       'Chainsaw',                     'MELEE',            6500,  7000,  0, 1,    9,  0,    0,     0,     0),
+(10, 'MELEE_CANE',           'Cane',                        'MELEE',            800,   1200,  0, 1,    15, 0,    0,     0,     0),
+(11, 'MELEE_FLOWERS',        'Bouquet of Flowers',                  'MELEE',            300,   1000,  0, 1,    14, 0,    0,     0,     0),
+(12, 'MELEE_DILDO',          'Adult Toy',          'MELEE',            500,   500,   0, 1,    10, 0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  Б. Огнестрельное оружие (ID 13..25) — без отдельных предметов патронов
 -- -----------------------------------------------------------------------------
-(13, 'WEAPON_PISTOL_9MM',    'Пистолет 9mm',                  'FIREARM',          1100,  1000,  0, 1,    22, 8,    0,     0,     0),
-(14, 'WEAPON_SILENCED_9MM',  'Пистолет 9mm с глушителем',     'FIREARM',          1300,  1500,  0, 1,    23, 8,    0,     0,     0),
-(15, 'WEAPON_DESERT_EAGLE',  'Пистолет Desert Eagle',         'FIREARM',          2000,  1500,  0, 1,    24, 20,   0,     0,     0),
-(16, 'WEAPON_PUMP_SHOTGUN',  'Помповый дробовик',             'FIREARM',          3600,  4000,  0, 1,    25, 45,   0,     0,     0),
-(17, 'WEAPON_SAWNOFF',       'Обрез двустволки',              'FIREARM',          2200,  2500,  0, 1,    26, 45,   0,     0,     0),
-(18, 'WEAPON_SPAS12',        'Боевой дробовик SPAS-12',       'FIREARM',          4400,  4500,  0, 1,    27, 45,   0,     0,     0),
-(19, 'WEAPON_MICRO_UZI',     'Пистолет-пулемет Micro Uzi',    'FIREARM',          1500,  1500,  0, 1,    28, 8,    0,     0,     0),
-(20, 'WEAPON_TEC9',          'Пистолет-пулемет Tec-9',        'FIREARM',          1400,  1500,  0, 1,    32, 8,    0,     0,     0),
-(21, 'WEAPON_MP5',           'Пистолет-пулемет MP5',          'FIREARM',          2900,  3000,  0, 1,    29, 8,    0,     0,     0),
-(22, 'WEAPON_AK47',          'Автомат AK-47',                 'FIREARM',          4300,  4500,  0, 1,    30, 16,   0,     0,     0),
-(23, 'WEAPON_M4',            'Штурмовая винтовка M4',         'FIREARM',          3400,  4000,  0, 1,    31, 12,   0,     0,     0),
-(24, 'WEAPON_COUNTRY_RIFLE', 'Охотничья винтовка',            'FIREARM',          3800,  4500,  0, 1,    33, 24,   0,     0,     0),
-(25, 'WEAPON_SNIPER_RIFLE',  'Снайперская винтовка',          'FIREARM',          6500,  6000,  0, 1,    34, 26,   0,     0,     0),
+(13, 'WEAPON_PISTOL_9MM',    '9mm Pistol',                  'FIREARM',          1100,  1000,  0, 1,    22, 8,    0,     0,     0),
+(14, 'WEAPON_SILENCED_9MM',  'Silenced 9mm Pistol',     'FIREARM',          1300,  1500,  0, 1,    23, 8,    0,     0,     0),
+(15, 'WEAPON_DESERT_EAGLE',  'Desert Eagle',         'FIREARM',          2000,  1500,  0, 1,    24, 20,   0,     0,     0),
+(16, 'WEAPON_PUMP_SHOTGUN',  'Pump Shotgun',             'FIREARM',          3600,  4000,  0, 1,    25, 45,   0,     0,     0),
+(17, 'WEAPON_SAWNOFF',       'Sawed-off Shotgun',              'FIREARM',          2200,  2500,  0, 1,    26, 45,   0,     0,     0),
+(18, 'WEAPON_SPAS12',        'Combat Shotgun SPAS-12',       'FIREARM',          4400,  4500,  0, 1,    27, 45,   0,     0,     0),
+(19, 'WEAPON_MICRO_UZI',     'Micro Uzi',    'FIREARM',          1500,  1500,  0, 1,    28, 8,    0,     0,     0),
+(20, 'WEAPON_TEC9',          'Tec-9',        'FIREARM',          1400,  1500,  0, 1,    32, 8,    0,     0,     0),
+(21, 'WEAPON_MP5',           'MP5',          'FIREARM',          2900,  3000,  0, 1,    29, 8,    0,     0,     0),
+(22, 'WEAPON_AK47',          'AK-47 Assault Rifle',                 'FIREARM',          4300,  4500,  0, 1,    30, 16,   0,     0,     0),
+(23, 'WEAPON_M4',            'M4 Assault Rifle',         'FIREARM',          3400,  4000,  0, 1,    31, 12,   0,     0,     0),
+(24, 'WEAPON_COUNTRY_RIFLE', 'Hunting Rifle',            'FIREARM',          3800,  4500,  0, 1,    33, 24,   0,     0,     0),
+(25, 'WEAPON_SNIPER_RIFLE',  'Sniper Rifle',          'FIREARM',          6500,  6000,  0, 1,    34, 26,   0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  В. Тяжелое, метательное и спецсредства (ID 26..39)
 -- -----------------------------------------------------------------------------
-(26, 'HEAVY_GRENADE',        'Граната осколочная',            'HEAVY_THROWABLE',  600,   500,   0, 1,    16, 0,    0,     0,     0),
-(27, 'HEAVY_TEARGAS',        'Шашка слезоточивого газа',      'HEAVY_THROWABLE',  500,   500,   0, 1,    17, 0,    0,     0,     0),
-(28, 'HEAVY_MOLOTOV',        'Коктейль Молотова',             'HEAVY_THROWABLE',  800,   800,   0, 1,    18, 0,    0,     0,     0),
-(29, 'HEAVY_SATCHEL_CHARGE', 'Взрывпакет с детонатором',      'HEAVY_THROWABLE',  3000,  2500,  0, 1,    39, 0,    0,     0,     0),
-(30, 'HEAVY_RPG7',           'Гранатомет РПГ-7',              'HEAVY_THROWABLE',  7000,  12000, 0, 1,    35, 2200, 0,     0,     0),
-(31, 'HEAVY_HS_ROCKET',      'ПЗРК с тепловым наведением',    'HEAVY_THROWABLE',  10500, 15000, 0, 1,    36, 3000, 0,     0,     0),
-(32, 'HEAVY_FLAMETHROWER',   'Ранцевый огнемет',              'HEAVY_THROWABLE',  12000, 14000, 0, 1,    37, 100,  0,     0,     0),
-(33, 'HEAVY_MINIGUN',        'Шестиствольный пулемет Миниган','HEAVY_THROWABLE',  38000, 25000, 0, 1,    38, 12,   0,     0,     0),
-(34, 'SPEC_SPRAYCAN',        'Перцовый баллончик',            'HEAVY_THROWABLE',  500,   500,   0, 1,    41, 1,    0,     0,     0),
-(35, 'SPEC_FIRE_EXT',        'Порошковый огнетушитель',       'HEAVY_THROWABLE',  6000,  5000,  0, 1,    42, 5,    0,     0,     0),
-(36, 'SPEC_CAMERA',          'Зеркальный фотоаппарат',        'HEAVY_THROWABLE',  900,   1000,  0, 1,    43, 1,    0,     0,     0),
-(37, 'SPEC_NV_GOGGLES',      'Прибор ночного видения',        'HEAVY_THROWABLE',  800,   1000,  0, 1,    44, 0,    0,     0,     0),
-(38, 'SPEC_THERMAL_GOGGLES', 'Тепловизионные очки',           'HEAVY_THROWABLE',  1000,  1200,  0, 1,    45, 0,    0,     0,     0),
-(39, 'SPEC_PARACHUTE',       'Десантный парашют',             'HEAVY_THROWABLE',  11000, 15000, 0, 1,    46, 0,    0,     0,     0),
+(26, 'HEAVY_GRENADE',        'Frag Grenade',            'HEAVY_THROWABLE',  600,   500,   0, 1,    16, 0,    0,     0,     0),
+(27, 'HEAVY_TEARGAS',        'Tear Gas',      'HEAVY_THROWABLE',  500,   500,   0, 1,    17, 0,    0,     0,     0),
+(28, 'HEAVY_MOLOTOV',        'Molotov Cocktail',             'HEAVY_THROWABLE',  800,   800,   0, 1,    18, 0,    0,     0,     0),
+(29, 'HEAVY_SATCHEL_CHARGE', 'Satchel Charge',      'HEAVY_THROWABLE',  3000,  2500,  0, 1,    39, 0,    0,     0,     0),
+(30, 'HEAVY_RPG7',           'RPG-7',              'HEAVY_THROWABLE',  7000,  12000, 0, 1,    35, 2200, 0,     0,     0),
+(31, 'HEAVY_HS_ROCKET',      'Heat-seeking SAM Launcher',    'HEAVY_THROWABLE',  10500, 15000, 0, 1,    36, 3000, 0,     0,     0),
+(32, 'HEAVY_FLAMETHROWER',   'Flamethrower',              'HEAVY_THROWABLE',  12000, 14000, 0, 1,    37, 100,  0,     0,     0),
+(33, 'HEAVY_MINIGUN',        'Minigun','HEAVY_THROWABLE',  38000, 25000, 0, 1,    38, 12,   0,     0,     0),
+(34, 'SPEC_SPRAYCAN',        'Pepper Spray',            'HEAVY_THROWABLE',  500,   500,   0, 1,    41, 1,    0,     0,     0),
+(35, 'SPEC_FIRE_EXT',        'Fire Extinguisher',       'HEAVY_THROWABLE',  6000,  5000,  0, 1,    42, 5,    0,     0,     0),
+(36, 'SPEC_CAMERA',          'Camera',        'HEAVY_THROWABLE',  900,   1000,  0, 1,    43, 1,    0,     0,     0),
+(37, 'SPEC_NV_GOGGLES',      'Night Vision Goggles',        'HEAVY_THROWABLE',  800,   1000,  0, 1,    44, 0,    0,     0,     0),
+(38, 'SPEC_THERMAL_GOGGLES', 'Thermal Goggles',           'HEAVY_THROWABLE',  1000,  1200,  0, 1,    45, 0,    0,     0,     0),
+(39, 'SPEC_PARACHUTE',       'Parachute',             'HEAVY_THROWABLE',  11000, 15000, 0, 1,    46, 0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  Г. Снаряжение, инструменты и электроника (ID 40..55)
 -- -----------------------------------------------------------------------------
-(40, 'GEAR_BODY_ARMOR',      'Тяжелый бронежилет',            'GEAR_ELECTRONICS', 6500,  8000,  0, 1,    0,  0,    0,     0,     0),
-(41, 'GEAR_BACKPACK',        'Туристический рюкзак',          'GEAR_ELECTRONICS', 1500,  2000,  0, 1,    0,  0,    25000, 35000, 0),
-(42, 'GEAR_DUFFLE_BAG',      'Спортивная сумка',              'GEAR_ELECTRONICS', 1200,  2500,  0, 1,    0,  0,    35000, 45000, 0),
-(43, 'GEAR_BALACLAVA',       'Тактическая балаклава',         'GEAR_ELECTRONICS', 200,   300,   0, 1,    0,  0,    0,     0,     1),
-(44, 'GEAR_HANDCUFFS',       'Стальные наручники',            'GEAR_ELECTRONICS', 500,   400,   1, 10,   0,  0,    0,     0,     0),
-(45, 'TOOL_LOCKPICK_SET',    'Набор отмычек',                 'GEAR_ELECTRONICS', 300,   300,   1, 20,   0,  0,    0,     0,     1),
-(46, 'TOOL_WRENCH_KIT',      'Ящик автомеханика с ключами',   'GEAR_ELECTRONICS', 4500,  3500,  0, 1,    0,  0,    10000, 8000,  0),
-(47, 'TOOL_GUNSMITH_KIT',    'Набор оружейника',              'GEAR_ELECTRONICS', 2500,  2000,  0, 1,    0,  0,    0,     0,     0),
-(48, 'TOOL_FUEL_CANISTER',   'Канистра с бензином 20 л',      'GEAR_ELECTRONICS', 16000, 20000, 0, 1,    0,  0,    0,     0,     0),
-(49, 'TOOL_BOLT_CUTTERS',    'Гидравлический болторез',       'GEAR_ELECTRONICS', 3200,  2500,  0, 1,    0,  0,    0,     0,     0),
-(50, 'ELEC_MOBILE_PHONE',    'Смартфон',                      'GEAR_ELECTRONICS', 200,   200,   0, 1,    0,  0,    0,     0,     1),
-(51, 'ELEC_BURNER_PHONE',    'Одноразовый телефон',           'GEAR_ELECTRONICS', 150,   100,   0, 1,    0,  0,    0,     0,     1),
-(52, 'ELEC_SIM_CARD',        'SIM-карта сотовой связи',       'GEAR_ELECTRONICS', 10,    10,    0, 1,    0,  0,    0,     0,     1),
-(53, 'ELEC_WALKIE_TALKIE',   'Портативная рация',             'GEAR_ELECTRONICS', 600,   700,   0, 1,    0,  0,    0,     0,     0),
-(54, 'TOOL_MINING_PICKAXE',  'Шахтерская кирка',              'GEAR_ELECTRONICS', 3800,  3000,  0, 1,    0,  0,    0,     0,     0),
-(55, 'TOOL_FORENSICS_KIT',   'Чемодан криминалиста',          'GEAR_ELECTRONICS', 2000,  2500,  0, 1,    0,  0,    0,     0,     0),
+(40, 'GEAR_BODY_ARMOR',      'Heavy Body Armor',            'GEAR_ELECTRONICS', 6500,  8000,  0, 1,    0,  0,    0,     0,     0),
+(41, 'GEAR_BACKPACK',        'Hiking Backpack',          'GEAR_ELECTRONICS', 1500,  2000,  0, 1,    0,  0,    25000, 35000, 0),
+(42, 'GEAR_DUFFLE_BAG',      'Duffle Bag',              'GEAR_ELECTRONICS', 1200,  2500,  0, 1,    0,  0,    35000, 45000, 0),
+(43, 'GEAR_BALACLAVA',       'Tactical Balaclava',         'GEAR_ELECTRONICS', 200,   300,   0, 1,    0,  0,    0,     0,     1),
+(44, 'GEAR_HANDCUFFS',       'Steel Handcuffs',            'GEAR_ELECTRONICS', 500,   400,   1, 10,   0,  0,    0,     0,     0),
+(45, 'TOOL_LOCKPICK_SET',    'Lockpick Set',                 'GEAR_ELECTRONICS', 300,   300,   1, 20,   0,  0,    0,     0,     1),
+(46, 'TOOL_WRENCH_KIT',      'Mechanic''s Wrench Kit',   'GEAR_ELECTRONICS', 4500,  3500,  0, 1,    0,  0,    10000, 8000,  0),
+(47, 'TOOL_GUNSMITH_KIT',    'Gunsmith Kit',              'GEAR_ELECTRONICS', 2500,  2000,  0, 1,    0,  0,    0,     0,     0),
+(48, 'TOOL_FUEL_CANISTER',   '20L Fuel Canister',      'GEAR_ELECTRONICS', 16000, 20000, 0, 1,    0,  0,    0,     0,     0),
+(49, 'TOOL_BOLT_CUTTERS',    'Bolt Cutters',       'GEAR_ELECTRONICS', 3200,  2500,  0, 1,    0,  0,    0,     0,     0),
+(50, 'ELEC_MOBILE_PHONE',    'Smartphone',                      'GEAR_ELECTRONICS', 200,   200,   0, 1,    0,  0,    0,     0,     1),
+(51, 'ELEC_BURNER_PHONE',    'Burner Phone',           'GEAR_ELECTRONICS', 150,   100,   0, 1,    0,  0,    0,     0,     1),
+(52, 'ELEC_SIM_CARD',        'SIM Card',       'GEAR_ELECTRONICS', 10,    10,    0, 1,    0,  0,    0,     0,     1),
+(53, 'ELEC_WALKIE_TALKIE',   'Walkie-Talkie',             'GEAR_ELECTRONICS', 600,   700,   0, 1,    0,  0,    0,     0,     0),
+(54, 'TOOL_MINING_PICKAXE',  'Mining Pickaxe',              'GEAR_ELECTRONICS', 3800,  3000,  0, 1,    0,  0,    0,     0,     0),
+(55, 'TOOL_FORENSICS_KIT',   'Forensics Kit',          'GEAR_ELECTRONICS', 2000,  2500,  0, 1,    0,  0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  Д. Медицина, еда, напитки и нелегал (ID 56..67)
 -- -----------------------------------------------------------------------------
-(56, 'MED_FIRST_AID_KIT',    'Аптечка первой помощи',         'MEDICAL_FOOD',     1500,  2000,  1, 10,   0,  0,    0,     0,     0),
-(57, 'MED_SURGICAL_KIT',     'Полевой хирургический набор',   'MEDICAL_FOOD',     2200,  2500,  0, 1,    0,  0,    0,     0,     0),
-(58, 'MED_BANDAGE',          'Стерильный бинт',               'MEDICAL_FOOD',     100,   100,   1, 50,   0,  0,    0,     0,     1),
-(59, 'MED_TOURNIQUET',       'Кровоостанавливающий жгут',     'MEDICAL_FOOD',     200,   200,   1, 20,   0,  0,    0,     0,     1),
-(60, 'MED_MORPHINE_SYRINGE', 'Шприц-тюбик с морфином',        'MEDICAL_FOOD',     100,   100,   1, 20,   0,  0,    0,     0,     1),
-(61, 'FOOD_WATER_BOTTLE',    'Бутылка питьевой воды 1 л',     'MEDICAL_FOOD',     1000,  1000,  1, 20,   0,  0,    0,     0,     0),
-(62, 'FOOD_MRE_RATION',      'Армейский сухпаек MRE',         'MEDICAL_FOOD',     800,   1000,  1, 20,   0,  0,    0,     0,     0),
-(63, 'FOOD_FASTFOOD_BURGER', 'Горячий бургер',                'MEDICAL_FOOD',     400,   500,   1, 20,   0,  0,    0,     0,     0),
-(64, 'FOOD_LIQUOR_BOTTLE',   'Бутылка виски',                 'MEDICAL_FOOD',     1200,  1000,  1, 20,   0,  0,    0,     0,     0),
-(65, 'FOOD_CIGARETTE_PACK',  'Пачка сигарет',                 'MEDICAL_FOOD',     50,    50,    1, 50,   0,  0,    0,     0,     1),
-(66, 'ILLEGAL_HARD_DRUG',    'Доза метамфетамина',            'ILLEGAL',          50,    50,    1, 100,  0,  0,    0,     0,     0),
-(67, 'ILLEGAL_WEED_PACK',    'Брикет марихуаны',              'ILLEGAL',          1000,  1000,  1, 50,   0,  0,    0,     0,     0),
+(56, 'MED_FIRST_AID_KIT',    'First Aid Kit',         'MEDICAL_FOOD',     1500,  2000,  1, 10,   0,  0,    0,     0,     0),
+(57, 'MED_SURGICAL_KIT',     'Surgical Kit',   'MEDICAL_FOOD',     2200,  2500,  0, 1,    0,  0,    0,     0,     0),
+(58, 'MED_BANDAGE',          'Sterile Bandage',               'MEDICAL_FOOD',     100,   100,   1, 50,   0,  0,    0,     0,     1),
+(59, 'MED_TOURNIQUET',       'Tourniquet',     'MEDICAL_FOOD',     200,   200,   1, 20,   0,  0,    0,     0,     1),
+(60, 'MED_MORPHINE_SYRINGE', 'Morphine Syringe',        'MEDICAL_FOOD',     100,   100,   1, 20,   0,  0,    0,     0,     1),
+(61, 'FOOD_WATER_BOTTLE',    '1L Water Bottle',     'MEDICAL_FOOD',     1000,  1000,  1, 20,   0,  0,    0,     0,     0),
+(62, 'FOOD_MRE_RATION',      'Military MRE Ration',         'MEDICAL_FOOD',     800,   1000,  1, 20,   0,  0,    0,     0,     0),
+(63, 'FOOD_FASTFOOD_BURGER', 'Hot Burger',                'MEDICAL_FOOD',     400,   500,   1, 20,   0,  0,    0,     0,     0),
+(64, 'FOOD_LIQUOR_BOTTLE',   'Whiskey Bottle',                 'MEDICAL_FOOD',     1200,  1000,  1, 20,   0,  0,    0,     0,     0),
+(65, 'FOOD_CIGARETTE_PACK',  'Cigarette Pack',                 'MEDICAL_FOOD',     50,    50,    1, 50,   0,  0,    0,     0,     1),
+(66, 'ILLEGAL_HARD_DRUG',    'Methamphetamine Dose',            'ILLEGAL',          50,    50,    1, 100,  0,  0,    0,     0,     0),
+(67, 'ILLEGAL_WEED_PACK',    'Marijuana Brick',              'ILLEGAL',          1000,  1000,  1, 50,   0,  0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  Е. Документы, валюта и промышленные товарные партии (ID 68..75)
 -- -----------------------------------------------------------------------------
-(68, 'DOC_PASSPORT_ID',      'Паспорт гражданина',            'DOCUMENT_CURRENCY',50,    50,    0, 1,    0,  0,    0,     0,     1),
-(69, 'DOC_WEAPON_LICENSE',   'Лицензия на ношение оружия',    'DOCUMENT_CURRENCY',20,    20,    0, 1,    0,  0,    0,     0,     1),
-(70, 'DOC_VEHICLE_TITLE',    'Техпаспорт транспортного средства','DOCUMENT_CURRENCY',20, 20,    0, 1,    0,  0,    0,     0,     1),
-(71, 'DOC_BANK_CARD',        'Банковская дебетовая карта',    'DOCUMENT_CURRENCY',10,    10,    0, 1,    0,  0,    0,     0,     1),
-(72, 'ITEM_PHYSICAL_KEYS',   'Связка ключей от замка',        'DOCUMENT_CURRENCY',100,   50,    0, 1,    0,  0,    0,     0,     1),
-(73, 'CURR_CASH_BUNDLE',     'Пачка банкнот наличными',       'DOCUMENT_CURRENCY',500,   400,   1, 10000,0,  0,    0,     0,     0),
-(74, 'RAW_COMMODITY_UNIT',   'Партия первичного сырья',       'RAW',              1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
-(75, 'INT_PROCESSED_METAL',  'Партия промышленного проката',  'INTERMEDIATE',     1000,  800,   1, 5000, 0,  0,    0,     0,     0),
+(68, 'DOC_PASSPORT_ID',      'Passport / ID',            'DOCUMENT_CURRENCY',50,    50,    0, 1,    0,  0,    0,     0,     1),
+(69, 'DOC_WEAPON_LICENSE',   'Weapon License',    'DOCUMENT_CURRENCY',20,    20,    0, 1,    0,  0,    0,     0,     1),
+(70, 'DOC_VEHICLE_TITLE',    'Vehicle Title','DOCUMENT_CURRENCY',20, 20,    0, 1,    0,  0,    0,     0,     1),
+(71, 'DOC_BANK_CARD',        'Bank Debit Card',    'DOCUMENT_CURRENCY',10,    10,    0, 1,    0,  0,    0,     0,     1),
+(72, 'ITEM_PHYSICAL_KEYS',   'Set of Keys',        'DOCUMENT_CURRENCY',100,   50,    0, 1,    0,  0,    0,     0,     1),
+(73, 'CURR_CASH_BUNDLE',     'Cash Bundle',       'DOCUMENT_CURRENCY',500,   400,   1, 10000,0,  0,    0,     0,     0),
+(74, 'RAW_COMMODITY_UNIT',   'Raw Commodity Unit',       'RAW',              1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
+(75, 'INT_PROCESSED_METAL',  'Processed Metal Unit',  'INTERMEDIATE',     1000,  800,   1, 5000, 0,  0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  Ж. Базовое сырье нулевого уровня цепочки (ID 76..81, раздел 8.0 GDD)
 -- -----------------------------------------------------------------------------
-(76, 'RAW_CRUDE_OIL',        'Сырая нефть',                   'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
-(77, 'RAW_IRON_ORE',         'Железная руда',                 'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
-(78, 'RAW_WOOD_LOG',         'Древесина-кругляк',             'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
-(79, 'RAW_TECH_WATER',       'Сырая техническая вода',        'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
-(80, 'RAW_GRAIN_FLOUR',      'Зерно и пекарская мука',        'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
-(81, 'RAW_CHEM_PRECURSORS',  'Химические реактивы и сера',    'RAW',              1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
+(76, 'RAW_CRUDE_OIL',        'Crude Oil',                   'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(77, 'RAW_IRON_ORE',         'Iron Ore',                 'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(78, 'RAW_WOOD_LOG',         'Raw Log',             'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(79, 'RAW_TECH_WATER',       'Raw Water',        'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(80, 'RAW_GRAIN_FLOUR',      'Grain and Flour',        'RAW',              1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(81, 'RAW_CHEM_PRECURSORS',  'Chemical Precursors',    'RAW',              1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  З. Промежуточные заводские компоненты первого уровня (ID 82..90, раздел 8.1 GDD)
 -- -----------------------------------------------------------------------------
-(82, 'INT_STEEL_SHEET',      'Листовой стальной прокат',      'INTERMEDIATE',     1000,  800,   1, 5000, 0,  0,    0,     0,     0),
-(83, 'INT_SPRINGS_PINS',     'Закаленные пружины и штифты',   'INTERMEDIATE',     500,   300,   1, 5000, 0,  0,    0,     0,     0),
-(84, 'INT_BEARINGS',         'Прецизионные подшипники',       'INTERMEDIATE',     200,   100,   1, 5000, 0,  0,    0,     0,     0),
-(85, 'INT_NAILS_FASTENERS',  'Гвозди и стальной крепеж',      'INTERMEDIATE',     100,   50,    1, 5000, 0,  0,    0,     0,     0),
-(86, 'INT_SYNTH_PLASTIC',    'Гранулы синтетического пластика','INTERMEDIATE',    1000,  1200,  1, 5000, 0,  0,    0,     0,     0),
-(87, 'INT_GUNPOWDER',        'Бездымный оружейный порох',     'INTERMEDIATE',     500,   500,   1, 5000, 0,  0,    0,     0,     0),
-(88, 'INT_WOOD_PLANKS',      'Строганые древесные доски',     'INTERMEDIATE',     1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
-(89, 'INT_TEXTILE_FABRIC',   'Плотное текстильное полотно',   'INTERMEDIATE',     500,   800,   1, 5000, 0,  0,    0,     0,     0),
-(90, 'INT_REFINED_FUEL',     'Очищенное моторное топливо',    'INTERMEDIATE',     1000,  1000,  1, 10000,0,  0,    0,     0,     0),
+(82, 'INT_STEEL_SHEET',      'Steel Sheet',      'INTERMEDIATE',     1000,  800,   1, 5000, 0,  0,    0,     0,     0),
+(83, 'INT_SPRINGS_PINS',     'Springs and Pins',   'INTERMEDIATE',     500,   300,   1, 5000, 0,  0,    0,     0,     0),
+(84, 'INT_BEARINGS',         'Bearings',       'INTERMEDIATE',     200,   100,   1, 5000, 0,  0,    0,     0,     0),
+(85, 'INT_NAILS_FASTENERS',  'Nails and Fasteners',      'INTERMEDIATE',     100,   50,    1, 5000, 0,  0,    0,     0,     0),
+(86, 'INT_SYNTH_PLASTIC',    'Synthetic Plastic','INTERMEDIATE',    1000,  1200,  1, 5000, 0,  0,    0,     0,     0),
+(87, 'INT_GUNPOWDER',        'Smokeless Gunpowder',     'INTERMEDIATE',     500,   500,   1, 5000, 0,  0,    0,     0,     0),
+(88, 'INT_WOOD_PLANKS',      'Planks',     'INTERMEDIATE',     1000,  1000,  1, 5000, 0,  0,    0,     0,     0),
+(89, 'INT_TEXTILE_FABRIC',   'Fabric',   'INTERMEDIATE',     500,   800,   1, 5000, 0,  0,    0,     0,     0),
+(90, 'INT_REFINED_FUEL',     'Refined Fuel',    'INTERMEDIATE',     1000,  1000,  1, 10000,0,  0,    0,     0,     0),
 
 -- -----------------------------------------------------------------------------
 --  И. Комплект одежды / Внешний скин персонажа (ID 91, 3 кг, раздел 3 GDD)
 -- -----------------------------------------------------------------------------
-(91, 'GEAR_CLOTHING_OUTFIT', 'Комплект верхней одежды',       'GEAR_ELECTRONICS', 3000,  3000,  0, 1,    0,  0,    0,     0,     1);
+(91, 'GEAR_CLOTHING_OUTFIT', 'Clothing Outfit',       'GEAR_ELECTRONICS', 3000,  3000,  0, 1,    0,  0,    0,     0,     1);
 
 -- =============================================================================
 --  2. РЕЦЕПТЫ ПЕРЕРАБОТКИ И КРАФТА (craft_recipes + craft_recipe_inputs)
@@ -409,184 +409,184 @@ INSERT INTO `organizations` (
     `hq_x`, `hq_y`, `hq_z`
 ) VALUES
 -- Группа 1: Правительство и государственные силовые структуры (1..11)
-(1,  'Правительство штата Сан-Андреас',       'GOV',    'STATE_AGENCY', 1, 5,  1,  100000000, 0, 100100, 1481.0,  -1771.0, 18.8),
-(2,  'Полицейский департамент Лос-Сантоса',   'LSPD',   'STATE_AGENCY', 1, 23, 2,  5000000,   0, 101100, 1554.9,  -1675.6, 16.2),
-(3,  'Полицейский департамент Сан-Фиерро',    'SFPD',   'STATE_AGENCY', 1, 23, 3,  5000000,   0, 102100, -1605.5, 710.8,   13.9),
-(4,  'Полицейский департамент Лас-Вентураса', 'LVPD',   'STATE_AGENCY', 1, 23, 4,  5000000,   0, 103100, 2287.0,  2431.8,  10.8),
-(5,  'Департамент Шерифа округа',             'SASD',   'STATE_AGENCY', 1, 23, 5,  4500000,   0, 104100, 627.6,   -571.8,  17.9),
-(6,  'Национальная Гвардия Лос-Сантоса',      'LSA',    'STATE_AGENCY', 1, 3,  6,  8000000,   0, 105100, 2728.5,  -2451.4, 17.6),
-(7,  'Военно-морские силы Сан-Фиерро',        'SFA',    'STATE_AGENCY', 1, 3,  7,  8000000,   0, 106100, -1346.8, 492.4,   11.2),
-(8,  'Военный гарнизон Зоны 69 Лас-Вентураса','LVA',    'STATE_AGENCY', 1, 3,  8,  10000000,  0, 107100, 213.8,   1872.5,  13.1),
-(9,  'Федеральное бюро расследований',        'FBI',    'STATE_AGENCY', 1, 31, 9,  12000000,  0, 108100, -2442.2, 502.3,   30.1),
-(10, 'Центральное разведывательное управление','CIA',   'STATE_AGENCY', 1, 63, 10, 15000000,  0, 109100, 1245.5,  -764.2,  92.1),
-(11, 'Иммиграционная и таможенная служба',    'ICE',    'STATE_AGENCY', 1, 23, 11, 4000000,   0, 110100, 55.6,    -1531.9, 5.1),
+(1,  'State Government of San Andreas',       'GOV',    'STATE_AGENCY', 1, 5,  1,  100000000, 0, 100100, 1481.0,  -1771.0, 18.8),
+(2,  'Los Santos Police Department',   'LSPD',   'STATE_AGENCY', 1, 23, 2,  5000000,   0, 101100, 1554.9,  -1675.6, 16.2),
+(3,  'San Fierro Police Department',    'SFPD',   'STATE_AGENCY', 1, 23, 3,  5000000,   0, 102100, -1605.5, 710.8,   13.9),
+(4,  'Las Venturas Police Department', 'LVPD',   'STATE_AGENCY', 1, 23, 4,  5000000,   0, 103100, 2287.0,  2431.8,  10.8),
+(5,  'County Sheriff''s Department',             'SASD',   'STATE_AGENCY', 1, 23, 5,  4500000,   0, 104100, 627.6,   -571.8,  17.9),
+(6,  'Los Santos National Guard',      'LSA',    'STATE_AGENCY', 1, 3,  6,  8000000,   0, 105100, 2728.5,  -2451.4, 17.6),
+(7,  'San Fierro Naval Forces',        'SFA',    'STATE_AGENCY', 1, 3,  7,  8000000,   0, 106100, -1346.8, 492.4,   11.2),
+(8,  'Area 69 Military Garrison','LVA',    'STATE_AGENCY', 1, 3,  8,  10000000,  0, 107100, 213.8,   1872.5,  13.1),
+(9,  'Federal Bureau of Investigation',        'FBI',    'STATE_AGENCY', 1, 31, 9,  12000000,  0, 108100, -2442.2, 502.3,   30.1),
+(10, 'Central Intelligence Agency','CIA',   'STATE_AGENCY', 1, 63, 10, 15000000,  0, 109100, 1245.5,  -764.2,  92.1),
+(11, 'Immigration and Customs Enforcement',    'ICE',    'STATE_AGENCY', 1, 23, 11, 4000000,   0, 110100, 55.6,    -1531.9, 5.1),
 
 -- Группа 2: Экстренные службы и медицина (12)
-(12, 'Департамент здравоохранения и скорой помощи', 'EMS', 'STATE_AGENCY', 1, 1, 12, 6000000, 0, 112100, 1172.8,  -1323.4, 15.4),
+(12, 'Department of Health and Emergency Services', 'EMS', 'STATE_AGENCY', 1, 1, 12, 6000000, 0, 112100, 1172.8,  -1323.4, 15.4),
 
 -- Группа 3: Легальные корпорации, ЧВК и инфраструктура (13..15)
-(13, 'ЧВК «Блэквотер Сан-Андреас»',           'PMC',    'PRIVATE_CORP', 1, 3,  13, 7500000,   0, 200100, 2504.3,  2772.9,  10.8),
-(14, 'Управление портов и логистики',         'PORT',   'STATE_AGENCY', 1, 17, 14, 10000000,  0, 201100, 2746.1,  -2437.2, 13.6),
-(15, 'Телерадиокомпания Сан-Андреас',         'NEWS',   'PRIVATE_CORP', 1, 1,  15, 2500000,   0, 202100, 777.8,   -1330.2, 13.5),
+(13, 'Blackwater San Andreas PMC',           'PMC',    'PRIVATE_CORP', 1, 3,  13, 7500000,   0, 200100, 2504.3,  2772.9,  10.8),
+(14, 'Port Authority and Logistics',         'PORT',   'STATE_AGENCY', 1, 17, 14, 10000000,  0, 201100, 2746.1,  -2437.2, 13.6),
+(15, 'San Andreas News Network',         'NEWS',   'PRIVATE_CORP', 1, 1,  15, 2500000,   0, 202100, 777.8,   -1330.2, 13.5),
 
 -- Группа 4: Канонические уличные банды и криминальные синдикаты (16..21)
-(16, 'Семьи Гроув-Стрит',                     'GROVE',  'UNREGISTERED', 1, 0,  16, 0,         0, 420100, 2495.3,  -1690.7, 14.8),
-(17, 'Банда Баллас',                          'BALLAS', 'UNREGISTERED', 1, 0,  17, 0,         0, 420200, 2000.2,  -1114.1, 27.1),
-(18, 'Лос-Сантос Вагос',                      'VAGOS',  'UNREGISTERED', 1, 0,  18, 0,         0, 420300, 2808.5,  -1176.9, 25.4),
-(19, 'Варриос Лос-Ацтекас',                   'AZTEC',  'UNREGISTERED', 1, 0,  19, 0,         0, 420400, 1882.4,  -2023.7, 13.5),
-(20, 'Синдикат Триад Сан-Фиерро',             'TRIAD',  'UNREGISTERED', 1, 0,  20, 0,         0, 420500, -2172.6, 680.1,   55.2),
-(21, 'Криминальная семья Лас-Вентураса',      'MAFIA',  'UNREGISTERED', 1, 0,  21, 0,         0, 420600, 2196.4,  1677.1,  12.4);
+(16, 'Grove Street Families',                     'GROVE',  'UNREGISTERED', 1, 0,  16, 0,         0, 420100, 2495.3,  -1690.7, 14.8),
+(17, 'Ballas Gang',                          'BALLAS', 'UNREGISTERED', 1, 0,  17, 0,         0, 420200, 2000.2,  -1114.1, 27.1),
+(18, 'Los Santos Vagos',                      'VAGOS',  'UNREGISTERED', 1, 0,  18, 0,         0, 420300, 2808.5,  -1176.9, 25.4),
+(19, 'Varrios Los Aztecas',                   'AZTEC',  'UNREGISTERED', 1, 0,  19, 0,         0, 420400, 1882.4,  -2023.7, 13.5),
+(20, 'San Fierro Triad Syndicate',             'TRIAD',  'UNREGISTERED', 1, 0,  20, 0,         0, 420500, -2172.6, 680.1,   55.2),
+(21, 'Las Venturas Crime Family',      'MAFIA',  'UNREGISTERED', 1, 0,  21, 0,         0, 420600, 2196.4,  1677.1,  12.4);
 
 -- Иерархия должностей (organization_ranks) для всех 21 постоянных фракций (по 5 базовых рангов)
 -- Маска прав RBAC (permissions_mask):
 --   1=Доступ к рации, 2=Автопарк, 4=Оружейная/Склад, 8=Прием/Увольнение, 16=Казна/Банк, 32=Управление рангами, 63=Полный доступ лидера
 INSERT INTO `organization_ranks` (`org_id`, `rank_order`, `title`, `salary_usd`, `permissions_mask`) VALUES
 -- 1. Правительство штата
-(1,  1, 'Секретарь аппарата',             800,  3),
-(1,  2, 'Инспектор налоговой службы',     1200, 7),
-(1,  3, 'Федеральный судья штата',        2200, 15),
-(1,  4, 'Вице-губернатор',                3000, 31),
-(1,  5, 'Губернатор штата Сан-Андреас',   4500, 63),
+(1,  1, 'Executive Secretary',             800,  3),
+(1,  2, 'Tax Service Inspector',     1200, 7),
+(1,  3, 'State Federal Judge',        2200, 15),
+(1,  4, 'Lieutenant Governor',                3000, 31),
+(1,  5, 'Governor of San Andreas',   4500, 63),
 
 -- 2. LSPD
-(2,  1, 'Кадет академии',                 600,  3),
-(2,  2, 'Патрульный офицер',              1100, 7),
-(2,  3, 'Детектив следственного отдела',  1600, 7),
-(2,  4, 'Капитан участка',                2400, 31),
-(2,  5, 'Шеф полиции Лос-Сантоса',        3500, 63),
+(2,  1, 'Academy Cadet',                 600,  3),
+(2,  2, 'Patrol Officer',              1100, 7),
+(2,  3, 'Detective, Investigations Division',  1600, 7),
+(2,  4, 'Precinct Captain',                2400, 31),
+(2,  5, 'Chief of Los Santos Police',        3500, 63),
 
 -- 3. SFPD
-(3,  1, 'Кадет академии',                 600,  3),
-(3,  2, 'Патрульный офицер',              1100, 7),
-(3,  3, 'Инспектор портовой зоны',        1600, 7),
-(3,  4, 'Капитан полиции',                2400, 31),
-(3,  5, 'Шеф полиции Сан-Фиерро',         3500, 63),
+(3,  1, 'Academy Cadet',                 600,  3),
+(3,  2, 'Patrol Officer',              1100, 7),
+(3,  3, 'Port District Inspector',        1600, 7),
+(3,  4, 'Police Captain',                2400, 31),
+(3,  5, 'Chief of San Fierro Police',         3500, 63),
 
 -- 4. LVPD
-(4,  1, 'Кадет академии',                 600,  3),
-(4,  2, 'Патрульный офицер',              1100, 7),
-(4,  3, 'Оперативник игорного надзора',   1600, 7),
-(4,  4, 'Капитан полиции',                2400, 31),
-(4,  5, 'Шеф полиции Лас-Вентураса',      3500, 63),
+(4,  1, 'Academy Cadet',                 600,  3),
+(4,  2, 'Patrol Officer',              1100, 7),
+(4,  3, 'Gaming Control Investigator',   1600, 7),
+(4,  4, 'Police Captain',                2400, 31),
+(4,  5, 'Chief of Las Venturas Police',      3500, 63),
 
 -- 5. SASD
-(5,  1, 'Стажер департамента шерифа',     600,  3),
-(5,  2, 'Помощник шерифа',                1100, 7),
-(5,  3, 'Старший рейнджер округа',        1600, 7),
-(5,  4, 'Андершериф',                     2400, 31),
-(5,  5, 'Шериф округа Сан-Андреас',       3500, 63),
+(5,  1, 'Sheriff''s Department Intern',     600,  3),
+(5,  2, 'Deputy Sheriff',                1100, 7),
+(5,  3, 'County Senior Ranger',        1600, 7),
+(5,  4, 'Undersheriff',                     2400, 31),
+(5,  5, 'Sheriff of San Andreas County',       3500, 63),
 
 -- 6. LSa
-(6,  1, 'Рядовой гвардии',                700,  3),
-(6,  2, 'Сержант мотопехоты',             1200, 7),
-(6,  3, 'Лейтенант снабжения',            1700, 7),
-(6,  4, 'Полковник гарнизона',            2500, 31),
-(6,  5, 'Генерал Национальной Гвардии',   3600, 63),
+(6,  1, 'Guardsman',                700,  3),
+(6,  2, 'Motorized Infantry Sergeant',             1200, 7),
+(6,  3, 'Logistics Lieutenant',            1700, 7),
+(6,  4, 'Garrison Colonel',            2500, 31),
+(6,  5, 'National Guard General',   3600, 63),
 
 -- 7. SFA
-(7,  1, 'Матрос береговой охраны',        700,  3),
-(7,  2, 'Старшина флота',                 1200, 7),
-(7,  3, 'Лейтенант морской авиации',      1700, 7),
-(7,  4, 'Капитан первого ранга',          2500, 31),
-(7,  5, 'Адмирал флота Сан-Фиерро',       3600, 63),
+(7,  1, 'Coast Guard Seaman',        700,  3),
+(7,  2, 'Fleet Petty Officer',                 1200, 7),
+(7,  3, 'Naval Aviation Lieutenant',      1700, 7),
+(7,  4, 'Captain First Rank',          2500, 31),
+(7,  5, 'Admiral of the San Fierro Fleet',       3600, 63),
 
 -- 8. LV Army (Зона 69)
-(8,  1, 'Рядовой охраны периметра',       750,  3),
-(8,  2, 'Сержант ракетного дивизиона',    1300, 7),
-(8,  3, 'Офицер секретного сектора',      1900, 7),
-(8,  4, 'Заместитель коменданта Зоны 69', 2700, 31),
-(8,  5, 'Комендант Зоны 69',              3800, 63),
+(8,  1, 'Perimeter Guard',       750,  3),
+(8,  2, 'Missile Battalion Sergeant',    1300, 7),
+(8,  3, 'Classified Sector Officer',      1900, 7),
+(8,  4, 'Deputy Commander of Area 69', 2700, 31),
+(8,  5, 'Commander of Area 69',              3800, 63),
 
 -- 9. FBI
-(9,  1, 'Младший агент ФБР',              1200, 7),
-(9,  2, 'Специальный агент ФБР',          1800, 7),
-(9,  3, 'Старший следователь ФБР',        2400, 15),
-(9,  4, 'Заместитель директора офиса',    3200, 31),
-(9,  5, 'Директор полевого офиса ФБР',    4200, 63),
+(9,  1, 'FBI Junior Agent',              1200, 7),
+(9,  2, 'FBI Special Agent',          1800, 7),
+(9,  3, 'FBI Senior Investigator',        2400, 15),
+(9,  4, 'Deputy Office Director',    3200, 31),
+(9,  5, 'Director of the FBI Field Office',    4200, 63),
 
 -- 10. CIA
-(10, 1, 'Аналитик резидентуры',           1400, 7),
-(10, 2, 'Оперативный сотрудник ЦРУ',      2000, 7),
-(10, 3, 'Куратор зарубежных операций',    2700, 15),
-(10, 4, 'Заместитель шефа станции',       3500, 31),
-(10, 5, 'Шеф резидентуры ЦРУ',            4500, 63),
+(10, 1, 'Station Analyst',           1400, 7),
+(10, 2, 'CIA Operations Officer',      2000, 7),
+(10, 3, 'Foreign Operations Handler',    2700, 15),
+(10, 4, 'Deputy Station Chief',       3500, 31),
+(10, 5, 'CIA Station Chief',            4500, 63),
 
 -- 11. ICE
-(11, 1, 'Инспектор КПП',                  700,  3),
-(11, 2, 'Офицер таможенного досмотра',    1150, 7),
-(11, 3, 'Следователь миграционной службы',1600, 7),
-(11, 4, 'Начальник пограничного сектора', 2300, 31),
-(11, 5, 'Комиссар таможенной службы ICE', 3300, 63),
+(11, 1, 'Checkpoint Inspector',                  700,  3),
+(11, 2, 'Customs Inspection Officer',    1150, 7),
+(11, 3, 'Immigration Investigator',1600, 7),
+(11, 4, 'Border Sector Chief', 2300, 31),
+(11, 5, 'ICE Customs Commissioner', 3300, 63),
 
 -- 12. EMS
-(12, 1, 'Фельдшер скорой помощи',         700,  3),
-(12, 2, 'Парамедик реанимационной бригады',1150,7),
-(12, 3, 'Хирург-травматолог',             1750, 7),
-(12, 4, 'Заведующий отделением',          2400, 31),
-(12, 5, 'Главный врач департамента EMS',  3400, 63),
+(12, 1, 'Paramedic',         700,  3),
+(12, 2, 'Critical Care Paramedic',1150,7),
+(12, 3, 'Trauma Surgeon',             1750, 7),
+(12, 4, 'Department Head',          2400, 31),
+(12, 5, 'EMS Chief Medical Officer',  3400, 63),
 
 -- 13. PMC
-(13, 1, 'Рекрут охранного подряда',       900,  3),
-(13, 2, 'Боец сопровождения конвоев',     1400, 7),
-(13, 3, 'Командир штурмовой группы',      2000, 7),
-(13, 4, 'Начальник оперативного штаба',   2800, 31),
-(13, 5, 'Исполнительный директор ЧВК',    3800, 63),
+(13, 1, 'Security Contract Recruit',       900,  3),
+(13, 2, 'Convoy Escort Operator',     1400, 7),
+(13, 3, 'Assault Team Leader',      2000, 7),
+(13, 4, 'Chief of Operations',   2800, 31),
+(13, 5, 'PMC Executive Director',    3800, 63),
 
 -- 14. Port Authority
-(14, 1, 'Диспетчер причала',              700,  3),
-(14, 2, 'Таможенный логист терминала',    1100, 7),
-(14, 3, 'Старший инспектор фрахта',       1600, 15),
-(14, 4, 'Заместитель начальника порта',   2300, 31),
-(14, 5, 'Генеральный директор портов',    3300, 63),
+(14, 1, 'Dock Dispatcher',              700,  3),
+(14, 2, 'Terminal Customs Logistician',    1100, 7),
+(14, 3, 'Senior Freight Inspector',       1600, 15),
+(14, 4, 'Deputy Port Director',   2300, 31),
+(14, 5, 'Port Director General',    3300, 63),
 
 -- 15. SAN News
-(15, 1, 'Стажер редакции',                550,  3),
-(15, 2, 'Корреспондент криминальной хроники', 950, 3),
-(15, 3, 'Ведущий прямого эфира',          1400, 7),
-(15, 4, 'Шеф-редактор вещания',           2000, 31),
-(15, 5, 'Генеральный продюсер SAN News',  2900, 63),
+(15, 1, 'Newsroom Intern',                550,  3),
+(15, 2, 'Crime Reporter', 950, 3),
+(15, 3, 'Live Broadcast Anchor',          1400, 7),
+(15, 4, 'Broadcast Editor-in-Chief',           2000, 31),
+(15, 5, 'SAN News Executive Producer',  2900, 63),
 
 -- 16. Grove Street Families
-(16, 1, 'Шпана с улицы',                  0,    1),
-(16, 2, 'Боец квартала',                  0,    3),
-(16, 3, 'Старший гангстер',               0,    7),
-(16, 4, 'Правая рука района',             0,    31),
-(16, 5, 'Лидер семей Гроув-Стрит',        0,    63),
+(16, 1, 'Street Hustler',                  0,    1),
+(16, 2, 'Block Soldier',                  0,    3),
+(16, 3, 'Senior Gangster',               0,    7),
+(16, 4, 'Neighborhood Right Hand',             0,    31),
+(16, 5, 'Leader of Grove Street Families',        0,    63),
 
 -- 17. Ballas Gang
-(17, 1, 'Бегунок с угла',                 0,    1),
-(17, 2, 'Стрелок квартала',               0,    3),
-(17, 3, 'Смотрящий за точками',           0,    7),
-(17, 4, 'Авторитет Айдлвуда',             0,    31),
-(17, 5, 'Главарь банды Баллас',           0,    63),
+(17, 1, 'Corner Runner',                 0,    1),
+(17, 2, 'Block Shooter',               0,    3),
+(17, 3, 'Corner Boss',           0,    7),
+(17, 4, 'Idlewood Authority',             0,    31),
+(17, 5, 'Ballas Gang Leader',           0,    63),
 
 -- 18. Los Santos Vagos
-(18, 1, 'Новичок баррио',                 0,    1),
-(18, 2, 'Солдат улицы',                   0,    3),
-(18, 3, 'Контрабандист оружия',           0,    7),
-(18, 4, 'Советник картеля',               0,    31),
-(18, 5, 'Падре Лос-Сантос Вагос',         0,    63),
+(18, 1, 'Barrio Rookie',                 0,    1),
+(18, 2, 'Street Soldier',                   0,    3),
+(18, 3, 'Arms Smuggler',           0,    7),
+(18, 4, 'Cartel Advisor',               0,    31),
+(18, 5, 'Padre of Los Santos Vagos',         0,    63),
 
 -- 19. Varrios Los Aztecas
-(19, 1, 'Младший гонщик',                 0,    1),
-(19, 2, 'Боец Маленькой Мексики',         0,    3),
-(19, 3, 'Механик автосиндиката',          0,    7),
-(19, 4, 'Ветеран квартала',               0,    31),
-(19, 5, 'Хефе Варриос Лос-Ацтекас',       0,    63),
+(19, 1, 'Junior Racer',                 0,    1),
+(19, 2, 'Little Mexico Soldier',         0,    3),
+(19, 3, 'Auto Syndicate Mechanic',          0,    7),
+(19, 4, 'Neighborhood Veteran',               0,    31),
+(19, 5, 'Jefe of Varrios Los Aztecas',       0,    63),
 
 -- 20. Триады Сан-Фиерро
-(20, 1, 'Уличный боец Чайнатауна',        0,    1),
-(20, 2, 'Исполнитель синдиката',          0,    3),
-(20, 3, 'Красный шест',                   0,    7),
-(20, 4, 'Авангард ложи',                  0,    31),
-(20, 5, 'Голова Дракона Триад',           0,    63),
+(20, 1, 'Chinatown Street Fighter',        0,    1),
+(20, 2, 'Syndicate Enforcer',          0,    3),
+(20, 3, 'Red Pole',                   0,    7),
+(20, 4, 'Lodge Vanguard',                  0,    31),
+(20, 5, 'Dragon Head of the Triads',           0,    63),
 
 -- 21. Мафия Лас-Вентураса
-(21, 1, 'Соучастник семьи',               0,    1),
-(21, 2, 'Солдат семьи',                   0,    3),
-(21, 3, 'Капореджиме',                    0,    7),
-(21, 4, 'Консильери',                     0,    31),
-(21, 5, 'Дон криминальной семьи',         0,    63);
+(21, 1, 'Family Associate',               0,    1),
+(21, 2, 'Family Soldier',                   0,    3),
+(21, 3, 'Caporegime',                    0,    7),
+(21, 4, 'Consigliere',                     0,    31),
+(21, 5, 'Don of the Crime Family',         0,    63);
 
 -- =============================================================================
 --  5. СТАРТОВЫЕ ПРЕДПРИЯТИЯ (enterprises) И ОРДЕРА (enterprise_market_orders)
@@ -598,28 +598,28 @@ INSERT INTO `enterprises` (
     `pos_x`, `pos_y`, `pos_z`, `auction_price_usd`
 ) VALUES
 -- Первичные добывающие предприятия (1..4, финансируются государством на старте)
-(1,  'Железорудный карьер Хантер-Куорри',     'MINE_ORE',    'STATE',   NULL, 1,    22, 1500000, 14, 595.4,   872.6,   -42.5, NULL),
-(2,  'Нефтедобывающий участок Октан-Спрингс', 'OIL_RIG',     'STATE',   NULL, 1,    23, 1500000, 16, 261.2,   1411.8,  10.6,  NULL),
-(3,  'Лесозаготовительный комплекс Эйнджел-Пайн', 'SAWMILL', 'STATE',   NULL, 1,    24, 1000000, 12, -533.8,  -179.4,  78.4,  NULL),
-(4,  'Аграрный зерновой комплекс Флинт-Каунти','FARM',       'STATE',   NULL, 1,    25, 1000000, 10, -382.1,  -1426.3, 25.7,  NULL),
+(1,  'Hunter Quarry Iron Mine',     'MINE_ORE',    'STATE',   NULL, 1,    22, 1500000, 14, 595.4,   872.6,   -42.5, NULL),
+(2,  'Octane Springs Oil Field', 'OIL_RIG',     'STATE',   NULL, 1,    23, 1500000, 16, 261.2,   1411.8,  10.6,  NULL),
+(3,  'Angel Pine Logging Complex', 'SAWMILL', 'STATE',   NULL, 1,    24, 1000000, 12, -533.8,  -179.4,  78.4,  NULL),
+(4,  'Flint County Grain Farm','FARM',       'STATE',   NULL, 1,    25, 1000000, 10, -382.1,  -1426.3, 25.7,  NULL),
 
 -- Промышленные перерабатывающие заводы (5..7)
-(5,  'Нефтеперерабатывающий завод Грин-Палмс','REFINERY',    'STATE',   NULL, 1,    26, 2500000, 8,  248.4,   1396.2,  10.6,  NULL),
-(6,  'Металлургический комбинат Оушен-Докс',  'METALLURGY',  'STATE',   NULL, 1,    27, 2500000, 10, 2180.5,  -2253.8, 13.5,  NULL),
-(7,  'Сборочный завод Истер-Бейсин',          'FACTORY',     'UNOWNED', NULL, NULL, 28, 1200000, 12, -1042.6, -664.2,  32.0,  850000),
+(5,  'Green Palms Oil Refinery','REFINERY',    'STATE',   NULL, 1,    26, 2500000, 8,  248.4,   1396.2,  10.6,  NULL),
+(6,  'Ocean Docks Steel Mill',  'METALLURGY',  'STATE',   NULL, 1,    27, 2500000, 10, 2180.5,  -2253.8, 13.5,  NULL),
+(7,  'Easter Basin Assembly Plant',          'FACTORY',     'UNOWNED', NULL, NULL, 28, 1200000, 12, -1042.6, -664.2,  32.0,  850000),
 
 -- Розничные магазины и АЗС (8..13)
-(8,  'Универсам Айдлвуд 24/7',                'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 29, 400000,  5,  1352.3,  -1759.2, 13.5,  250000),
-(9,  'Универсам Джунипер-Хилл 24/7',          'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 30, 400000,  5,  -2442.6, 754.8,   35.2,  250000),
-(10, 'Торговый дом Крик Лас-Вентурас',        'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 31, 400000,  5,  2194.2,  1991.0,  12.3,  275000),
-(11, 'Топливная станция Айдлвуд',             'GAS_STATION', 'UNOWNED', NULL, NULL, 32, 600000,  5,  1940.1,  -1772.9, 13.4,  350000),
-(12, 'Топливная станция Истер-Бейсин',        'GAS_STATION', 'UNOWNED', NULL, NULL, 33, 600000,  5,  -1676.3, 413.2,   7.2,   350000),
-(13, 'Топливная станция Изумрудный Остров',   'GAS_STATION', 'UNOWNED', NULL, NULL, 34, 600000,  5,  2115.2,  920.1,   10.8,  375000),
+(8,  'Idlewood 24/7 Supermarket',                'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 29, 400000,  5,  1352.3,  -1759.2, 13.5,  250000),
+(9,  'Juniper Hill 24/7 Supermarket',          'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 30, 400000,  5,  -2442.6, 754.8,   35.2,  250000),
+(10, 'Las Venturas Creek Trading House',        'RETAIL_SHOP', 'UNOWNED', NULL, NULL, 31, 400000,  5,  2194.2,  1991.0,  12.3,  275000),
+(11, 'Idlewood Gas Station',             'GAS_STATION', 'UNOWNED', NULL, NULL, 32, 600000,  5,  1940.1,  -1772.9, 13.4,  350000),
+(12, 'Easter Basin Gas Station',        'GAS_STATION', 'UNOWNED', NULL, NULL, 33, 600000,  5,  -1676.3, 413.2,   7.2,   350000),
+(13, 'Emerald Isle Gas Station',   'GAS_STATION', 'UNOWNED', NULL, NULL, 34, 600000,  5,  2115.2,  920.1,   10.8,  375000),
 
 -- Нелегальные авторазборки / шроты (14..16)
-(14, 'Авторазборка Восточного Лос-Сантоса',   'CHOP_SHOP',   'PRIVATE', NULL, 19,   35, 300000,  8,  2403.5,  -1406.2, 24.0,  NULL),
-(15, 'Подпольный гараж Доэрти',               'CHOP_SHOP',   'PRIVATE', NULL, 20,   36, 350000,  8,  -2051.8, 178.4,   28.8,  NULL),
-(16, 'Авторазборка Рэдсэндс-Уэст',            'CHOP_SHOP',   'PRIVATE', NULL, 21,   37, 400000,  8,  1658.4,  2196.1,  10.8,  NULL);
+(14, 'East Los Santos Chop Shop',   'CHOP_SHOP',   'PRIVATE', NULL, 19,   35, 300000,  8,  2403.5,  -1406.2, 24.0,  NULL),
+(15, 'Doherty Underground Garage',               'CHOP_SHOP',   'PRIVATE', NULL, 20,   36, 350000,  8,  -2051.8, 178.4,   28.8,  NULL),
+(16, 'Redsands West Chop Shop',            'CHOP_SHOP',   'PRIVATE', NULL, 21,   37, 400000,  8,  1658.4,  2196.1,  10.8,  NULL);
 
 -- Стартовые биржевые ордера заводов и магазинов (enterprise_market_orders)
 INSERT INTO `enterprise_market_orders` (
@@ -797,7 +797,7 @@ INSERT INTO `audit_logs` (
     `item_def_id`, `amount`, `details`
 ) VALUES (
     NULL, 'SEED_GENESIS', 'SYSTEM_TREASURY', 'ORG_1_GOVERNMENT',
-    73, 100000000, 'Первичная инициализация государственного резерва (Seed Money) при развертывании БД'
+    73, 100000000, 'Initial seeding of the state reserve (Seed Money) during database deployment'
 );
 
 SET FOREIGN_KEY_CHECKS = 1;

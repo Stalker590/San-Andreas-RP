@@ -230,11 +230,11 @@ static stock Internal_GetRaceTitleRu(E_CHAR_RACE:race, output[], len = sizeof(ou
 {
     switch (race)
     {
-        case CHAR_RACE_CAUCASIAN: format(output, len, "Европеоидная");
-        case CHAR_RACE_AFRO:      format(output, len, "Афроамериканская");
-        case CHAR_RACE_LATINO:    format(output, len, "Латиноамериканская");
-        case CHAR_RACE_ASIAN:     format(output, len, "Азиатская");
-        default:                  format(output, len, "Европеоидная");
+        case CHAR_RACE_CAUCASIAN: format(output, len, "Caucasian");
+        case CHAR_RACE_AFRO:      format(output, len, "African American");
+        case CHAR_RACE_LATINO:    format(output, len, "Latin American");
+        case CHAR_RACE_ASIAN:     format(output, len, "Asian");
+        default:                  format(output, len, "Caucasian");
     }
 }
 
@@ -349,11 +349,11 @@ static stock Internal_ShowWizardStep1Gender(playerid)
         playerid,
         DIALOG_CHAR_SELECT_GENDER,
         DIALOG_STYLE_LIST,
-        "{FFC800}Создание персонажа (Шаг 1/4) {FFFFFF}| Выбор пола",
-        "{88CCFF}1.{FFFFFF} Мужской пол\n" \
-        "{FF88CC}2.{FFFFFF} Женский пол",
-        "Далее",
-        "Отмена");
+        "{FFC800}Character Creation (Step 1/4) {FFFFFF}| Gender selection",
+        "{88CCFF}1.{FFFFFF} Male\n" \
+        "{FF88CC}2.{FFFFFF} Female",
+        "Next",
+        "Cancel");
 }
 
 static stock Internal_ShowWizardStep2Race(playerid)
@@ -363,13 +363,13 @@ static stock Internal_ShowWizardStep2Race(playerid)
         playerid,
         DIALOG_CHAR_SELECT_RACE,
         DIALOG_STYLE_LIST,
-        "{FFC800}Создание персонажа (Шаг 2/4) {FFFFFF}| Этническое происхождение",
-        "{FFFFFF}1. Европеоидная\n" \
-        "{FFFFFF}2. Афроамериканская\n" \
-        "{FFFFFF}3. Латиноамериканская\n" \
-        "{FFFFFF}4. Азиатская",
-        "Далее",
-        "Назад");
+        "{FFC800}Character Creation (Step 2/4) {FFFFFF}| Ethnic origin",
+        "{FFFFFF}1. Caucasian\n" \
+        "{FFFFFF}2. African American\n" \
+        "{FFFFFF}3. Latin American\n" \
+        "{FFFFFF}4. Asian",
+        "Next",
+        "Back");
 }
 
 static stock Internal_ShowWizardStep3Skin(playerid)
@@ -384,10 +384,10 @@ static stock Internal_ShowWizardStep3Skin(playerid)
 
     new body[512];
     format(body, sizeof(body),
-        "{FFC800}Автоматический каноничный образ выбранной роли{FFFFFF}\n" \
-        "Повседневный комплект одежды №1 (Скин ID %d)\n" \
-        "Повседневный комплект одежды №2 (Скин ID %d)\n" \
-        "Повседневный комплект одежды №3 (Скин ID %d)",
+        "{FFC800}Automatic canonical image of the selected role{FFFFFF}\n" \
+        "Casual clothing set No. 1 (Skin ID %d)\n" \
+        "Casual clothing set No. 2 (Skin ID %d)\n" \
+        "Casual clothing set No. 3 (Skin ID %d)",
         sCasualSkins[genderIdx][raceIdx][0],
         sCasualSkins[genderIdx][raceIdx][1],
         sCasualSkins[genderIdx][raceIdx][2]);
@@ -396,10 +396,10 @@ static stock Internal_ShowWizardStep3Skin(playerid)
         playerid,
         DIALOG_CHAR_SELECT_SKIN,
         DIALOG_STYLE_LIST,
-        "{FFC800}Создание персонажа (Шаг 3/4) {FFFFFF}| Стартовая внешность",
+        "{FFC800}Character Creation (Step 3/4) {FFFFFF}| Starting appearance",
         body,
-        "Далее",
-        "Назад");
+        "Next",
+        "Back");
 }
 
 static stock Internal_ShowWizardStep4RoleList(playerid)
@@ -423,10 +423,10 @@ static stock Internal_ShowWizardStep4RoleList(playerid)
         playerid,
         DIALOG_CHAR_SELECT_ROLE_LIST,
         DIALOG_STYLE_TABLIST_HEADERS,
-        "{FFC800}Создание персонажа (Шаг 4/4) {FFFFFF}| Выберите одну из 25 стартовых ролей",
+        "{FFC800}Character Creation (Step 4/4) {FFFFFF}| Choose from 25 starting roles",
         sRoleListDialogBuffer,
-        "Выбрать",
-        "Назад");
+        "Select",
+        "Back");
 }
 
 static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
@@ -446,13 +446,13 @@ static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
 
     new fullDialog[1792];
     format(fullDialog, sizeof(fullDialog),
-        "{FFFFFF}Имя персонажа: {FFC800}%s{FFFFFF} | Пол: %s | Происхождение: %s\n" \
-        "Фиксированный стартовый уровень: {88CCFF}1 ур.{FFFFFF} | Возраст по формуле (17 + Level): {88CCFF}18 лет{FFFFFF} | Скин ID: {88CCFF}%d{FFFFFF}\n" \
+        "{FFFFFF}Character name: {FFC800}%s{FFFFFF} | Gender: %s | Origin: %s\n" \
+        "Fixed starting level: {88CCFF}1 level {FFFFFF} | Age according to the formula (17 + Level): {88CCFF}18 years {FFFFFF} | Skin ID: {88CCFF}%d{FFFFFF}\n" \
         "--------------------------------------------------------------------------------\n" \
         "%s\n" \
-        "{AFAFAF}Подтвердите выбор роли для создания персонажа и спавна в игровом мире.{FFFFFF}",
+        "{AFAFAF}Confirm the choice of role for character creation and spawn in the game world.{FFFFFF}",
         sCharacters[playerid][E_CHAR_RP_NAME],
-        (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? ("Женский") : ("Мужской"),
+        (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? ("Female") : ("Male"),
         raceName,
         resolvedSkin,
         roleCard);
@@ -461,10 +461,10 @@ static stock Internal_ShowWizardStep5ConfirmRole(playerid, role_id)
         playerid,
         DIALOG_CHAR_CONFIRM_ROLE,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Подтверждение биографии и стартовой роли",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Confirmation of biography and starting role",
         fullDialog,
-        "Начать игру",
-        "К списку");
+        "Start game",
+        "To the list");
 }
 
 // =============================================================================
@@ -698,7 +698,7 @@ public OnAccountAuthenticated(playerid, bool:isNewRegistration)
     else
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "Выберите пол, происхождение, внешность и одну из 25 стартовых ролей вашего персонажа.");
+            "Choose your character's gender, origin, appearance, and one of 25 starting roles.");
         Internal_ShowWizardStep1Gender(playerid);
     }
     return 1;
@@ -718,7 +718,7 @@ public OnCharacterQueryLoaded(playerid, sessionToken)
     if (rows <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "У вас еще нет активного персонажа. Пройдите короткую анкету создания героя.");
+            "You don't have an active character yet. Complete the short hero creation questionnaire.");
         Internal_ShowWizardStep1Gender(playerid);
         return 1;
     }
@@ -952,7 +952,7 @@ public OnCharacterCreatedInDb(playerid, sessionToken)
         format(ssnText, sizeof(ssnText), "IMMIGRANT");
 
     format(details, sizeof(details),
-        "Создан персонаж %s (ID: %d, Роль #%d: %s, SSN: %s)",
+        "Character %s created (ID: %d, Role #%d: %s, SSN: %s)",
         sCharacters[playerid][E_CHAR_RP_NAME],
         sCharacters[playerid][E_CHAR_DB_ID],
         sCharacters[playerid][E_CHAR_ROLE_ID],
@@ -1297,7 +1297,7 @@ stock Character_UndressToUnderwear(playerid, bool:notify = true)
     if (notify && IsPlayerConnected(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Гардероб]: Надетый комплект одежды снят. Вы остались в нижнем белье.");
+            "[Wardrobe]: The worn set of clothes is removed. You were left in your underwear.");
     }
     return 1;
 }
@@ -1350,7 +1350,7 @@ public OnStorageLostEquippedClothing(src_slot, item_slot, dst_slot)
     if (IsPlayerConnected(srcPlayer))
     {
         SendClientMessage(srcPlayer, COLOR_UI_WARNING,
-            "[Гардероб]: Комплект одежды покинул ваш инвентарь. Вы остались в нижнем белье.");
+            "[Wardrobe]: A set of clothes has left your inventory. You were left in your underwear.");
     }
     return 1;
 }
@@ -1453,7 +1453,7 @@ stock Character_WearOutfitItem(playerid, item_slot)
     if (!Internal_DoesStorageBelongToPlayer(playerid, Storage_GetItemStorageSlot(item_slot)))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Гардероб]: Этот комплект одежды находится не в вашем инвентаре.");
+            "[Wardrobe]: This set of clothes is not in your inventory.");
         return 0;
     }
 
@@ -1465,7 +1465,7 @@ stock Character_WearOutfitItem(playerid, item_slot)
         sCharacters[playerid][E_CHAR_EQUIPPED_OUTFIT_DB_ID] = 0;
         Internal_ApplyPlayerSkin(playerid, Character_GetUnderwearSkin(playerid), true);
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "[Гардероб]: Вы сняли комплект одежды и убрали его в сумку.");
+            "[Wardrobe]: You took off your set of clothes and put them in your bag.");
         return 1;
     }
 
@@ -1483,7 +1483,7 @@ stock Character_WearOutfitItem(playerid, item_slot)
     Internal_ApplyPlayerSkin(playerid, skinId, true);
 
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "[Гардероб]: Вы надели выбранный комплект одежды. Он отмечен статусом «Надето».");
+        "[Wardrobe]: You are wearing the selected set of clothes. It is marked with the status “Equipped”.");
     return 1;
 }
 
@@ -2308,7 +2308,7 @@ timer Character_InventorySyncTimer[500](playerid, expectedToken, attempt)
         Character_SyncInventorySkin(playerid, true);
         Character_SyncLayer1Weapons(playerid);
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Инвентарь]: Загрузка заняла слишком много времени. Проверьте соединение и повторите вход.");
+            "[Inventory]: Loading took too long. Check your connection and sign in again.");
         return;
     }
 
@@ -2367,13 +2367,13 @@ stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
         if (sCharacters[playerid][E_CHAR_SSN][0] != EOS)
             format(ssnDisplay, sizeof(ssnDisplay), "%s", sCharacters[playerid][E_CHAR_SSN]);
         else
-            format(ssnDisplay, sizeof(ssnDisplay), "Отсутствует");
+            format(ssnDisplay, sizeof(ssnDisplay), "Missing");
 
         new msg[160];
         SendClientMessage(playerid, COLOR_SERVER_GOLD,
             "==========================================================================");
         format(msg, sizeof(msg),
-            "Персонаж %s успешно создан! Роль: «%s» | Возраст: %d лет (Уровень %d).",
+            "Character %s has been created successfully! Role: \"%s\" | Age: %d years (Level %d).",
             sCharacters[playerid][E_CHAR_RP_NAME],
             roleName,
             Character_GetAge(playerid),
@@ -2381,14 +2381,14 @@ stock Character_SpawnPlayerInWorld(playerid, bool:isFirstCreation = false)
         SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
         format(msg, sizeof(msg),
-            "Статус: %s | SSN: %s | Наличные: %s | Банк: %s.",
-            (sCharacters[playerid][E_CHAR_CITIZENSHIP] == CITIZENSHIP_CITIZEN) ? ("Гражданин США") : ("Иммигрант"),
+            "Status: %s | SSN: %s | Cash: %s | Bank: %s.",
+            (sCharacters[playerid][E_CHAR_CITIZENSHIP] == CITIZENSHIP_CITIZEN) ? ("US citizen") : ("Immigrant"),
             ssnDisplay,
             cashStr,
             bankStr);
         SendClientMessage(playerid, COLOR_UI_INFO, msg);
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "Используйте /stats для просмотра паспорта и состояния, /skills — для матрицы навыков.");
+            "Use /stats to view your passport and status, /skills for the skills matrix.");
         SendClientMessage(playerid, COLOR_SERVER_GOLD,
             "==========================================================================");
     }
@@ -2412,12 +2412,12 @@ stock Character_ShowStatsDialog(playerid)
     if (sCharacters[playerid][E_CHAR_SSN][0] != EOS)
         format(ssnDisplay, sizeof(ssnDisplay), "%s", sCharacters[playerid][E_CHAR_SSN]);
     else
-        format(ssnDisplay, sizeof(ssnDisplay), "Не присвоен");
+        format(ssnDisplay, sizeof(ssnDisplay), "Not assigned");
 
     if (sCharacters[playerid][E_CHAR_BANK_IBAN][0] != EOS)
         format(ibanDisplay, sizeof(ibanDisplay), "%s", sCharacters[playerid][E_CHAR_BANK_IBAN]);
     else
-        format(ibanDisplay, sizeof(ibanDisplay), "Нет счета");
+        format(ibanDisplay, sizeof(ibanDisplay), "No account");
 
     new const layer1Slot = sCharacters[playerid][E_CHAR_LAYER1_SLOT];
     new const layer2Slot = sCharacters[playerid][E_CHAR_LAYER2_SLOT];
@@ -2429,30 +2429,30 @@ stock Character_ShowStatsDialog(playerid)
 
     new body[1280];
     format(body, sizeof(body),
-        "{FFC800}1. Юридический профиль и биография:{FFFFFF}\n" \
-        "• Имя и Фамилия: {88CCFF}%s{FFFFFF} (ID персонажа: %d)\n" \
-        "• Уровень в штате: {66CC66}%d ур.{FFFFFF} (Прогресс: %d / %d сек.) | Возраст: {66CC66}%d лет{FFFFFF}\n" \
-        "• Пол: %s | Происхождение: %s | Стартовая роль: {FFC800}%s (#%d){FFFFFF}\n" \
-        "• Гражданство: %s | Номер SSN: {88CCFF}%s{FFFFFF}\n" \
-        "• Уровень розыска: {FF4444}%d / 100{FFFFFF} (Снижение через: %d сек.)\n\n" \
-        "{FFC800}2. Финансы и банковское обслуживание:{FFFFFF}\n" \
-        "• Наличные в карманах (USD): {66CC66}%s{FFFFFF}\n" \
-        "• Банковский счет IBAN: {88CCFF}%s{FFFFFF} | Баланс: {66CC66}%s{FFFFFF}\n" \
-        "• Кредитная задолженность: {FFAA00}%s{FFFFFF}\n\n" \
-        "{FFC800}3. Физиология и двухслойное хранилище:{FFFFFF}\n" \
-        "• Здоровье: %.1f HP | Броня: %.1f%% | Голод: %.1f%% | Жажда: %.1f%% | Стресс: %.1f%%\n" \
-        "• Слой 1 (Внешний): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF} | Слой 2 (Потайной): {88CCFF}%d.%02d / %d.%02d кг{FFFFFF}",
+        "{FFC800}1. Legal profile and biography:{FFFFFF}\n" \
+        "• First and Last Name: {88CCFF}%s{FFFFFF} (Character ID: %d)\n" \
+        "• Level in the state: {66CC66}%d level {FFFFFF} (Progress: %d / %d sec.) | Age: {66CC66}%d years {FFFFFF}\n" \
+        "• Gender: %s | Origin: %s | Starting role: {FFC800}%s (#%d){FFFFFF}\n" \
+        "• Citizenship: %s | SSN: {88CCFF}%s{FFFFFF}\n" \
+        "• Wanted level: {FF4444}%d / 100{FFFFFF} (Decreased after: %d sec.)\n\n" \
+        "{FFC800}2. Finance and Banking:{FFFFFF}\n" \
+        "• Cash in Pockets (USD): {66CC66}%s{FFFFFF}\n" \
+        "• Bank account IBAN: {88CCFF}%s{FFFFFF} | Balance: {66CC66}%s{FFFFFF}\n" \
+        "• Credit debt: {FFAA00}%s{FFFFFF}\n\n" \
+        "{FFC800}3. Physiology and double-layer storage:{FFFFFF}\n" \
+        "• Health: %.1f HP | Armor: %.1f%% | Hunger: %.1f%% | Thirst: %.1f%% | Stress: %.1f%%\n" \
+        "• Layer 1 (Outer): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF} | Layer 2 (Secret): {88CCFF}%d.%02d / %d.%02d kg{FFFFFF}",
         sCharacters[playerid][E_CHAR_RP_NAME],
         sCharacters[playerid][E_CHAR_DB_ID],
         sCharacters[playerid][E_CHAR_LEVEL],
         sCharacters[playerid][E_CHAR_EXP_SECONDS],
         LEVEL_UP_ACTIVE_SECONDS,
         Character_GetAge(playerid),
-        (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? ("Женский") : ("Мужской"),
+        (sCharacters[playerid][E_CHAR_GENDER_VAL] == CHAR_GENDER_FEMALE) ? ("Female") : ("Male"),
         raceName,
         roleName,
         sCharacters[playerid][E_CHAR_ROLE_ID],
-        (sCharacters[playerid][E_CHAR_CITIZENSHIP] == CITIZENSHIP_CITIZEN) ? ("Гражданин США") : ("Иммигрант"),
+        (sCharacters[playerid][E_CHAR_CITIZENSHIP] == CITIZENSHIP_CITIZEN) ? ("US citizen") : ("Immigrant"),
         ssnDisplay,
         sCharacters[playerid][E_CHAR_WANTED_LEVEL],
         WARRANT_DECAY_ACTIVE_SECONDS - sCharacters[playerid][E_CHAR_ACTIVE_PLAY_SECONDS],
@@ -2474,10 +2474,10 @@ stock Character_ShowStatsDialog(playerid)
         playerid,
         DIALOG_CHAR_STATS_VIEW,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Личное дело и статистика персонажа",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Personal file and character statistics",
         body,
-        "Навыки",
-        "Закрыть");
+        "Skills",
+        "Close");
     return 1;
 }
 
@@ -2509,11 +2509,11 @@ hook OnGameModeInit()
     Storage_Unload(testL2);
     Skills_ResetDefaults(0);
 
-    printf("%s [Entities/Character] Модуль персонажа инициализирован (Age(1)=18: %s | Слой 2 роли #3 (%d г): %s | Ветеран M4=%d, Вес Слоя 1=%d г).",
+    printf("%s [Entities/Character] Character module initialized (Age(1)=18: %s | Layer 2 role #3 (%d g): %s | Veteran M4=%d, Weight of Layer 1=%d g).",
         SERVER_LOG_PREFIX,
-        ageFormulaOk ? ("ОК") : ("ОШИБКА"),
+        ageFormulaOk ? ("OK") : ("ERROR"),
         l2W,
-        doubleLayer2Ok ? ("ОК") : ("ОШИБКА"),
+        doubleLayer2Ok ? ("OK") : ("ERROR"),
         vetM4Skill,
         vetL1Weight);
     return 1;
@@ -2646,7 +2646,7 @@ task Character_SecondProgressionTask[1000]()
 
             new msg[144];
             format(msg, sizeof(msg),
-                "Поздравляем! Вы прожили еще один год в штате Сан-Андреас. Ваш уровень: %d (Возраст: %d лет).",
+                "Congratulations! You have lived another year in the state of San Andreas. Your level: %d (Age: %d years).",
                 sCharacters[playerid][E_CHAR_LEVEL],
                 Character_GetAge(playerid));
             SendClientMessage(playerid, COLOR_SERVER_GOLD, msg);
@@ -2771,7 +2771,7 @@ CMD:stats(playerid, params[])
     if (!Character_IsLoaded(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Ваш персонаж еще не загружен. Завершите авторизацию или создание героя.");
+            "Your character has not yet been loaded. Complete authorization or hero creation.");
         return 1;
     }
     Character_ShowStatsDialog(playerid);
@@ -2785,7 +2785,7 @@ CMD:roleinfo(playerid, params[])
     if (!Character_IsLoaded(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Сначала завершите создание персонажа.");
+            "First complete character creation.");
         return 1;
     }
 
@@ -2795,9 +2795,9 @@ CMD:roleinfo(playerid, params[])
         playerid,
         DIALOG_CHAR_ROLE_INFO,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}SAN ANDREAS RP {FFFFFF}| Описание вашей стартовой роли",
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Description of your starting role",
         card,
-        "Закрыть",
+        "Close",
         "");
     return 1;
 }

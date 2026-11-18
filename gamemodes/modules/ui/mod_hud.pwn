@@ -49,7 +49,7 @@ static stock Internal_CreatePlayerHud(playerid)
         playerid,
         HUD_PANEL_POS_X,
         HUD_PANEL_POS_Y,
-        "Вес: 0.0 / 25.0 кг~n~Голод: 100% | Жажда: 100%~n~Статус: НОРМА~n~Розыск: 0/100 | Рация: Выкл"
+        "Weight: 0.0 / 25.0 kg~n~Hunger: 100% | Thirst: 100%~n~Status: NORMAL~n~Wanted: 0/100 | Radio: OFF"
     );
 
     if (td != INVALID_PLAYER_TEXT_DRAW)
@@ -86,31 +86,31 @@ static stock Internal_BuildStatusFlags(playerid, output[], len = sizeof(output))
 
     if (Survival_IsOverweight(playerid))
     {
-        strcat(output, "~r~ПЕРЕГРУЗ", len);
+        strcat(output, "~r~OVERWEIGHT", len);
         count++;
     }
     if (Medical_IsBleeding(playerid))
     {
         if (count > 0) strcat(output, " ~w~| ", len);
-        strcat(output, "~r~КРОВОТЕЧЕНИЕ", len);
+        strcat(output, "~r~BLEEDING", len);
         count++;
     }
     if (Survival_IsInWithdrawal(playerid))
     {
         if (count > 0) strcat(output, " ~w~| ", len);
-        strcat(output, "~p~ЛОМКА", len);
+        strcat(output, "~p~WITHDRAWAL", len);
         count++;
     }
     if (Survival_IsCuffed(playerid))
     {
         if (count > 0) strcat(output, " ~w~| ", len);
-        strcat(output, "~y~НАРУЧНИКИ", len);
+        strcat(output, "~y~HANDCUFFED", len);
         count++;
     }
 
     if (count == 0)
     {
-        strcat(output, "~g~НОРМА", len);
+        strcat(output, "~g~NORMAL", len);
     }
 }
 
@@ -161,18 +161,18 @@ stock HUD_RefreshPlayer(playerid)
     new radioBuf[32];
     if (radioKhz > 0)
     {
-        format(radioBuf, sizeof(radioBuf), "%d.%03d МГц", radioKhz / 1000, radioKhz % 1000);
+        format(radioBuf, sizeof(radioBuf), "%d.%03d MHz", radioKhz / 1000, radioKhz % 1000);
     }
     else
     {
-        format(radioBuf, sizeof(radioBuf), "Выкл");
+        format(radioBuf, sizeof(radioBuf), "OFF");
     }
 
     new hudString[256];
     format(
         hudString,
         sizeof(hudString),
-        "Вес: %d.%d / %d.%d кг~n~Голод: %d%% | Жажда: %d%%~n~Статус: %s~w~~n~Розыск: %d/100 | Рация: %s",
+        "Weight: %d.%d / %d.%d kg~n~Hunger: %d%% | Thirst: %d%%~n~Status: %s~w~~n~Wanted: %d/100 | Radio: %s",
         curWeightG / 1000, (curWeightG % 1000) / 100,
         maxWeightG / 1000, (maxWeightG % 1000) / 100,
         hungerPct,
@@ -250,7 +250,7 @@ hook OnGameModeInit()
         sPlayerHudVisible[i] = false;
         sPlayerLastHudCache[i][0] = '\0';
     }
-    printf("%s [UI/HUD] Модуль текстового HUD выживания инициализирован (событийное обновление без спама таймером: ОК).",
+    printf("%s [UI/HUD] Survival text HUD module initialized (event-based update without timer spam: OK).",
         SERVER_LOG_PREFIX);
     return 1;
 }

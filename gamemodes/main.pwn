@@ -57,7 +57,7 @@
 //  3. КОНСТАНТЫ И МАКРОСЫ ТОЧКИ ВХОДА
 // =============================================================================
 
-#define SERVER_GAMEMODE_TEXT                    "SAN ANDREAS RP | Русский Мир"
+#define SERVER_GAMEMODE_TEXT                    "SAN ANDREAS RP | English World"
 #define SERVER_VERSION_STRING                   "1.0.0-phase10"
 #define SERVER_LOG_PREFIX                       "[SA:RP]"
 
@@ -181,7 +181,7 @@ static stock Internal_ConfigureWorldRules()
 static stock Internal_VerifyComponentsAndLibs()
 {
     print("======================================================================");
-    printf("%s Запуск самодиагностики C++ компонентов и библиотек YSI (v%s)...",
+    printf("%s Starting self-diagnostics of C++ components and YSI libraries (v%s)...",
         SERVER_LOG_PREFIX, SERVER_VERSION_STRING);
 
     // 1. Проверка компонента MySQL (BlueG R41-4+) через нативный вызов mysql_init_options()
@@ -193,10 +193,10 @@ static stock Internal_VerifyComponentsAndLibs()
         mysql_set_option(mysqlOpt, AUTO_RECONNECT, true);
         sServerBootState[E_BOOT_MYSQL_OK] = true;
     }
-    printf("%s [1/6] Компонент MySQL (%s): %s (пул потоков = %d, кодировка сессии = cp1251).",
+    printf("%s [1/6] MySQL component (%s): %s (thread pool = %d, session charset = cp1251).",
         SERVER_LOG_PREFIX,
         MYSQL_PLUGIN_RELEASE_TAG,
-        sServerBootState[E_BOOT_MYSQL_OK] ? ("загружен") : ("ОШИБКА"),
+        sServerBootState[E_BOOT_MYSQL_OK] ? ("loaded") : ("ERROR"),
         MYSQL_ASYNC_POOL_THREADS);
 
     // 2. Проверка компонента Streamer (Incognito v2.9.6+)
@@ -204,15 +204,15 @@ static stock Internal_VerifyComponentsAndLibs()
     Streamer_SetVisibleItems(STREAMER_TYPE_OBJECT, STREAMER_DEFAULT_VISIBLE_OBJECTS);
     new const streamerTickRate = Streamer_GetTickRate();
     sServerBootState[E_BOOT_STREAMER_OK] = (streamerTickRate == STREAMER_DEFAULT_TICK_RATE);
-    printf("%s [2/6] Компонент Streamer: %s (TickRate = %d мс, лимит объектов = %d).",
+    printf("%s [2/6] Streamer component: %s (TickRate = %d ms, object limit = %d).",
         SERVER_LOG_PREFIX,
-        sServerBootState[E_BOOT_STREAMER_OK] ? ("загружен") : ("ОШИБКА"),
+        sServerBootState[E_BOOT_STREAMER_OK] ? ("loaded") : ("ERROR"),
         streamerTickRate,
         STREAMER_DEFAULT_VISIBLE_OBJECTS);
 
     // 3. Проверка процессора команд Pawn.CMD
     sServerBootState[E_BOOT_PAWNCMD_OK] = (PAWNCMD_INCLUDE_VERSION > 0);
-    printf("%s [3/6] Компонент Pawn.CMD: загружен (версия %d.%d.%d).",
+    printf("%s [3/6] Pawn.CMD component: loaded (version %d.%d.%d).",
         SERVER_LOG_PREFIX,
         (PAWNCMD_INCLUDE_VERSION >> 16) & 0xFF,
         (PAWNCMD_INCLUDE_VERSION >> 8) & 0xFF,
@@ -220,7 +220,7 @@ static stock Internal_VerifyComponentsAndLibs()
 
     // 4. Проверка сетевого перехватчика Pawn.RakNet
     sServerBootState[E_BOOT_PAWNRAKNET_OK] = (PAWNRAKNET_INCLUDE_VERSION > 0);
-    printf("%s [4/6] Компонент Pawn.RakNet: загружен (версия %d.%d.%d).",
+    printf("%s [4/6] Pawn.RakNet component: loaded (version %d.%d.%d).",
         SERVER_LOG_PREFIX,
         (PAWNRAKNET_INCLUDE_VERSION >> 16) & 0xFF,
         (PAWNRAKNET_INCLUDE_VERSION >> 8) & 0xFF,
@@ -235,14 +235,14 @@ static stock Internal_VerifyComponentsAndLibs()
         Regex_Delete(rpNameRegex);
         sServerBootState[E_BOOT_PAWNREGEX_OK] = (validMatch && invalidMatch);
     }
-    printf("%s [5/6] Компонент Pawn.Regex: %s (тест RP-маски First_Last пройден).",
+    printf("%s [5/6] Pawn.Regex component: %s (First_Last RP mask test passed).",
         SERVER_LOG_PREFIX,
-        sServerBootState[E_BOOT_PAWNREGEX_OK] ? ("загружен") : ("ОШИБКА"));
+        sServerBootState[E_BOOT_PAWNREGEX_OK] ? ("loaded") : ("ERROR"));
 
     // 6. Инициализация и проверка bcrypt (cost = 12) + проверка ABI передачи аргументов (playerid, token)
     bcrypt_set_thread_limit(4);
     bcrypt_hash(0, "OnStartupBcryptHashPing", "SARP_Bcrypt_Init_Check", BCRYPT_WORK_FACTOR, "d", 777);
-    printf("%s [6/6] Компонент bcrypt: пул потоков = 4, запущен тест хеширования (cost = %d)...",
+    printf("%s [6/6] bcrypt component: thread pool = 4, hash test started (cost = %d)...",
         SERVER_LOG_PREFIX, BCRYPT_WORK_FACTOR);
 
     // 7. Проверка итераторов YSI (y_iterate) и запуск тестового таймера (y_timers)
@@ -258,7 +258,7 @@ static stock Internal_VerifyComponentsAndLibs()
     Iter_Clear(sStartupProbeIter);
     sServerBootState[E_BOOT_YSI_ITERATE_OK] = (iterSum == 10);
 
-    printf("%s [YSI] Подсистемы y_hooks, y_iterate (контрольная сумма = %d), y_va активны.",
+    printf("%s [YSI] y_hooks, y_iterate (checksum = %d) and y_va subsystems are active.",
         SERVER_LOG_PREFIX, iterSum);
 
     defer OnStartupYsiTimerPing();
@@ -268,7 +268,7 @@ static stock Internal_VerifyComponentsAndLibs()
 static stock Internal_FlushAllDirtyBeforeExit()
 {
     sServerBootState[E_BOOT_IS_SHUTTING_DOWN] = true;
-    printf("%s Подготовка к остановке сервера: принудительное сохранение всех измененных сущностей (is_dirty)...",
+    printf("%s Preparing for server shutdown: force-saving all modified entities (is_dirty)...",
         SERVER_LOG_PREFIX);
 
     #if defined _mod_database_included
@@ -279,7 +279,7 @@ static stock Internal_FlushAllDirtyBeforeExit()
         Audit_FlushBufferSync();
     #endif
 
-    printf("%s Все буферы состояния успешно синхронизированы.", SERVER_LOG_PREFIX);
+    printf("%s All state buffers have been synchronized successfully.", SERVER_LOG_PREFIX);
 }
 
 // =============================================================================
@@ -299,7 +299,7 @@ public OnStartupBcryptHashPing(playerid, testToken)
     }
     else
     {
-        printf("%s [FATAL] Ошибка генерации хеша bcrypt (длина = %d, token = %d).",
+        printf("%s [FATAL] bcrypt hash generation failed (length = %d, token = %d).",
             SERVER_LOG_PREFIX, strlen(hashBuffer), testToken);
     }
     return 1;
@@ -310,11 +310,11 @@ public OnStartupBcryptVerifyPing(playerid, bool:success, testToken)
 {
     #pragma unused playerid
     sServerBootState[E_BOOT_BCRYPT_OK] = (success && testToken == 777);
-    printf("%s [6/6] Компонент bcrypt: верификация хеша (cost = %d, token = %d) %s.",
+    printf("%s [6/6] bcrypt component: hash verification (cost = %d, token = %d) %s.",
         SERVER_LOG_PREFIX,
         BCRYPT_WORK_FACTOR,
         testToken,
-        sServerBootState[E_BOOT_BCRYPT_OK] ? ("УСПЕШНО ПРОЙДЕНА") : ("ЗАВЕРШИЛАСЬ ОШИБКОЙ"));
+        sServerBootState[E_BOOT_BCRYPT_OK] ? ("PASSED") : ("FAILED"));
     return 1;
 }
 
@@ -324,7 +324,7 @@ public OnStartupBcryptVerifyPing(playerid, bool:success, testToken)
 
 main()
 {
-    printf("%s Точка входа игрового режима загружена (main.amx, сборка %s).",
+    printf("%s Game mode entry point loaded (main.amx, build %s).",
         SERVER_LOG_PREFIX, SERVER_VERSION_STRING);
 }
 
@@ -340,7 +340,7 @@ public OnGameModeInit()
     // Защита от переполнения статических пулов [MAX_PLAYERS]
     if (configuredSlots > MAX_PLAYERS)
     {
-        printf("%s [FATAL] Параметр max_players (%d) в config.json превышает MAX_PLAYERS (%d). Аварийная остановка.",
+        printf("%s [FATAL] max_players (%d) in config.json exceeds MAX_PLAYERS (%d). Emergency shutdown.",
             SERVER_LOG_PREFIX, configuredSlots, MAX_PLAYERS);
         SendRconCommand("exit");
         return 0;
@@ -348,14 +348,14 @@ public OnGameModeInit()
 
     if (configuredSlots < MAX_PLAYERS)
     {
-        printf("%s [WARN] Параметр max_players (%d) в config.json меньше MAX_PLAYERS (%d).",
+        printf("%s [WARN] max_players (%d) in config.json is lower than MAX_PLAYERS (%d).",
             SERVER_LOG_PREFIX, configuredSlots, MAX_PLAYERS);
     }
 
     Internal_ConfigureWorldRules();
     Internal_VerifyComponentsAndLibs();
 
-    printf("%s Игровой режим инициализирован. Доступно слотов игроков: %d.",
+    printf("%s Game mode initialized. Available player slots: %d.",
         SERVER_LOG_PREFIX, configuredSlots);
     return 1;
 }
@@ -363,7 +363,7 @@ public OnGameModeInit()
 public OnGameModeExit()
 {
     Internal_FlushAllDirtyBeforeExit();
-    printf("%s Работа игрового режима корректно завершена (аптайм: %d сек).",
+    printf("%s Game mode shut down cleanly (uptime: %d sec).",
         SERVER_LOG_PREFIX, sServerBootState[E_BOOT_UPTIME_SECONDS]);
     return 1;
 }
@@ -372,9 +372,9 @@ hook OnPlayerConnect(playerid)
 {
     #if !defined _mod_account_included
         SendClientMessage(playerid, COLOR_SERVER_GOLD,
-            "Добро пожаловать на сервер SAN ANDREAS RP! Свободный рынок, честная физика и выживание.");
+            "Welcome to SAN ANDREAS RP! Free market, honest physics and survival.");
         SendClientMessage(playerid, COLOR_SERVER_INFO,
-            "Для проверки статуса систем сервера используйте команду /serverinfo.");
+            "Use /serverinfo to check the status of server systems.");
     #endif
     return 1;
 }
@@ -386,7 +386,7 @@ hook OnPlayerConnect(playerid)
 timer OnStartupYsiTimerPing[500]()
 {
     sServerBootState[E_BOOT_YSI_TIMERS_OK] = true;
-    printf("%s [YSI] Таймерная подсистема y_timers успешно запущена и синхронизирована.",
+    printf("%s [YSI] The y_timers subsystem started and synchronized successfully.",
         SERVER_LOG_PREFIX);
 }
 
@@ -453,7 +453,7 @@ CMD:serverinfo(playerid, params[])
     #pragma unused params
     new msg[144];
     format(msg, sizeof(msg),
-        "Сервер SAN ANDREAS RP (версия %s) | Время непрерывной работы: %d сек.",
+        "SAN ANDREAS RP server (version %s) | Uptime: %d sec.",
         SERVER_VERSION_STRING, sServerBootState[E_BOOT_UPTIME_SECONDS]);
     SendClientMessage(playerid, COLOR_SERVER_SUCCESS, msg);
     return 1;

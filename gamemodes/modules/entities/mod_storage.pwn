@@ -855,7 +855,7 @@ stock bool:Storage_OpenForPlayer(playerid, slot_id)
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Вы находитесь слишком далеко от выбранного хранилища.");
+                "You are too far from the selected storage location.");
         }
         return false;
     }
@@ -865,7 +865,7 @@ stock bool:Storage_OpenForPlayer(playerid, slot_id)
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Хранилище сейчас используется другим игроком.");
+                "The storage is currently in use by another player.");
         }
         return false;
     }
@@ -1019,7 +1019,7 @@ stock Storage_Create(
     new const slot_id = Iter_Free(StorageIter);
     if (slot_id == INVALID_ITERATOR_SLOT)
     {
-        printf("%s [Entities/Storage] [ERROR] Пул хранилищ MAX_ACTIVE_STORAGES (%d) переполнен!",
+        printf("%s [Entities/Storage] [ERROR] Storage pool MAX_ACTIVE_STORAGES (%d) is full!",
             SERVER_LOG_PREFIX, MAX_ACTIVE_STORAGES);
         return INVALID_STORAGE_SLOT;
     }
@@ -1411,7 +1411,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Операция отклонена: хранилище заперто на замок.");
+                "The operation was rejected: the vault is locked.");
         }
         return STORAGE_RES_LOCKED;
     }
@@ -1422,7 +1422,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Вы слишком далеко от хранилища для перемещения предмета.");
+                "You are too far from the storage to move the item.");
         }
         return STORAGE_RES_TOO_FAR;
     }
@@ -1444,7 +1444,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Исходное хранилище сейчас используется другим игроком.");
+                "The original storage is currently in use by another player.");
         }
         return STORAGE_RES_MUTEX_BUSY;
     }
@@ -1458,7 +1458,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Целевое хранилище сейчас используется другим игроком.");
+                "The target storage is currently in use by another player.");
         }
         return STORAGE_RES_MUTEX_BUSY;
     }
@@ -1479,7 +1479,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
         if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Этот предмет слишком крупный для потайных карманов (Слой 2).");
+                "This item is too large for hidden pockets (Layer 2).");
         }
         return STORAGE_RES_LAYER2_FORBIDDEN;
     }
@@ -1507,7 +1507,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
             if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Нельзя вкладывать контейнеры глубже допустимого предела (максимум 2 уровня).");
+                    "Containers cannot be placed deeper than the permissible limit (maximum 2 levels).");
             }
             return STORAGE_RES_NESTING_LIMIT;
         }
@@ -1537,7 +1537,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
             if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Перемещение отклонено: превышен лимит максимального веса целевого хранилища.");
+                    "Move rejected: The maximum weight limit of the destination storage has been exceeded.");
             }
             return STORAGE_RES_WEIGHT_EXCEEDED;
         }
@@ -1550,7 +1550,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
             if (playerid != INVALID_PLAYER_ID && IsPlayerConnected(playerid))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Перемещение отклонено: недостаточно свободного объема в целевом хранилище.");
+                    "Move rejected: There is not enough free space in the destination storage.");
             }
             return STORAGE_RES_VOLUME_EXCEEDED;
         }
@@ -1710,7 +1710,7 @@ stock E_STORAGE_RESULT:Storage_TransferItem(
     format(srcEntityTag, sizeof(srcEntityTag), "STORAGE_%d", srcStorageDbId);
     format(dstEntityTag, sizeof(dstEntityTag), "STORAGE_%d", dstStorageDbId);
     format(auditDetails, sizeof(auditDetails),
-        "Перемещение предмета '%s' (кол-во: %d, вес: %d г) из хранилища #%d в #%d",
+        "Moving item '%s' (Qty: %d, Weight: %d g) from storage #%d to #%d",
         itemName, amount, transferWeightG, srcStorageDbId, dstStorageDbId);
 
     Audit_Log(actor_char_id, "ITEM_MOVE", srcEntityTag, dstEntityTag, defId, amount, auditDetails);
@@ -1796,13 +1796,13 @@ stock Storage_CreateWorldDrop(
         new itemName[64];
         Item_GetName(primary_item_def_id, itemName);
         format(labelText, sizeof(labelText),
-            "Предмет на земле: %s\nНажмите [Y] для взаимодействия",
+            "Item on the ground: %s\nPress [Y] to interact",
             itemName);
     }
     else
     {
         format(labelText, sizeof(labelText),
-            "Полевой схрон / сброшенные вещи\nНажмите [Y] для взаимодействия");
+            "Field Cache / Dropped Items\nPress [Y] to interact");
     }
 
     Internal_SpawnWorldDropVisuals(slot_id, modelId, labelText, COLOR_UI_LABEL_DROP);
@@ -1840,8 +1840,8 @@ stock Storage_CreateCorpseLoot(
 
     new labelText[144];
     format(labelText, sizeof(labelText),
-        "Тело погибшего: %s\nНажмите [Y] для обыска",
-        (victim_name[0] != '\0') ? victim_name : "Неизвестный");
+        "Body of the deceased: %s\nPress [Y] to search",
+        (victim_name[0] != '\0') ? victim_name : "Unknown");
 
     Internal_SpawnWorldDropVisuals(slot_id, CORPSE_WORLD_OBJECT_MODEL, labelText, COLOR_UI_LABEL_CORPSE);
     return slot_id;
@@ -2367,13 +2367,13 @@ static stock Internal_RunStorageSelfTests()
     Storage_Unload(testPocketSlot);
     Storage_Unload(testTrunkSlot);
 
-    printf("%s [Entities/Storage] Самопроверка: MutexLock=%s | Рекурсивный вес рюкзака (7300 г == %d г)=%s | Защита перегруза=%s | WorldDrop=%s.",
+    printf("%s [Entities/Storage] Self-test: MutexLock=%s | Recursive backpack weight (7300 g == %d g)=%s | Overload protection=%s | WorldDrop=%s.",
         SERVER_LOG_PREFIX,
-        (firstLockOk && secondLockBlocked) ? ("ОК") : ("ОШИБКА"),
+        (firstLockOk && secondLockBlocked) ? ("OK") : ("ERROR"),
         totalPocketWeightG,
-        recursiveWeightOk ? ("ОК") : ("ОШИБКА"),
-        overflowRejectedOk ? ("ОК") : ("ОШИБКА"),
-        worldDropOk ? ("ОК") : ("ОШИБКА"));
+        recursiveWeightOk ? ("OK") : ("ERROR"),
+        overflowRejectedOk ? ("OK") : ("ERROR"),
+        worldDropOk ? ("OK") : ("ERROR"));
 }
 
 // =============================================================================
@@ -2443,7 +2443,7 @@ task Tick_StorageGarbageCollector[60000]()
 
     if (expiredCount > 0)
     {
-        printf("%s [Entities/Storage] Сборщик мусора очистил %d просроченных полевых контейнеров.",
+        printf("%s [Entities/Storage] The garbage collector has cleared %d of expired field containers.",
             SERVER_LOG_PREFIX, expiredCount);
     }
 }
@@ -2467,7 +2467,7 @@ hook OnGameModeInit()
     }
 
     new const loadedCount = Internal_LoadPersistentStoragesOnInitSync();
-    printf("%s [Entities/Storage] Загружено %d постоянных хранилищ из БД.",
+    printf("%s [Entities/Storage] Loaded %d persistent storage from the database.",
         SERVER_LOG_PREFIX, loadedCount);
 
     Internal_RunStorageSelfTests();
@@ -2498,12 +2498,12 @@ hook OnPlayerEnterDynamicArea(playerid, STREAMER_TAG_AREA:areaid)
             if (sStorages[slot][E_STORAGE_KIND] == STORAGE_CORPSE_LOOT)
             {
                 SendClientMessage(playerid, COLOR_UI_INFO,
-                    "Рядом обнаружено тело погибшего. Нажмите клавишу [Y], чтобы осмотреть вещи.");
+                    "The body of the deceased was found nearby. Press [Y] to inspect things.");
             }
             else if (sStorages[slot][E_STORAGE_KIND] == STORAGE_WORLD_DROP)
             {
                 SendClientMessage(playerid, COLOR_UI_INFO,
-                    "Рядом находятся выброшенные предметы. Нажмите клавишу [Y] для взаимодействия.");
+                    "There are discarded items nearby. Press [Y] to interact.");
             }
             break;
         }

@@ -115,10 +115,10 @@ static stock Internal_GetCurrencyNameRu(currency, output[], len = sizeof(output)
 {
     switch (currency)
     {
-        case CURRENCY_USD: format(output, len, "Доллары США (USD)");
-        case CURRENCY_EUR: format(output, len, "Евро (EUR)");
-        case CURRENCY_CNY: format(output, len, "Китайские юани (CNY)");
-        default:           format(output, len, "Неизвестная валюта");
+        case CURRENCY_USD: format(output, len, "US dollars (USD)");
+        case CURRENCY_EUR: format(output, len, "Euro (EUR)");
+        case CURRENCY_CNY: format(output, len, "Chinese Yuan (CNY)");
+        default:           format(output, len, "Unknown currency");
     }
     return 1;
 }
@@ -127,11 +127,11 @@ static stock Internal_GetCashFlagNameRu(cash_flag, output[], len = sizeof(output
 {
     if (cash_flag == CASH_FLAG_DIRTY)
     {
-        format(output, len, "грязные");
+        format(output, len, "dirty");
     }
     else
     {
-        format(output, len, "чистые");
+        format(output, len, "clean");
     }
     return 1;
 }
@@ -414,13 +414,13 @@ static stock Internal_ShowMainMenu(playerid)
     if (hasAccount)
     {
         format(caption, sizeof(caption),
-            "{FFC800}Центральный банк Сан-Андреаса {FFFFFF}| Баланс: {66CC66}%s",
+            "{FFC800}Central Bank of San Andreas {FFFFFF}| Balance: {66CC66}%s",
             balanceStr);
     }
     else
     {
         format(caption, sizeof(caption),
-            "{FFC800}Центральный банк Сан-Андреаса {FFFFFF}| Счет не открыт");
+            "{FFC800}Central Bank of San Andreas {FFFFFF}| Account not opened");
     }
 
     new body[1024];
@@ -429,26 +429,26 @@ static stock Internal_ShowMainMenu(playerid)
 
     if (hasAccount)
     {
-        strcat(body, "Пополнить счет наличными\n", sizeof(body));
+        strcat(body, "Top up your account with cash\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_DEPOSIT;
-        strcat(body, "Снять наличные со счета\n", sizeof(body));
+        strcat(body, "Withdraw cash from account\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_WITHDRAW;
-        strcat(body, "Перевод другому клиенту по IBAN\n", sizeof(body));
+        strcat(body, "Transfer to another client using IBAN\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_TRANSFER_IBAN;
-        strcat(body, "Обмен физической валюты\n", sizeof(body));
+        strcat(body, "Physical currency exchange\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_EXCHANGE;
-        strcat(body, "Выписка по счету\n", sizeof(body));
+        strcat(body, "Account statement\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_STATEMENT;
-        strcat(body, "Легализовать грязные наличные через бизнес\n", sizeof(body));
+        strcat(body, "Legalize dirty cash through business\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_LAUNDER;
-        strcat(body, "Проверить наличные и валютные пачки\n", sizeof(body));
+        strcat(body, "Check cash and currency bundles\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_CASH_INFO;
     }
     else
     {
-        strcat(body, "Открыть банковский счет\n", sizeof(body));
+        strcat(body, "Open a bank account\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_OPEN_ACCOUNT;
-        strcat(body, "Проверить наличные и валютные пачки\n", sizeof(body));
+        strcat(body, "Check cash and currency bundles\n", sizeof(body));
         sBankMenuAction[playerid][actionCount++] = _:BANK_ACTION_CASH_INFO;
     }
 
@@ -459,8 +459,8 @@ static stock Internal_ShowMainMenu(playerid)
         DIALOG_STYLE_LIST,
         caption,
         body,
-        "Выбрать",
-        "Закрыть");
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -476,13 +476,13 @@ static stock Internal_ShowExchangeMenu(playerid)
         playerid,
         DIALOG_BANK_EXCHANGE_MENU,
         DIALOG_STYLE_LIST,
-        "{FFC800}Обменный пункт Центрального банка",
-        "Купить евро за доллары США (курс 1 EUR = 1.08 USD)\n" \
-        "Продать евро за доллары США (курс 1 EUR = 1.04 USD)\n" \
-        "Купить китайские юани за доллары США (курс 1 CNY = 0.15 USD)\n" \
-        "Продать китайские юани за доллары США (курс 1 CNY = 0.13 USD)",
-        "Выбрать",
-        "Закрыть");
+        "{FFC800}Central Bank exchange office",
+        "Buy euros for US dollars (rate 1 EUR = 1.08 USD)\n" \
+        "Sell euros for US dollars (rate 1 EUR = 1.04 USD)\n" \
+        "Buy Chinese yuan for US dollars (rate 1 CNY = 0.15 USD)\n" \
+        "Sell Chinese yuan for US dollars (rate 1 CNY = 0.13 USD)",
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -502,22 +502,22 @@ static stock Internal_ShowCashInfo(playerid)
 
     new body[512];
     format(body, sizeof(body),
-        "{FFC800}Наличные в вашем инвентаре:{FFFFFF}\n" \
-        "• Доллары США (USD), чистые: {66CC66}%s{FFFFFF}\n" \
-        "• Евро (EUR), чистые: {66CC66}%s{FFFFFF}\n" \
-        "• Китайские юани (CNY), чистые: {66CC66}%s{FFFFFF}\n" \
-        "• Доллары США (USD), грязные: {FFAA00}%s{FFFFFF}\n\n" \
-        "Грязные наличные не принимаются банкоматами. Их можно легализовать через кассу собственного легального бизнеса.",
+        "{FFC800}Cash in your inventory:{FFFFFF}\n" \
+        "• US dollars (USD), net: {66CC66}%s{FFFFFF}\n" \
+        "• Euro (EUR), net: {66CC66}%s{FFFFFF}\n" \
+        "• Chinese Yuan (CNY), net: {66CC66}%s{FFFFFF}\n" \
+        "• US dollars (USD), dirty: {FFAA00}%s{FFFFFF}\n\n" \
+        "Dirty cash is not accepted at ATMs. They can be legalized through the cash desk of your own legal business.",
         usdStr, eurStr, cnyStr, dirtyStr);
 
     ShowPlayerDialog(
         playerid,
         DIALOG_BANK_STATEMENT,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}Наличные и валютные пачки",
+        "{FFC800}Cash and currency bundles",
         body,
-        "Понятно",
-        "Закрыть");
+        "Understood",
+        "Close");
     return 1;
 }
 
@@ -528,11 +528,11 @@ static stock Internal_ShowDepositInput(playerid)
         playerid,
         DIALOG_BANK_AMOUNT,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Пополнение банковского счета",
-        "Введите сумму чистых наличных USD для внесения на счет.\n" \
-        "Грязные наличные банкоматом не принимаются.",
-        "Внести",
-        "Отмена");
+        "{FFC800}Top up your bank account",
+        "Enter the amount of net USD cash to be deposited into the account.\n" \
+        "Dirty cash is not accepted at the ATM.",
+        "Contribute",
+        "Cancel");
     return 1;
 }
 
@@ -544,17 +544,17 @@ static stock Internal_ShowWithdrawInput(playerid)
 
     new body[256];
     format(body, sizeof(body),
-        "Введите сумму USD для снятия наличными.\n" \
-        "Доступный остаток на счете: %s.",
+        "Enter the USD amount for cash withdrawal.\n" \
+        "Available account balance: %s.",
         balanceStr);
     ShowPlayerDialog(
         playerid,
         DIALOG_BANK_AMOUNT,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Снятие наличных со счета",
+        "{FFC800}Withdraw cash from your account",
         body,
-        "Снять",
-        "Отмена");
+        "Remove",
+        "Cancel");
     return 1;
 }
 
@@ -565,11 +565,11 @@ static stock Internal_ShowTransferIbanInput(playerid)
         playerid,
         DIALOG_BANK_TRANSFER_IBAN,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Перевод по IBAN",
-        "Введите IBAN получателя в формате SA00XXXX00000000.\n" \
-        "Перевод выполняется только в долларах США (USD).",
-        "Продолжить",
-        "Отмена");
+        "{FFC800}Transfer via IBAN",
+        "Enter the recipient's IBAN in the format SA00XXXX00000000.\n" \
+        "Transfers are made in US dollars (USD) only.",
+        "Continue",
+        "Cancel");
     return 1;
 }
 
@@ -581,19 +581,19 @@ static stock Internal_ShowTransferAmountInput(playerid)
 
     new body[320];
     format(body, sizeof(body),
-        "Получатель: %s\n" \
-        "Доступный остаток: %s\n\n" \
-        "Введите сумму перевода в USD.",
+        "Recipient: %s\n" \
+        "Available balance: %s\n\n" \
+        "Enter the transfer amount in USD.",
         sBankTargetIban[playerid],
         balanceStr);
     ShowPlayerDialog(
         playerid,
         DIALOG_BANK_TRANSFER_AMOUNT,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Сумма банковского перевода",
+        "{FFC800}Bank transfer amount",
         body,
-        "Перевести",
-        "Отмена");
+        "Translate",
+        "Cancel");
     return 1;
 }
 
@@ -602,7 +602,7 @@ static stock Internal_ShowStatement(playerid)
     if (!DB_IsConnected())
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Выписка временно недоступна: нет соединения с банковской базой данных.");
+            "The statement is temporarily unavailable: there is no connection to the banking database.");
         return 0;
     }
 
@@ -610,7 +610,7 @@ static stock Internal_ShowStatement(playerid)
     if (charId <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Не удалось определить идентификатор вашего персонажа.");
+            "Your character ID could not be determined.");
         return 0;
     }
 
@@ -629,34 +629,34 @@ static stock Internal_ExecuteDeposit(playerid, amount)
 {
     if (!Character_HasBankAccount(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет открытого банковского счета.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not have an open bank account.");
         return 0;
     }
     if (Character_IsBankFrozen(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш банковский счет заморожен по решению суда или ФБР.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your bank account has been frozen by a court order or by the FBI.");
         return 0;
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сумма пополнения должна быть положительной.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The replenishment amount must be positive.");
         return 0;
     }
     if (Internal_CountCash(playerid, CURRENCY_USD, CASH_FLAG_CLEAN) < amount)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "У вас недостаточно чистых наличных долларов США для пополнения счета.");
+            "You do not have enough net USD cash to fund your account.");
         return 0;
     }
     if (!Internal_RemoveCash(playerid, CURRENCY_USD, CASH_FLAG_CLEAN, amount))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось изъять наличные из инвентаря.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Could not remove cash from inventory.");
         return 0;
     }
-    if (!Banking_CreditAccount(playerid, amount, "Пополнение счета наличными"))
+    if (!Banking_CreditAccount(playerid, amount, "Top up your account with cash"))
     {
         Internal_AddCash(playerid, CURRENCY_USD, CASH_FLAG_CLEAN, amount);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Банк отклонил операцию пополнения счета.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The bank rejected the top-up transaction.");
         return 0;
     }
 
@@ -666,7 +666,7 @@ static stock Internal_ExecuteDeposit(playerid, amount)
 
     new msg[192];
     format(msg, sizeof(msg),
-        "Вы внесли %s на банковский счет. Текущий баланс: %s.",
+        "You have deposited %s into your bank account. Current balance: %s.",
         amountStr, balanceStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     return 1;
@@ -676,22 +676,22 @@ static stock Internal_ExecuteWithdraw(playerid, amount)
 {
     if (!Character_HasBankAccount(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет открытого банковского счета.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not have an open bank account.");
         return 0;
     }
     if (Character_IsBankFrozen(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш банковский счет заморожен. Снятие наличных невозможно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your bank account is frozen. Cash withdrawals are not possible.");
         return 0;
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сумма снятия должна быть положительной.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The withdrawal amount must be positive.");
         return 0;
     }
     if (Character_GetBankBalanceUsd(playerid) < amount)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "На счете недостаточно средств для снятия указанной суммы.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are insufficient funds in the account to withdraw the specified amount.");
         return 0;
     }
 
@@ -704,21 +704,21 @@ static stock Internal_ExecuteWithdraw(playerid, amount)
             (Storage_GetCurrentVolume(layer1Slot) + cashVolumeMl) > Storage_GetMaxVolume(layer1Slot))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "В инвентаре недостаточно места для такой суммы наличных.");
+                "There is not enough space in your inventory for this amount of cash.");
             return 0;
         }
     }
 
-    if (!Banking_DebitAccount(playerid, amount, "Снятие наличных со счета"))
+    if (!Banking_DebitAccount(playerid, amount, "Withdrawing cash from your account"))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Банк отклонил операцию снятия.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The bank rejected the withdrawal transaction.");
         return 0;
     }
     if (!Internal_AddCash(playerid, CURRENCY_USD, CASH_FLAG_CLEAN, amount))
     {
-        Banking_CreditAccount(playerid, amount, "Возврат после неудачного снятия");
+        Banking_CreditAccount(playerid, amount, "Refund after unsuccessful withdrawal");
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Не удалось выдать наличные: инвентарь переполнен. Операция отменена.");
+            "Failed to issue cash: inventory is full. The operation has been cancelled.");
         return 0;
     }
 
@@ -728,7 +728,7 @@ static stock Internal_ExecuteWithdraw(playerid, amount)
 
     new msg[192];
     format(msg, sizeof(msg),
-        "Вы сняли %s наличными. Текущий баланс: %s.",
+        "You withdrew %s in cash. Current balance: %s.",
         amountStr, balanceStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     return 1;
@@ -738,17 +738,17 @@ static stock Internal_ExecuteExchange(playerid, fromCurrency, toCurrency, amount
 {
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сумма обмена должна быть положительной.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The exchange amount must be positive.");
         return 0;
     }
     if (fromCurrency == toCurrency)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Выберите разные валюты для обмена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Choose different currencies to exchange.");
         return 0;
     }
     if (Internal_CountCash(playerid, fromCurrency, CASH_FLAG_CLEAN) < amount)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас недостаточно чистых наличных выбранной валюты.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not have enough net cash in the selected currency.");
         return 0;
     }
 
@@ -771,25 +771,25 @@ static stock Internal_ExecuteExchange(playerid, fromCurrency, toCurrency, amount
     }
     else
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Такой обменный курс не поддерживается.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "This exchange rate is not supported.");
         return 0;
     }
 
     if (targetAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сумма слишком мала для обмена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The amount is too small to exchange.");
         return 0;
     }
 
     if (!Internal_RemoveCash(playerid, fromCurrency, CASH_FLAG_CLEAN, amount))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось изъять исходную валюту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The original currency could not be withdrawn.");
         return 0;
     }
     if (!Internal_AddCash(playerid, toCurrency, CASH_FLAG_CLEAN, targetAmount))
     {
         Internal_AddCash(playerid, fromCurrency, CASH_FLAG_CLEAN, amount);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не хватает места для целевой валюты. Обмен отменен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is not enough space for the target currency. Exchange cancelled.");
         return 0;
     }
 
@@ -801,12 +801,12 @@ static stock Internal_ExecuteExchange(playerid, fromCurrency, toCurrency, amount
 
     new msg[256];
     format(msg, sizeof(msg),
-        "Обмен выполнен: %s %s -> %s %s.",
+        "The exchange is completed: %s %s -> %s %s.",
         fromStr, fromName, toStr, toName);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[160];
-    format(details, sizeof(details), "Обмен %s на %s в отделении банка", fromName, toName);
+    format(details, sizeof(details), "Exchange %s for %s at a bank branch", fromName, toName);
     Audit_Log(Character_GetId(playerid), "BANK_EXCHANGE", "PHYSICAL_CASH", "PHYSICAL_CASH",
         ITEM_ID_CASH_BUNDLE, amount, details);
     return 1;
@@ -832,17 +832,17 @@ static stock Internal_ShowLaunderMenu(playerid)
     if (!Character_HasBankAccount(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для легализации грязных наличных необходим открытый банковский счет.");
+            "To legalize dirty cash, an open bank account is required.");
         return 0;
     }
     if (Character_IsBankFrozen(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш банковский счет заморожен: легализация невозможна.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your bank account is frozen: legalization is impossible.");
         return 0;
     }
     if (Internal_CountCash(playerid, CURRENCY_USD, CASH_FLAG_DIRTY) <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "У вас нет грязных наличных долларов США.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "You don't have dirty US dollars cash.");
         return 0;
     }
 
@@ -896,7 +896,7 @@ static stock Internal_ShowLaunderMenu(playerid)
     if (rowCount == 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Рядом нет вашего легального бизнеса с кассой для легализации наличных.");
+            "There is no legal business near you with a cash register for legalizing cash.");
         return 0;
     }
 
@@ -904,10 +904,10 @@ static stock Internal_ShowLaunderMenu(playerid)
         playerid,
         DIALOG_BANK_LAUNDER_LIST,
         DIALOG_STYLE_LIST,
-        "{FFC800}Легализация грязных наличных через кассу бизнеса",
+        "{FFC800}Legalization of dirty cash through a business cash register",
         dialogBody,
-        "Выбрать",
-        "Отмена");
+        "Select",
+        "Cancel");
     return 1;
 }
 
@@ -915,18 +915,18 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
 {
     if (!Enterprise_IsValid(enterpriseId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Предприятие не найдено.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Business not found.");
         return 0;
     }
     if (Enterprise_GetOwnership(enterpriseId) != ENTERPRISE_OWN_PRIVATE ||
         Enterprise_GetOwnerCharId(enterpriseId) != Character_GetId(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы не являетесь владельцем этого предприятия.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not own this business.");
         return 0;
     }
     if (!Internal_IsLaunderEnterpriseType(Enterprise_GetType(enterpriseId)))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Это предприятие не имеет права принимать наличные.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "This business is not authorized to accept cash.");
         return 0;
     }
 
@@ -934,28 +934,28 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
     if (!Enterprise_GetPos(enterpriseId, ex, ey, ez) ||
         !Utils_IsPlayerNearPoint(playerid, BANK_LAUNDER_INTERACT_DISTANCE, ex, ey, ez))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы слишком далеко от кассы предприятия.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are too far from the company's cash desk.");
         return 0;
     }
 
     if (!Character_HasBankAccount(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет банковского счета для зачисления чистых средств.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not have a bank account to deposit net funds.");
         return 0;
     }
     if (Character_IsBankFrozen(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш банковский счет заморожен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your bank account is frozen.");
         return 0;
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сумма легализации должна быть положительной.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The amount of legalization must be positive.");
         return 0;
     }
     if (Internal_CountCash(playerid, CURRENCY_USD, CASH_FLAG_DIRTY) < amount)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас недостаточно грязных наличных долларов США.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You don't have enough dirty US dollars cash.");
         return 0;
     }
 
@@ -973,19 +973,19 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
     new const netAmount = amount - taxAmount;
     if (netAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "После уплаты налога сумма к зачислению равна нулю.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "After paying the tax, the amount to be credited is zero.");
         return 0;
     }
 
     if (!Internal_RemoveCash(playerid, CURRENCY_USD, CASH_FLAG_DIRTY, amount))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось изъять грязные наличные из инвентаря.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to remove dirty cash from inventory.");
         return 0;
     }
-    if (!Banking_CreditAccount(playerid, netAmount, "Легализация наличных через кассу предприятия"))
+    if (!Banking_CreditAccount(playerid, netAmount, "Legalization of cash through the company's cash register"))
     {
         Internal_AddCash(playerid, CURRENCY_USD, CASH_FLAG_DIRTY, amount);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Банк отклонил зачисление чистых средств.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The bank rejected the transfer of net funds.");
         return 0;
     }
 
@@ -1005,13 +1005,13 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
 
     new msg[288];
     format(msg, sizeof(msg),
-        "Легализация завершена: %s грязных наличных. Удержан налог %d%% (%s), на счет зачислено %s.",
+        "Legalization completed: %s dirty cash. Tax %d%% (%s) was withheld, %s was credited to the account.",
         amountStr, taxPercent, taxStr, netStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[192];
     format(details, sizeof(details),
-        "Легализация через предприятие #%d, налог %d%%, зачислено %d USD",
+        "Legalization through enterprise #%d, tax %d%%, credited %d USD",
         Enterprise_GetDbId(enterpriseId), taxPercent, netAmount);
     Audit_Log(Character_GetId(playerid), "MONEY_LAUNDER", "DIRTY_CASH", "BANK_ACCOUNT",
         ITEM_ID_CASH_BUNDLE, amount, details);
@@ -1020,7 +1020,7 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
     {
         new taxDetails[160];
         format(taxDetails, sizeof(taxDetails),
-            "Налог на легализацию от персонажа #%d через предприятие #%d",
+            "Legalization tax from character #%d through enterprise #%d",
             Character_GetId(playerid), Enterprise_GetDbId(enterpriseId));
         Organizations_AddGovernmentFunds(taxAmount, taxDetails);
     }
@@ -1031,11 +1031,11 @@ static stock Internal_ExecuteLaunder(playerid, enterpriseId, amount)
         sBankLaunderAlertSent[enterpriseId] = true;
         new alertText[192];
         format(alertText, sizeof(alertText),
-            "Аномальный суточный оборот кассы предприятия #%d: %d USD. Требуется финансовая проверка.",
+            "Anomalous daily cash turnover of the enterprise #%d: %d USD. Financial verification required.",
             Enterprise_GetDbId(enterpriseId), sBankDailyLaunderVolume[enterpriseId]);
         Organizations_SendFinancialAlert(0, Character_GetId(playerid), sBankDailyLaunderVolume[enterpriseId], alertText);
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Внимание: повышенный оборот кассы привлек внимание аналитиков ФБР и Минфина.");
+            "Attention: the increased cash turnover attracted the attention of analysts from the FBI and the Ministry of Finance.");
     }
     return 1;
 }
@@ -1044,19 +1044,19 @@ static stock Internal_OpenBankAccount(playerid)
 {
     if (Character_HasBankAccount(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "У вас уже есть открытый банковский счет.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "You already have an open bank account.");
         return 0;
     }
     if (!Internal_IsPlayerNearBankBranch(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Открыть счет можно только в отделении Центрального банка Сан-Андреаса.");
+            "You can open an account only at a branch of the Central Bank of San Andreas.");
         return 0;
     }
     if (Character_GetCitizenship(playerid) != CITIZENSHIP_CITIZEN)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Банковский счет открывается только гражданам США при наличии SSN.");
+            "A bank account is opened only to US citizens with an SSN.");
         return 0;
     }
 
@@ -1065,19 +1065,19 @@ static stock Internal_OpenBankAccount(playerid)
     if (ssn[0] == EOS)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для открытия счета необходим действующий номер социального страхования (SSN).");
+            "A valid Social Security Number (SSN) is required to open an account.");
         return 0;
     }
     if (Roles_HasPerk(Character_GetRoleId(playerid), PERK_FIRE_RESIST_50))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Религиозные убеждения вашего персонажа запрещают пользоваться банковской системой.");
+            "Your character's religious beliefs prohibit him from using the banking system.");
         return 0;
     }
     if (!Internal_HasPassportWithSsn(playerid, ssn))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для открытия счета предъявите паспорт с действующим номером SSN в потайном Слое 2.");
+            "To open an account, present a passport with a valid SSN number in the secret Layer 2.");
         return 0;
     }
 
@@ -1101,19 +1101,19 @@ static stock Internal_OpenBankAccount(playerid)
     if (cardIssued)
     {
         format(msg, sizeof(msg),
-            "Банковский счет успешно открыт. Ваш IBAN: %s. Дебетовая карта выдана в Слой 2.",
+            "The bank account has been successfully opened. Your IBAN: %s. Debit card issued in Layer 2.",
             iban);
     }
     else
     {
         format(msg, sizeof(msg),
-            "Банковский счет успешно открыт. Ваш IBAN: %s. Для получения карты освободите место в Слое 2.",
+            "The bank account has been successfully opened. Your IBAN: %s. To receive the card, free up space in Layer 2.",
             iban);
     }
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[160];
-    format(details, sizeof(details), "Открытие банковского счета %s", iban);
+    format(details, sizeof(details), "Opening a bank account %s", iban);
     Audit_Log(Character_GetId(playerid), "BANK_OPEN", "BANK", "CHARACTER", 0, 0, details);
     return 1;
 }
@@ -1243,13 +1243,13 @@ public OnBankStatementLoaded(playerid, sessionToken)
     cache_get_row_count(rows);
     if (rows <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "По вашему счету пока нет банковских операций.");
+        SendClientMessage(playerid, COLOR_UI_INFO, "There are no bank transactions on your account yet.");
         return 1;
     }
 
     new body[BANK_STATEMENT_BUFFER_LEN];
     body[0] = '\0';
-    strcat(body, "{FFC800}Последние банковские операции:{FFFFFF}\n\n", sizeof(body));
+    strcat(body, "{FFC800}Last banking transactions:{FFFFFF}\n\n", sizeof(body));
 
     for (new r = 0; r < rows; r++)
     {
@@ -1278,10 +1278,10 @@ public OnBankStatementLoaded(playerid, sessionToken)
         playerid,
         DIALOG_BANK_STATEMENT,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}Выписка по банковскому счету",
+        "{FFC800}Bank statement",
         body,
-        "Понятно",
-        "Закрыть");
+        "Understood",
+        "Close");
     return 1;
 }
 
@@ -1302,7 +1302,7 @@ public OnBankTransferLookup(playerid, sessionToken, amount, const targetIban[])
     if (rows <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Получатель с указанным IBAN не найден в банковской системе.");
+            "The recipient with the specified IBAN was not found in the banking system.");
         return 1;
     }
 
@@ -1314,27 +1314,27 @@ public OnBankTransferLookup(playerid, sessionToken, amount, const targetIban[])
 
     if (targetCharId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Некорректный банковский счет получателя.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The recipient's bank account is incorrect.");
         return 1;
     }
     if (targetCharId == Character_GetId(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Перевод самому себе невозможен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "It is impossible to translate to yourself.");
         return 1;
     }
     if (targetFrozen != 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Счет получателя заморожен. Перевод отклонен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The recipient's account is frozen. The transfer was rejected.");
         return 1;
     }
     if (Character_IsBankFrozen(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш счет заморожен. Перевод невозможен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your account is frozen. Translation is not possible.");
         return 1;
     }
     if (Character_GetBankBalanceUsd(playerid) < amount)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "На вашем счете недостаточно средств для перевода.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are insufficient funds in your account for the transfer.");
         return 1;
     }
 
@@ -1356,7 +1356,7 @@ public OnBankTransferLookup(playerid, sessionToken, amount, const targetIban[])
 
         new targetMsg[192];
         format(targetMsg, sizeof(targetMsg),
-            "На ваш банковский счет поступил перевод на сумму %d USD.",
+            "A transfer in the amount of %d USD has been received into your bank account.",
             amount);
         SendClientMessage(targetPlayer, COLOR_UI_SUCCESS, targetMsg);
     }
@@ -1367,13 +1367,13 @@ public OnBankTransferLookup(playerid, sessionToken, amount, const targetIban[])
 
     new msg[224];
     format(msg, sizeof(msg),
-        "Перевод %s по IBAN %s выполнен. Ваш баланс: %s.",
+        "Transfer of %s according to IBAN %s is completed. Your balance: %s.",
         amountStr, targetIban, balanceStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[192];
     format(details, sizeof(details),
-        "Перевод на IBAN %s, счет получателя #%d", targetIban, targetAccId);
+        "Transfer to IBAN %s, recipient account #%d", targetIban, targetAccId);
     Audit_Log(Character_GetId(playerid), "BANK_TRANSFER", "BANK_ACCOUNT", "BANK_ACCOUNT",
         0, amount, details);
     return 1;
@@ -1403,7 +1403,7 @@ hook OnGameModeInit()
         sBankDailyLaunderDay[e] = 0;
         sBankLaunderAlertSent[e] = false;
     }
-    printf("%s [Systems/Banking] Банковская система и обменные курсы инициализированы.",
+    printf("%s [Systems/Banking] Banking system and exchange rates have been initialized.",
         SERVER_LOG_PREFIX);
     return 1;
 }
@@ -1472,7 +1472,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new parsedAmount = 0;
             if (!Internal_ParsePositiveInt(inputtext, parsedAmount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректную положительную сумму цифрами.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter a valid positive amount in numbers.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1483,7 +1483,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             {
                 case BANK_ACTION_DEPOSIT: Internal_ExecuteDeposit(playerid, parsedAmount);
                 case BANK_ACTION_WITHDRAW: Internal_ExecuteWithdraw(playerid, parsedAmount);
-                default: SendClientMessage(playerid, COLOR_UI_ERROR, "Неизвестная банковская операция.");
+                default: SendClientMessage(playerid, COLOR_UI_ERROR, "Unknown banking transaction.");
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }
@@ -1501,12 +1501,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (strlen(iban) != 20 || iban[0] != 'S' || iban[1] != 'A')
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Неверный формат IBAN. Ожидается 20 символов, начинающихся с SA.");
+                    "Invalid IBAN format. Expect 20 characters starting with SA.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (!DB_IsConnected())
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Банковская сеть временно недоступна.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The banking network is temporarily unavailable.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1526,7 +1526,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new amount = 0;
             if (!Internal_ParsePositiveInt(inputtext, amount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректную сумму перевода цифрами.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter the correct transfer amount in numbers.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1559,18 +1559,18 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
             new body[320];
             format(body, sizeof(body),
-                "Введите сумму грязных наличных USD для легализации.\n" \
-                "Доступно в инвентаре: %s.\n" \
-                "Налог составляет от 15%% до 25%% в зависимости от суммы.",
+                "Enter the amount of dirty cash USD for legalization.\n" \
+                "Available in inventory: %s.\n" \
+                "The tax ranges from 15%% to 25%% depending on the amount.",
                 dirtyStr);
             ShowPlayerDialog(
                 playerid,
                 DIALOG_BANK_LAUNDER_AMOUNT,
                 DIALOG_STYLE_INPUT,
-                "{FFC800}Легализация грязных наличных",
+                "{FFC800}Legalization of dirty cash",
                 body,
-                "Легализовать",
-                "Отмена");
+                "Legalize",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -1615,17 +1615,17 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             Internal_GetCurrencyNameRu(sBankExchangeFrom[playerid], fromName, sizeof(fromName));
             new body[256];
             format(body, sizeof(body),
-                "Введите сумму в валюте %s для обмена.\n" \
-                "Банк выполняет обмен по действующему внутреннему курсу.",
+                "Enter the amount in currency %s for exchange.\n" \
+                "The bank carries out the exchange at the current internal rate.",
                 fromName);
             ShowPlayerDialog(
                 playerid,
                 DIALOG_BANK_EXCHANGE_AMOUNT,
                 DIALOG_STYLE_INPUT,
-                "{FFC800}Обмен валюты",
+                "{FFC800}Currency exchange",
                 body,
-                "Обменять",
-                "Отмена");
+                "Exchange",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -1638,7 +1638,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new amount = 0;
             if (!Internal_ParsePositiveInt(inputtext, amount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректную сумму обмена цифрами.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter the correct exchange amount.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             Internal_ExecuteExchange(
@@ -1659,7 +1659,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new amount = 0;
             if (!Internal_ParsePositiveInt(inputtext, amount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректную сумму легализации цифрами.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter the correct amount of legalization in numbers.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             Internal_ExecuteLaunder(playerid, sBankLaunderEnterprise[playerid], amount);
@@ -1683,7 +1683,7 @@ CMD:bank(playerid, params[])
     new const nowTick = GetTickCount();
     if ((nowTick - sBankLastCommandTick[playerid]) < BANK_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Не так быстро: дождитесь завершения предыдущей операции.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "Not so fast: Wait for the previous operation to complete.");
         return 1;
     }
     sBankLastCommandTick[playerid] = nowTick;
@@ -1713,7 +1713,7 @@ CMD:launder(playerid, params[])
     new const nowTick = GetTickCount();
     if ((nowTick - sBankLastCommandTick[playerid]) < BANK_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Не так быстро: дождитесь завершения предыдущей операции.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "Not so fast: Wait for the previous operation to complete.");
         return 1;
     }
     sBankLastCommandTick[playerid] = nowTick;

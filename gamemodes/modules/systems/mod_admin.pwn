@@ -127,57 +127,57 @@ static stock sAdminSqlBuffer[768];
 
 static stock const sAdminPermMeta[ADMIN_PERM_TOTAL][E_ADMIN_PERM_META] =
 {
-    { "", "Нет права", "Служебное" },
-    { "ADMIN_PANEL_ACCESS", "Доступ к админ-панели", "Доступ" },
-    { "ADMIN_HELP_ACCESS", "Доступ к справке /ahelp", "Доступ" },
-    { "MANAGE_ADMINS", "Назначение и снятие администраторов", "Доступ" },
-    { "MANAGE_ROLES", "Создание и настройка админ-ролей", "Доступ" },
-    { "VIEW_AUDIT", "Просмотр журнала аудита", "Доступ" },
-    { "VIEW_ANTICHEAT", "Просмотр статистики античита", "Доступ" },
-    { "PLAYER_TELEPORT", "Телепорт к игроку (/goto)", "Игроки" },
-    { "PLAYER_GET_HERE", "Телепорт игрока к себе (/gethere)", "Игроки" },
-    { "PLAYER_SPECTATE", "Слежка за игроком (/sp)", "Игроки" },
-    { "PLAYER_FREEZE", "Заморозка и разморозка игрока", "Игроки" },
-    { "PLAYER_SLAP", "Слап игрока", "Игроки" },
-    { "PLAYER_SET_STATS", "Изменение HP, брони и физиологии", "Игроки" },
-    { "PLAYER_SET_SKIN", "Смена скина игрока", "Игроки" },
-    { "PLAYER_KICK", "Кик и тихий кик", "Игроки" },
-    { "PLAYER_BAN", "Временный и постоянный бан", "Игроки" },
-    { "PLAYER_UNBAN", "Разбан аккаунта", "Игроки" },
-    { "PLAYER_MUTE", "Мут игрока", "Игроки" },
-    { "PLAYER_WARN", "Выдача предупреждения", "Игроки" },
-    { "PLAYER_JAIL", "Админ-тюрьма (деморган)", "Игроки" },
-    { "PLAYER_SET_WANTED", "Изменение уровня розыска", "Игроки" },
-    { "ORG_SET_LEADER", "Назначение лидера организации", "Организации" },
-    { "ORG_SET_MEMBER", "Назначение участника организации", "Организации" },
-    { "ORG_MANAGE_RANKS", "Управление рангами организаций", "Организации" },
-    { "CHAR_SET_LEVEL", "Изменение уровня персонажа", "Персонаж" },
-    { "CHAR_SET_EXP", "Изменение опыта персонажа", "Персонаж" },
-    { "CHAR_SET_SKILLS", "Изменение навыков персонажа", "Персонаж" },
-    { "CHAR_SET_LICENSES", "Управление лицензиями", "Персонаж" },
-    { "CHAR_SET_STATUS", "Изменение статуса персонажа", "Персонаж" },
-    { "ECON_GIVE_CASH", "Выдача и изъятие наличных", "Экономика" },
-    { "ECON_SET_BANK", "Изменение банковского баланса", "Экономика" },
-    { "ECON_CLEAR_DEBT", "Погашение банковского долга", "Экономика" },
-    { "ECON_ISSUE_DEBT", "Выдача банковского долга", "Экономика" },
-    { "INV_VIEW", "Просмотр инвентаря и хранилищ", "Инвентарь" },
-    { "INV_GIVE_ITEM", "Выдача предметов", "Инвентарь" },
-    { "INV_EDIT_ITEM", "Редактирование предметов", "Инвентарь" },
-    { "INV_CLEAR", "Очистка инвентаря", "Инвентарь" },
-    { "PROP_GIVE", "Выдача недвижимости", "Имущество" },
-    { "PROP_REMOVE", "Изъятие недвижимости", "Имущество" },
-    { "VEH_SPAWN", "Спавн транспорта", "Транспорт" },
-    { "VEH_DELETE", "Удаление и респавн транспорта", "Транспорт" },
-    { "VEH_KEYS", "Выдача ключей от транспорта", "Транспорт" },
-    { "VEH_REFUEL", "Заправка транспорта", "Транспорт" },
-    { "VEH_REPAIR", "Починка транспорта", "Транспорт" },
-    { "VEH_TELEPORT", "Телепорт транспорта", "Транспорт" },
-    { "WORLD_TELEPORT", "Телепорт по координатам и мирам", "Мир" },
-    { "WORLD_WEATHER", "Смена погоды", "Мир" },
-    { "WORLD_TIME", "Смена времени суток", "Мир" },
-    { "WORLD_ANNOUNCE", "Глобальные объявления", "Мир" },
-    { "SERVER_SAVE", "Экстренное сохранение БД", "Сервер" },
-    { "SERVER_RESTART", "Перезапуск сервера", "Сервер" }
+    { "", "No right", "Official" },
+    { "ADMIN_PANEL_ACCESS", "Access to the admin panel", "Access" },
+    { "ADMIN_HELP_ACCESS", "Access help /ahelp", "Access" },
+    { "MANAGE_ADMINS", "Appointment and removal of administrators", "Access" },
+    { "MANAGE_ROLES", "Creating and setting up admin roles", "Access" },
+    { "VIEW_AUDIT", "Viewing the Audit Log", "Access" },
+    { "VIEW_ANTICHEAT", "View anti-cheat statistics", "Access" },
+    { "PLAYER_TELEPORT", "Teleport to player (/goto)", "Players" },
+    { "PLAYER_GET_HERE", "Teleport player to yourself (/gethere)", "Players" },
+    { "PLAYER_SPECTATE", "Player tracking (/sp)", "Players" },
+    { "PLAYER_FREEZE", "Freezing and unfreezing a player", "Players" },
+    { "PLAYER_SLAP", "Player slap", "Players" },
+    { "PLAYER_SET_STATS", "HP, Armor and Physiology Changes", "Players" },
+    { "PLAYER_SET_SKIN", "Changing player skin", "Players" },
+    { "PLAYER_KICK", "Kick and quiet kick", "Players" },
+    { "PLAYER_BAN", "Temporary and permanent ban", "Players" },
+    { "PLAYER_UNBAN", "Unban account", "Players" },
+    { "PLAYER_MUTE", "Mute player", "Players" },
+    { "PLAYER_WARN", "Issuing a warning", "Players" },
+    { "PLAYER_JAIL", "Admin jail (demorgan)", "Players" },
+    { "PLAYER_SET_WANTED", "Changing your wanted level", "Players" },
+    { "ORG_SET_LEADER", "Appointment of an organization leader", "Factions" },
+    { "ORG_SET_MEMBER", "Appointment of an organization member", "Factions" },
+    { "ORG_MANAGE_RANKS", "Organization rank management", "Factions" },
+    { "CHAR_SET_LEVEL", "Changing Character Level", "Character" },
+    { "CHAR_SET_EXP", "Changing Character Experience", "Character" },
+    { "CHAR_SET_SKILLS", "Changing Character Skills", "Character" },
+    { "CHAR_SET_LICENSES", "License management", "Character" },
+    { "CHAR_SET_STATUS", "Changing a Character's Status", "Character" },
+    { "ECON_GIVE_CASH", "Cash issuance and withdrawal", "Economics" },
+    { "ECON_SET_BANK", "Change in bank balance", "Economics" },
+    { "ECON_CLEAR_DEBT", "Repay bank debt", "Economics" },
+    { "ECON_ISSUE_DEBT", "Give bank debt", "Economics" },
+    { "INV_VIEW", "View Inventory and Storage", "Inventory" },
+    { "INV_GIVE_ITEM", "Issue of items", "Inventory" },
+    { "INV_EDIT_ITEM", "Editing Items", "Inventory" },
+    { "INV_CLEAR", "Clearing Inventory", "Inventory" },
+    { "PROP_GIVE", "Give property", "Property" },
+    { "PROP_REMOVE", "Confiscate property", "Property" },
+    { "VEH_SPAWN", "Vehicle spawn", "Vehicle" },
+    { "VEH_DELETE", "Removing and respawning vehicles", "Vehicle" },
+    { "VEH_KEYS", "Give vehicle keys", "Vehicle" },
+    { "VEH_REFUEL", "Refueling vehicles", "Vehicle" },
+    { "VEH_REPAIR", "Vehicle repair", "Vehicle" },
+    { "VEH_TELEPORT", "Vehicle teleport", "Vehicle" },
+    { "WORLD_TELEPORT", "Teleport by coordinates and worlds", "world" },
+    { "WORLD_WEATHER", "Change of weather", "world" },
+    { "WORLD_TIME", "Change of time of day", "world" },
+    { "WORLD_ANNOUNCE", "Global announcements", "world" },
+    { "SERVER_SAVE", "Emergency database saving", "Server" },
+    { "SERVER_RESTART", "Restarting the server", "Server" }
 };
 
 // =============================================================================
@@ -312,8 +312,8 @@ stock Admin_LoadRoles()
 
     if (!DB_IsConnected())
     {
-        Internal_AddRoleToPool(1, "Root-администратор", 100, true, true);
-        printf("%s [Systems/Admin] MySQL недоступен: активирована встроенная Root-роль (RAM).",
+        Internal_AddRoleToPool(1, "Root administrator", 100, true, true);
+        printf("%s [Systems/Admin] MySQL is unavailable: the built-in Root role (RAM) is activated.",
             SERVER_LOG_PREFIX);
         return 1;
     }
@@ -347,7 +347,7 @@ stock Admin_LoadRoles()
         {
             rootRoleId = sNextAdminRoleDbId++;
         }
-        Internal_AddRoleToPool(rootRoleId, "Root-администратор", 100, true, true);
+        Internal_AddRoleToPool(rootRoleId, "Root administrator", 100, true, true);
     }
 
     new const Cache:permCache = mysql_query(gMySQL,
@@ -384,10 +384,10 @@ stock Admin_LoadRoles()
         cache_delete(permCache);
     }
 
-    printf("%s [Systems/Admin] Загружено админ-ролей: %d (Root: %s).",
+    printf("%s [Systems/Admin] Loaded admin roles: %d (Root: %s).",
         SERVER_LOG_PREFIX,
         sAdminRoleCount,
-        (Admin_GetRootRoleDbId() > 0) ? ("да") : ("нет"));
+        (Admin_GetRootRoleDbId() > 0) ? ("Yes") : ("No"));
     return 1;
 }
 
@@ -665,8 +665,8 @@ stock Admin_Unmute(playerid, target_playerid)
         }
         mysql_tquery(gMySQL, sAdminSqlBuffer);
     }
-    SendClientMessage(target_playerid, COLOR_UI_INFO, "Администратор снял с вас мут.");
-    Admin_Audit(playerid, target_account_id, Character_GetId(target_playerid), "ADMIN_UNMUTE", 0, 0, "Снятие мута");
+    SendClientMessage(target_playerid, COLOR_UI_INFO, "The administrator has removed the mutt from you.");
+    Admin_Audit(playerid, target_account_id, Character_GetId(target_playerid), "ADMIN_UNMUTE", 0, 0, "Mute removal");
     return 1;
 }
 
@@ -728,7 +728,7 @@ stock bool:Admin_BanAccount(playerid, target_account_id, minutes, const reason[]
         {
             new msg[192];
             format(msg, sizeof(msg),
-                "Вы забанены на %d минут. Причина: %s", minutes, reason);
+                "You are banned for %d minutes. Reason: %s", minutes, reason);
             SendClientMessage(target_playerid, COLOR_UI_ERROR, msg);
             defer Admin_DelayedKick(target_playerid, Config_GetPlayerSessionToken(target_playerid));
         }
@@ -769,7 +769,7 @@ stock bool:Admin_BanAccount(playerid, target_account_id, minutes, const reason[]
         if (target_playerid != INVALID_PLAYER_ID)
         {
             SendClientMessage(target_playerid, COLOR_UI_ERROR,
-                "Вы забанены навсегда. Причина указана в журнале администрации.");
+                "You are banned forever. The reason is indicated in the administration log.");
             defer Admin_DelayedKick(target_playerid, Config_GetPlayerSessionToken(target_playerid));
         }
     }
@@ -805,7 +805,7 @@ stock bool:Admin_UnbanAccount(playerid, target_account_id)
     }
     mysql_tquery(gMySQL, sAdminSqlBuffer);
 
-    Admin_Audit(playerid, target_account_id, 0, "ADMIN_UNBAN", 0, 0, "Снятие бана");
+    Admin_Audit(playerid, target_account_id, 0, "ADMIN_UNBAN", 0, 0, "Removing a ban");
     return true;
 }
 
@@ -837,13 +837,13 @@ stock Admin_Punish(playerid, target_playerid, E_PUNISHMENT_TYPE:type, const reas
     if (type == PUNISHMENT_MUTE)
     {
         sPlayerMuteUntil[target_playerid] = gettime() + ((duration_sec > 0) ? duration_sec : 300);
-        SendClientMessage(target_playerid, COLOR_UI_ERROR, "Вам выдан мут. Причина указана администратором.");
+        SendClientMessage(target_playerid, COLOR_UI_ERROR, "You have been issued a mute. The reason was given by the administrator.");
     }
     else if (type == PUNISHMENT_WARN)
     {
         sPlayerWarnCount[target_playerid]++;
         new msg[160];
-        format(msg, sizeof(msg), "Вам выдано предупреждение (%d). Причина: %s",
+        format(msg, sizeof(msg), "You have received a warning (%d). Reason: %s",
             sPlayerWarnCount[target_playerid], reason);
         SendClientMessage(target_playerid, COLOR_UI_WARNING, msg);
     }
@@ -900,7 +900,7 @@ stock Admin_CreateRole(playerid, const name[], level)
 {
     if (!Admin_HasPermission(playerid, ADMIN_PERM_MANAGE_ROLES))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_CREATE", "Недостаточно прав MANAGE_ROLES");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_CREATE", "Insufficient MANAGE_ROLES rights");
         return 0;
     }
     if (strlen(name) < 2 || level < 1 || level > 99 || Internal_FindRoleIndexByName(name) != ADMIN_INVALID_ROLE)
@@ -909,7 +909,7 @@ stock Admin_CreateRole(playerid, const name[], level)
     }
     if (!Admin_IsRoot(playerid) && level >= Admin_GetRoleLevel(playerid))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_CREATE", "Нельзя создать роль своего уровня или выше");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_CREATE", "You cannot create a role at your level or higher");
         return 0;
     }
     if (sAdminRoleCount >= MAX_ADMIN_ROLES)
@@ -943,7 +943,7 @@ stock Admin_CreateRole(playerid, const name[], level)
     }
 
     new details[160];
-    format(details, sizeof(details), "Создана админ-роль «%s» (level %d)", name, level);
+    format(details, sizeof(details), "The admin role “%s” has been created (level %d)", name, level);
     Admin_Audit(playerid, 0, 0, "ADMIN_ROLE_CREATE", 0, level, details);
     return role_db_id;
 }
@@ -952,7 +952,7 @@ stock Admin_DeleteRole(playerid, role_db_id)
 {
     if (!Admin_HasPermission(playerid, ADMIN_PERM_MANAGE_ROLES))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_DELETE", "Недостаточно прав MANAGE_ROLES");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_DELETE", "Insufficient MANAGE_ROLES rights");
         return 0;
     }
     new const index = Internal_FindRoleIndexByDbId(role_db_id);
@@ -962,7 +962,7 @@ stock Admin_DeleteRole(playerid, role_db_id)
     }
     if (!Admin_IsRoot(playerid) && sAdminRoles[index][E_AR_LEVEL] >= Admin_GetRoleLevel(playerid))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_DELETE", "Нельзя удалить роль своего уровня или выше");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_DELETE", "You cannot delete a role at your level or higher");
         return 0;
     }
 
@@ -993,7 +993,7 @@ stock Admin_DeleteRole(playerid, role_db_id)
     }
 
     new details[160];
-    format(details, sizeof(details), "Удалена админ-роль «%s» (id %d)", roleName, role_db_id);
+    format(details, sizeof(details), "Administrator role “%s” (id %d) was deleted", roleName, role_db_id);
     Admin_Audit(playerid, 0, 0, "ADMIN_ROLE_DELETE", 0, role_db_id, details);
     return 1;
 }
@@ -1002,7 +1002,7 @@ stock Admin_SetRolePermission(playerid, role_db_id, E_ADMIN_PERM:perm, bool:allo
 {
     if (!Admin_HasPermission(playerid, ADMIN_PERM_MANAGE_ROLES))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "Недостаточно прав MANAGE_ROLES");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "Insufficient MANAGE_ROLES rights");
         return 0;
     }
     new const index = Internal_FindRoleIndexByDbId(role_db_id);
@@ -1018,12 +1018,12 @@ stock Admin_SetRolePermission(playerid, role_db_id, E_ADMIN_PERM:perm, bool:allo
     {
         if (sAdminRoles[index][E_AR_LEVEL] >= Admin_GetRoleLevel(playerid))
         {
-            Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "Нельзя менять права роли своего уровня или выше");
+            Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "You cannot change the permissions of a role of your level or higher.");
             return 0;
         }
         if (allowed && !Admin_HasPermission(playerid, perm))
         {
-            Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "Нельзя выдать право, которым не обладаешь сам");
+            Admin_LogDenied(playerid, "ADMIN_ROLE_PERM", "You cannot give away a right that you do not have yourself.");
             return 0;
         }
     }
@@ -1042,8 +1042,8 @@ stock Admin_SetRolePermission(playerid, role_db_id, E_ADMIN_PERM:perm, bool:allo
 
     new details[160];
     new const permIndex = _:perm;
-    format(details, sizeof(details), "Роль %d: право %s = %s", role_db_id,
-        sAdminPermMeta[permIndex][E_APM_KEY], allowed ? ("разрешено") : ("запрещено"));
+    format(details, sizeof(details), "Role %d: right %s = %s", role_db_id,
+        sAdminPermMeta[permIndex][E_APM_KEY], allowed ? ("allowed") : ("prohibited"));
     Admin_Audit(playerid, 0, 0, "ADMIN_ROLE_PERM", 0, _:perm, details);
     return 1;
 }
@@ -1052,7 +1052,7 @@ stock Admin_AssignRole(playerid, target_account_id, role_db_id)
 {
     if (!Admin_HasPermission(playerid, ADMIN_PERM_MANAGE_ADMINS))
     {
-        Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Недостаточно прав MANAGE_ADMINS");
+        Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Insufficient MANAGE_ADMINS rights");
         return 0;
     }
     if (target_account_id <= 0)
@@ -1065,7 +1065,7 @@ stock Admin_AssignRole(playerid, target_account_id, role_db_id)
         new const target_playerid = Internal_FindPlayerByAccountId(target_account_id);
         if (target_playerid != INVALID_PLAYER_ID && Admin_IsRoot(target_playerid))
         {
-            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Root-роль нельзя снять через админ-панель");
+            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "The root role cannot be removed through the admin panel");
             return 0;
         }
     }
@@ -1079,12 +1079,12 @@ stock Admin_AssignRole(playerid, target_account_id, role_db_id)
         }
         if (sAdminRoles[index][E_AR_IS_ROOT] && !Admin_IsRoot(playerid))
         {
-            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Только Root может назначить Root-роль");
+            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Only Root can assign the Root role");
             return 0;
         }
         if (!Admin_IsRoot(playerid) && sAdminRoles[index][E_AR_LEVEL] > Admin_GetRoleLevel(playerid))
         {
-            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "Нельзя назначить роль выше своего уровня");
+            Admin_LogDenied(playerid, "ADMIN_ROLE_ASSIGN", "You cannot assign a role higher than your level");
             return 0;
         }
     }
@@ -1109,7 +1109,7 @@ stock Admin_AssignRole(playerid, target_account_id, role_db_id)
     Internal_ApplyRoleToOnline(target_account_id, (role_db_id > 0) ? role_db_id : 0);
 
     new details[160];
-    format(details, sizeof(details), "Аккаунт %d: назначена админ-роль %d", target_account_id, role_db_id);
+    format(details, sizeof(details), "Account %d: assigned admin role %d", target_account_id, role_db_id);
     Admin_Audit(playerid, target_account_id, 0, "ADMIN_ROLE_ASSIGN", 0, role_db_id, details);
     return 1;
 }
@@ -1176,7 +1176,7 @@ stock bool:Admin_BanOffline(playerid, const field[], const value[], minutes, con
     }
 
     new details[192];
-    format(details, sizeof(details), "Оффлайн-бан по %s «%s» на %d мин.: %s", field, value, minutes, reason);
+    format(details, sizeof(details), "Offline ban by %s “%s” on %d min.: %s", field, value, minutes, reason);
     Admin_Audit(playerid, 0, 0, "ADMIN_BAN_OFFLINE", 0, minutes, details);
     return true;
 }
@@ -1209,7 +1209,7 @@ stock bool:Admin_UnbanByUsername(playerid, const username[])
     mysql_tquery(gMySQL, sAdminSqlBuffer);
 
     new details[128];
-    format(details, sizeof(details), "Разбан аккаунта «%s»", username);
+    format(details, sizeof(details), "Unban account \"%s\"", username);
     Admin_Audit(playerid, 0, 0, "ADMIN_UNBAN_OFFLINE", 0, 0, details);
     return true;
 }
@@ -1365,7 +1365,7 @@ hook OnPlayerText(playerid, text[])
     {
         new msg[192];
         format(msg, sizeof(msg),
-            "Вы лишены права писать в чат еще %d секунд. Причина мута указана администратором.",
+            "You are deprived of the right to write to the chat for another %d seconds. The reason for the mute was specified by the administrator.",
             Admin_GetMuteSecondsLeft(playerid));
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return Y_HOOKS_BREAK_RETURN_0;

@@ -227,7 +227,7 @@ static stock Internal_LoadContractsSync()
 
     if (!DB_IsConnected())
     {
-        printf("%s [Systems/Logistics] MySQL недоступен: контракты будут создаваться в оперативной памяти.",
+        printf("%s [Systems/Logistics] MySQL is not available: contracts will be created in RAM.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -255,7 +255,7 @@ static stock Internal_LoadContractsSync()
 
     if (!cache_is_valid(cache))
     {
-        printf("%s [Systems/Logistics] [WARN] Не удалось прочитать logistics_contracts.",
+        printf("%s [Systems/Logistics] [WARN] Failed to read logistics_contracts.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -301,7 +301,7 @@ static stock Internal_LoadContractsSync()
     }
     cache_delete(cache);
 
-    printf("%s [Systems/Logistics] Контракты загружены из MySQL (активных: %d).",
+    printf("%s [Systems/Logistics] Contracts loaded from MySQL (active: %d).",
         SERVER_LOG_PREFIX, loadedContracts);
     return loadedContracts;
 }
@@ -518,7 +518,7 @@ static stock Internal_GetDestinationName(contract_slot, output[], len = sizeof(o
     if (contract_slot < 0 || contract_slot >= MAX_LOGISTICS_CONTRACTS ||
         !sContracts[contract_slot][E_CONTRACT_VALID])
     {
-        format(output, len, "Неизвестно");
+        format(output, len, "Unknown");
         return 0;
     }
 
@@ -535,7 +535,7 @@ static stock Internal_GetDestinationName(contract_slot, output[], len = sizeof(o
         }
         else
         {
-            format(output, len, "Предприятие #%d", sContracts[contract_slot][E_CONTRACT_DEST_ID]);
+            format(output, len, "Enterprise #%d", sContracts[contract_slot][E_CONTRACT_DEST_ID]);
         }
     }
     return 1;
@@ -749,7 +749,7 @@ stock bool:Logistics_CreateContract(source_ent_id, dest_type, dest_id, item_def_
     Internal_GetDestinationName(contractSlot, destName, sizeof(destName));
     Item_GetName(item_def_id, itemName);
     format(auditDetails, sizeof(auditDetails),
-        "Создан контракт #%d: %s (кол-во: %d, вес: %d г) из '%s' в '%s'.",
+        "Created contract #%d: %s (quantity: %d, weight: %d g) from '%s' to '%s'.",
         contractDbId, itemName, amount, totalWeightG, sourceName, destName);
     Audit_Log(
         create_by_char_id,
@@ -771,34 +771,34 @@ stock Logistics_UnloadAtPort(playerid, port_id)
     }
     if (Ports_FindNearestPort(playerid, LOGISTICS_TRUCK_RADIUS) != port_id)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Подгоните фуру ближе к портовому терминалу.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Drive the truck closer to the port terminal.");
         return 0;
     }
 
     new const vehicleId = Internal_GetPlayerDriverVehicle(playerid);
     if (vehicleId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Вы должны находиться за рулем грузовика.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: You must be driving the truck.");
         return 0;
     }
 
     new const contractSlot = Internal_GetActiveContractSlot(playerid, true);
     if (contractSlot == INVALID_CONTRACT_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: У вас нет активного контракта в пути.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: You do not have an active contract in transit.");
         return 0;
     }
     if (sContracts[contractSlot][E_CONTRACT_DEST_TYPE] != LOGISTICS_DEST_PORT ||
         sContracts[contractSlot][E_CONTRACT_DEST_ID] != port_id)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Этот контракт оформлен на другой порт.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: This contract is issued for another port.");
         return 0;
     }
 
     new const trunkSlot = Logistics_GetVehicleTrunkSlot(vehicleId);
     if (!Storage_IsValidSlot(trunkSlot) || !Storage_AreItemsReady(trunkSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Грузовой отсек недоступен или еще загружается.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: Cargo bay unavailable or still loading.");
         return 0;
     }
 
@@ -806,7 +806,7 @@ stock Logistics_UnloadAtPort(playerid, port_id)
     new amount = Storage_CountItemInTree(trunkSlot, itemDefId);
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: В кузове нет груза по контракту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no contract cargo in the back.");
         return 0;
     }
     if (amount > sContracts[contractSlot][E_CONTRACT_AMOUNT])
@@ -816,7 +816,7 @@ stock Logistics_UnloadAtPort(playerid, port_id)
 
     if (!Storage_AcquireMutex(trunkSlot, playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Кузов занят другим действием.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: The body is busy with another activity.");
         return 0;
     }
     new const removedAmount = Storage_RemoveItemInTree(trunkSlot, itemDefId, amount);
@@ -824,7 +824,7 @@ stock Logistics_UnloadAtPort(playerid, port_id)
 
     if (removedAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Не удалось выгрузить груз из кузова.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Failed to unload cargo from truck.");
         return 0;
     }
 
@@ -846,7 +846,7 @@ stock Logistics_UnloadAtPort(playerid, port_id)
         Storage_AddItem(trunkSlot, itemDefId, removedAmount, 0, 100.0, 0, 0, "", outItemSlot);
         sContracts[contractSlot][E_CONTRACT_STATUS] = oldStatus;
         sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] = oldTrucker;
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Порт отказал в приеме груза. Груз возвращен в кузов.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The port refused to accept the cargo. The cargo is returned to the body.");
         return 0;
     }
 
@@ -861,7 +861,7 @@ stock Logistics_UnloadAtPort(playerid, port_id)
     new itemName[64], msg[192];
     Item_GetName(itemDefId, itemName);
     format(msg, sizeof(msg),
-        "[Логистика]: Выгружено в порт: %s (количество: %d). Выручка: $%d.",
+        "[Logistics]: Unloaded at port: %s (quantity: %d). Revenue: $%d.",
         itemName, removedAmount, revenue);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
@@ -879,7 +879,7 @@ static stock Internal_LoadCargo(playerid)
     new const vehicleId = Internal_GetPlayerDriverVehicle(playerid);
     if (vehicleId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Сядьте за руль грузового автомобиля.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Get behind the wheel of a truck.");
         return 0;
     }
 
@@ -887,7 +887,7 @@ static stock Internal_LoadCargo(playerid)
     if (!Internal_GetTruckCapacity(GetVehicleModel(vehicleId), maxWeightG, maxVolumeMl))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Этот транспорт не предназначен для грузоперевозок.");
+            "[Logistics]: This vehicle is not intended for cargo transportation.");
         return 0;
     }
 
@@ -895,13 +895,13 @@ static stock Internal_LoadCargo(playerid)
     if (contractSlot == INVALID_CONTRACT_SLOT)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Сначала возьмите контракт командой /contracts.");
+            "[Logistics]: First, take the contract with the /contracts command.");
         return 0;
     }
     if (sContracts[contractSlot][E_CONTRACT_STATUS] != CONTRACT_STATUS_OPEN)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Груз по этому контракту уже находится в пути.");
+            "[Logistics]: The cargo for this contract is already on its way.");
         return 0;
     }
 
@@ -909,39 +909,39 @@ static stock Internal_LoadCargo(playerid)
         sContracts[contractSlot][E_CONTRACT_SOURCE_ENT_DB_ID]);
     if (!Enterprise_IsValid(sourceEnterpriseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Предприятие-отправитель не найдено.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Shipping company not found.");
         return 0;
     }
     if (!Enterprise_IsPlayerNearWarehouse(playerid, sourceEnterpriseSlot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Подгоните фуру вплотную к складу предприятия-отправителя.");
+            "[Logistics]: Drive the truck close to the warehouse of the sending company.");
         return 0;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(sourceEnterpriseSlot);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Склад еще загружается. Повторите через секунду.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: The warehouse is still loading. Repeat in a second.");
         return 0;
     }
 
     new const trunkSlot = Logistics_GetVehicleTrunkSlot(vehicleId);
     if (!Storage_IsValidSlot(trunkSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Не удалось подготовить грузовой отсек фуры.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Failed to prepare the cargo compartment of the truck.");
         return 0;
     }
     if (!Storage_AreItemsReady(trunkSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Грузовой отсек еще загружается. Повторите через секунду.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: The cargo bay is still loading. Repeat in a second.");
         return 0;
     }
 
     if (Storage_GetCurrentWeight(trunkSlot) > 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Кузов не пуст. Сначала разгрузите предыдущий груз.");
+            "[Logistics]: The body is not empty. Unload the previous load first.");
         return 0;
     }
 
@@ -949,7 +949,7 @@ static stock Internal_LoadCargo(playerid)
     new const warehouseAmount = Storage_CountItemInTree(warehouseSlot, itemDefId);
     if (warehouseAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: На складе нет груза по контракту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no contract cargo in the warehouse.");
         return 0;
     }
 
@@ -982,7 +982,7 @@ static stock Internal_LoadCargo(playerid)
     }
     if (loadAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Грузоподъемность кузова исчерпана.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The carrying capacity of the body has been exhausted.");
         return 0;
     }
 
@@ -1015,7 +1015,7 @@ static stock Internal_LoadCargo(playerid)
 
     if (movedAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Не удалось загрузить груз в кузов.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Failed to load cargo into the truck.");
         return 0;
     }
 
@@ -1028,13 +1028,13 @@ static stock Internal_LoadCargo(playerid)
     Item_GetName(itemDefId, itemName);
     Utils_FormatWeightGrams(Item_CalculateInstanceWeight(itemDefId, movedAmount), weightStr);
     format(msg, sizeof(msg),
-        "[Логистика]: Погружено в фуру: %s (количество: %d, вес: %s). Следуйте к точке разгрузки.",
+        "[Logistics]: Loaded on truck: %s (quantity: %d, weight: %s). Proceed to the unloading point.",
         itemName, movedAmount, weightStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Погрузка по контракту #%d: %s (кол-во: %d, вес: %d г) в транспорт #%d.",
+        "Loading under contract #%d: %s (quantity: %d, weight: %d g) into vehicle #%d.",
         sContracts[contractSlot][E_CONTRACT_DB_ID], itemName, movedAmount,
         Item_CalculateInstanceWeight(itemDefId, movedAmount), vehicleId);
     Audit_Log(
@@ -1068,46 +1068,46 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     new const vehicleId = Internal_GetPlayerDriverVehicle(playerid);
     if (vehicleId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Вы должны находиться за рулем фуры.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: You must be driving the truck.");
         return 0;
     }
 
     new const contractSlot = Internal_GetActiveContractSlot(playerid, true);
     if (contractSlot == INVALID_CONTRACT_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Нет активного контракта в пути.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: No active contract in transit.");
         return 0;
     }
     if (sContracts[contractSlot][E_CONTRACT_DEST_TYPE] != LOGISTICS_DEST_ENTERPRISE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Этот контракт оформлен на порт.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: This contract is issued to the port.");
         return 0;
     }
 
     new const destEnterpriseSlot = Enterprise_FindByDbId(sContracts[contractSlot][E_CONTRACT_DEST_ID]);
     if (!Enterprise_IsValid(destEnterpriseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Предприятие-получатель не найдено.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Recipient company not found.");
         return 0;
     }
     if (!Enterprise_IsPlayerNearWarehouse(playerid, destEnterpriseSlot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Подгоните фуру вплотную к складу получателя.");
+            "[Logistics]: Drive the truck close to the recipient's warehouse.");
         return 0;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(destEnterpriseSlot);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Склад получателя еще загружается.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: The recipient's warehouse is still loading.");
         return 0;
     }
 
     new const trunkSlot = Logistics_GetVehicleTrunkSlot(vehicleId);
     if (!Storage_IsValidSlot(trunkSlot) || !Storage_AreItemsReady(trunkSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Грузовой отсек недоступен или еще загружается.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: Cargo bay unavailable or still loading.");
         return 0;
     }
 
@@ -1115,7 +1115,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     new amount = Storage_CountItemInTree(trunkSlot, itemDefId);
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: В кузове нет груза по контракту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no contract cargo in the back.");
         return 0;
     }
     if (amount > sContracts[contractSlot][E_CONTRACT_AMOUNT])
@@ -1131,7 +1131,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     }
     if (feeUsd <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Партия слишком мала для оплаты перевозки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The shipment is too small to cover shipping costs.");
         return 0;
     }
 
@@ -1140,7 +1140,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     if (buyPricePerUnit <= 0 && Enterprise_GetDbId(destEnterpriseSlot) != sourceEnterpriseDbId)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: У получателя нет активного закупочного ордера на этот товар. Разгрузка отклонена.");
+            "[Logistics]: The recipient does not have an active purchase order for this item. Unloading rejected.");
         return 0;
     }
 
@@ -1149,7 +1149,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     {
         if (amount > (2000000000 / buyPricePerUnit))
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Слишком большая стоимость партии для расчета.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The cost of the batch is too high to calculate.");
             return 0;
         }
         goodsValueUsd = buyPricePerUnit * amount;
@@ -1159,7 +1159,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     {
         new msg[224];
         format(msg, sizeof(msg),
-            "[Логистика]: В кассе получателя недостаточно средств. Нужно $%d (товар $%d + доставка $%d).",
+            "[Logistics]: There are insufficient funds in the recipient's cash register. Need $%d (product $%d + shipping $%d).",
             goodsValueUsd + feeUsd, goodsValueUsd, feeUsd);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 0;
@@ -1195,7 +1195,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     if (movedAmount <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Не удалось выгрузить груз (склад переполнен или занят).");
+            "[Logistics]: Failed to unload cargo (warehouse is full or busy).");
         return 0;
     }
 
@@ -1243,7 +1243,7 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
                 }
             }
             SendClientMessage(playerid, COLOR_UI_WARNING,
-                "[Логистика]: Оплата не поместилась в инвентарь и выдана на земле.");
+                "[Logistics]: Payment did not fit into inventory and was issued on the ground.");
         }
         Enterprise_TakeReserve(destEnterpriseSlot, actualFeeUsd);
     }
@@ -1275,13 +1275,13 @@ static stock Internal_UnloadCargoAtEnterprise(playerid)
     Item_GetName(itemDefId, itemName);
     Enterprise_GetName(destEnterpriseSlot, destName);
     format(msg, sizeof(msg),
-        "[Логистика]: Доставлено в «%s»: %s (количество: %d). Оплата доставки: $%d, стоимость товара: $%d.",
+        "[Logistics]: Delivered to \"%s\": %s (Quantity: %d). Delivery fee: $%d, product cost: $%d.",
         destName, itemName, movedAmount, actualFeeUsd, actualGoodsValueUsd);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[224];
     format(auditDetails, sizeof(auditDetails),
-        "Разгрузка по контракту #%d: %s (кол-во: %d, вес: %d г) в '%s'. Водителю: $%d, товар: $%d.",
+        "Unloading under contract #%d: %s (quantity: %d, weight: %d g) to '%s'. To the driver: $%d, product: $%d.",
         sContracts[contractSlot][E_CONTRACT_DB_ID], itemName, movedAmount, actualWeightG,
         destName, actualFeeUsd, actualGoodsValueUsd);
     Audit_Log(
@@ -1302,7 +1302,7 @@ static stock Internal_HijackNearestTruck(playerid)
 {
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Для перехвата груза выйдите из автомобиля.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: To intercept the cargo, exit the vehicle.");
         return 0;
     }
     new Float:px, Float:py, Float:pz;
@@ -1330,7 +1330,7 @@ static stock Internal_HijackNearestTruck(playerid)
 
     if (nearestVehicle <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Рядом нет грузового автомобиля.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no truck nearby.");
         return 0;
     }
 
@@ -1339,7 +1339,7 @@ static stock Internal_HijackNearestTruck(playerid)
     new const Float:speed = floatsqroot((vx * vx) + (vy * vy) + (vz * vz)) * 180.0;
     if (speed > 8.0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Фура движется слишком быстро для перехвата.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The truck is moving too fast to be intercepted.");
         return 0;
     }
 
@@ -1347,7 +1347,7 @@ static stock Internal_HijackNearestTruck(playerid)
     if (!Storage_IsValidSlot(trunkSlot) || !Storage_AreItemsReady(trunkSlot) ||
         Storage_GetCurrentWeight(trunkSlot) <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: В кузове этой фуры нет груза.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no cargo in the back of this truck.");
         return 0;
     }
 
@@ -1394,7 +1394,7 @@ static stock Internal_HijackNearestTruck(playerid)
         if (sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] == Character_GetId(playerid))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Логистика]: Нельзя перехватить собственный груз. Доставьте его по контракту.");
+                "[Logistics]: You cannot intercept your own cargo. Deliver it as per contract.");
             return 0;
         }
         itemDefId = sContracts[contractSlot][E_CONTRACT_ITEM_DEF_ID];
@@ -1413,7 +1413,7 @@ static stock Internal_HijackNearestTruck(playerid)
     new const cargoAmount = Storage_CountItemInTree(trunkSlot, itemDefId);
     if (itemDefId <= 0 || cargoAmount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Груз в кузове не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: No cargo was found in the truck.");
         return 0;
     }
 
@@ -1480,13 +1480,13 @@ static stock Internal_HijackNearestTruck(playerid)
     if (movedAmount <= 0)
     {
         format(msg, sizeof(msg),
-            "[Логистика]: Контракт перехвачен, но груз (%s) не поместился в инвентарь. Часть осталась в кузове.",
+            "[Logistics]: The contract was intercepted, but the cargo (%s) did not fit into inventory. Some of it remained in the back.",
             itemName);
     }
     else
     {
         format(msg, sizeof(msg),
-            "[Логистика]: Контракт перехвачен! Вы забрали %s (количество: %d).",
+            "[Logistics]: Contract intercepted! You have collected %s (amount: %d).",
             itemName, movedAmount);
     }
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
@@ -1495,13 +1495,13 @@ static stock Internal_HijackNearestTruck(playerid)
     if (hasContract)
     {
         format(auditDetails, sizeof(auditDetails),
-            "Перехват контракта #%d: %s (кол-во: %d) из транспорта #%d.",
+            "Intercepting contract #%d: %s (quantity: %d) from vehicle #%d.",
             sContracts[contractSlot][E_CONTRACT_DB_ID], itemName, movedAmount, nearestVehicle);
     }
     else
     {
         format(auditDetails, sizeof(auditDetails),
-            "Вскрытие бесхозной фуры #%d: %s (кол-во: %d).",
+            "Opening of an ownerless truck #%d: %s (quantity: %d).",
             nearestVehicle, itemName, movedAmount);
     }
     Audit_Log(
@@ -1522,21 +1522,21 @@ static stock Internal_SellStolenGoods(playerid)
         Enterprise_GetType(shopEnterpriseSlot) != ENTERPRISE_CHOP_SHOP)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Черный рынок]: Подойдите вплотную к авторазборке, чтобы продать товар.");
+            "[Black Market]: Get close to a car wrecker to sell goods.");
         return 0;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Черный рынок]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Black Market]: Inventory unavailable.");
         return 0;
     }
 
     new const bool:layer1WasLocked = Storage_IsMutexLocked(layer1Slot);
     if (!Storage_AcquireMutex(layer1Slot, playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Черный рынок]: Инвентарь занят другим действием.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Black Market]: Inventory is occupied by another activity.");
         return 0;
     }
 
@@ -1580,7 +1580,7 @@ static stock Internal_SellStolenGoods(playerid)
     if (totalValue <= 0 || totalAmount <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Черный рынок]: Нет товара для сбыта или касса авторазборки пуста.");
+            "[Black Market]: There is no product for sale or the car dismantling cash register is empty.");
         return 0;
     }
 
@@ -1609,20 +1609,20 @@ static stock Internal_SellStolenGoods(playerid)
             }
         }
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Черный рынок]: Грязные деньги не поместились в инвентарь и выданы на земле.");
+            "[Black Market]: Dirty money did not fit into inventory and was given out on the ground.");
     }
 
     Enterprise_TakeReserve(shopEnterpriseSlot, totalValue);
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Черный рынок]: Вы сбыли %d единиц товара за $%d грязными наличными.",
+        "[Black Market]: You sold %d units for $%d dirty cash.",
         totalAmount, totalValue);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Сбыт краденого товара на авторазборке #%d: %d единиц за $%d (грязные деньги).",
+        "Sale of stolen goods at a car disassembly #%d: %d units for $%d (dirty money).",
         Enterprise_GetDbId(shopEnterpriseSlot), totalAmount, totalValue);
     Audit_Log(
         Character_GetId(playerid),
@@ -1640,14 +1640,14 @@ static stock Internal_ReturnCargoToSource(playerid)
     new const vehicleId = Internal_GetPlayerDriverVehicle(playerid);
     if (vehicleId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Вы должны находиться за рулем фуры.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: You must be driving the truck.");
         return 0;
     }
 
     new const contractSlot = Internal_GetActiveContractSlot(playerid, true);
     if (contractSlot == INVALID_CONTRACT_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Нет активного контракта в пути.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: No active contract in transit.");
         return 0;
     }
 
@@ -1657,14 +1657,14 @@ static stock Internal_ReturnCargoToSource(playerid)
         !Enterprise_IsPlayerNearWarehouse(playerid, sourceEnterpriseSlot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Вернуть груз можно только на складе предприятия-отправителя.");
+            "[Logistics]: The goods can only be returned to the sending company’s warehouse.");
         return 0;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(sourceEnterpriseSlot);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Логистика]: Склад отправителя еще загружается.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Logistics]: The sender's warehouse is still loading.");
         return 0;
     }
 
@@ -1672,7 +1672,7 @@ static stock Internal_ReturnCargoToSource(playerid)
     if (!Storage_IsValidSlot(trunkSlot) || !Storage_AreItemsReady(trunkSlot) ||
         Storage_GetCurrentWeight(trunkSlot) <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: В кузове нет груза для возврата.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: There is no return cargo in the truck.");
         return 0;
     }
 
@@ -1684,7 +1684,7 @@ static stock Internal_ReturnCargoToSource(playerid)
     if (movedItems <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Не удалось вернуть груз на склад (склад переполнен или занят).");
+            "[Logistics]: The cargo could not be returned to the warehouse (the warehouse is full or busy).");
         return 0;
     }
 
@@ -1695,17 +1695,17 @@ static stock Internal_ReturnCargoToSource(playerid)
         sContractVehicle[contractSlot] = 0;
         Internal_UpdateContractDb(contractSlot);
         SendClientMessage(playerid, COLOR_UI_SUCCESS,
-            "[Логистика]: Груз возвращен на склад отправителя. Контракт снова свободен.");
+            "[Logistics]: The cargo has been returned to the sender's warehouse. The contract is free again.");
     }
     else
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Логистика]: Часть груза возвращена, остаток остается в кузове.");
+            "[Logistics]: Part of the cargo is returned, the rest remains in the body.");
     }
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Возврат груза по контракту #%d на склад отправителя (позиций: %d).",
+        "Return of cargo under contract #%d to the sender's warehouse (positions: %d).",
         sContracts[contractSlot][E_CONTRACT_DB_ID], movedItems);
     Audit_Log(
         Character_GetId(playerid),
@@ -1723,19 +1723,19 @@ static stock Internal_CancelContract(playerid)
     new const contractSlot = Internal_GetActiveContractSlot(playerid, false);
     if (contractSlot == INVALID_CONTRACT_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: У вас нет закрепленного контракта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: You do not have an assigned contract.");
         return 0;
     }
     if (sContracts[contractSlot][E_CONTRACT_STATUS] == CONTRACT_STATUS_IN_TRANSIT)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Нельзя отказаться от контракта с грузом в кузове. Сначала разгрузите его.");
+            "[Logistics]: You cannot refuse a contract with cargo in the back. Unload it first.");
         return 0;
     }
 
     sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] = 0;
     Internal_UpdateContractDb(contractSlot);
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Логистика]: Контракт освобожден.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "[Logistics]: Contract released.");
     return 1;
 }
 
@@ -2010,12 +2010,12 @@ CMD:contracts(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Мертвый персонаж не может работать с грузом.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: A dead character cannot handle cargo.");
         return 1;
     }
 
@@ -2050,7 +2050,7 @@ CMD:contracts(playerid, params[])
         }
         else
         {
-            format(sourceName, sizeof(sourceName), "Предприятие #%d",
+            format(sourceName, sizeof(sourceName), "Enterprise #%d",
                 sContracts[contractSlot][E_CONTRACT_SOURCE_ENT_DB_ID]);
         }
 
@@ -2058,14 +2058,14 @@ CMD:contracts(playerid, params[])
         Item_GetName(sContracts[contractSlot][E_CONTRACT_ITEM_DEF_ID], itemName);
 
         format(rowLine, sizeof(rowLine),
-            "#%d | %s -> %s | %s | количество: %d | вес: %d кг | %s",
+            "#%d | %s -> %s | %s | quantity: %d | weight: %d kg | %s",
             sContracts[contractSlot][E_CONTRACT_DB_ID],
             sourceName,
             destName,
             itemName,
             sContracts[contractSlot][E_CONTRACT_AMOUNT],
             sContracts[contractSlot][E_CONTRACT_TOTAL_WEIGHT_G] / 1000,
-            (sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] > 0) ? ("закреплен") : ("свободен"));
+            (sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] > 0) ? ("secured") : ("free"));
 
         strcat(sLogisticsDialogBuffer, rowLine, sizeof(sLogisticsDialogBuffer));
         strcat(sLogisticsDialogBuffer, "\n", sizeof(sLogisticsDialogBuffer));
@@ -2075,7 +2075,7 @@ CMD:contracts(playerid, params[])
     if (sContractDialogRowCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Логистика]: Свободных контрактов нет. Они появляются автоматически по мере накопления сырья.");
+            "[Logistics]: There are no free contracts. They appear automatically as raw materials accumulate.");
         return 1;
     }
 
@@ -2083,10 +2083,10 @@ CMD:contracts(playerid, params[])
         playerid,
         DIALOG_LOGISTICS_CONTRACTS,
         DIALOG_STYLE_LIST,
-        "Биржа грузоперевозок",
+        "Freight exchange",
         sLogisticsDialogBuffer,
-        "Взять контракт",
-        "Закрыть");
+        "Take a contract",
+        "Close");
     return 1;
 }
 alias:contracts("contract");
@@ -2095,12 +2095,12 @@ CMD:cargo(playerid, params[])
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Мертвый персонаж не может работать с грузом.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: A dead character cannot handle cargo.");
         return 1;
     }
 
@@ -2114,7 +2114,7 @@ CMD:cargo(playerid, params[])
     if (params[0] == '\0')
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "[Логистика]: Команды: /cargo load (погрузка), unload (разгрузка), return (возврат), hijack (перехват), sell (сбыт), cancel (отмена).");
+            "[Logistics]: Commands: /cargo load (loading), unload (unloading), return (return), hijack (interception), sell (sales), cancel (cancel).");
         return 1;
     }
 
@@ -2127,7 +2127,7 @@ CMD:cargo(playerid, params[])
         new const contractSlot = Internal_GetActiveContractSlot(playerid, true);
         if (contractSlot == INVALID_CONTRACT_SLOT)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Нет активного контракта в пути.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: No active contract in transit.");
             return 1;
         }
 
@@ -2159,7 +2159,7 @@ CMD:cargo(playerid, params[])
     else
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Логистика]: Неизвестное действие. Доступно: load — погрузка, unload — разгрузка, return — возврат, hijack — перехват, sell — сбыт, cancel — отмена.");
+            "[Logistics]: Unknown action. Available: load - loading, unload - unloading, return - return, hijack - interception, sell - sales, cancel - cancellation.");
     }
     return 1;
 }
@@ -2200,7 +2200,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         !sContracts[contractSlot][E_CONTRACT_VALID] ||
         sContracts[contractSlot][E_CONTRACT_STATUS] != CONTRACT_STATUS_OPEN)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Контракт больше недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: The contract is no longer available.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2208,7 +2208,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     if (sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] != 0 &&
         sContracts[contractSlot][E_CONTRACT_TRUCKER_CHAR_ID] != charId)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Логистика]: Этот контракт уже закреплен за другим водителем.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Logistics]: This contract is already assigned to another driver.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2223,7 +2223,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
              sContracts[otherSlot][E_CONTRACT_STATUS] == CONTRACT_STATUS_IN_TRANSIT))
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Логистика]: У вас уже есть активный контракт. Сначала завершите или отмените его.");
+                "[Logistics]: You already have an active contract. Complete or cancel it first.");
             return Y_HOOKS_BREAK_RETURN_1;
         }
     }
@@ -2234,11 +2234,11 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     new itemName[64], msg[192];
     Item_GetName(sContracts[contractSlot][E_CONTRACT_ITEM_DEF_ID], itemName);
     format(msg, sizeof(msg),
-        "[Логистика]: Контракт #%d закреплен за вами. Груз: %s (количество: %d).",
+        "[Logistics]: Contract #%d is assigned to you. Cargo: %s (quantity: %d).",
         sContracts[contractSlot][E_CONTRACT_DB_ID], itemName, sContracts[contractSlot][E_CONTRACT_AMOUNT]);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     SendClientMessage(playerid, COLOR_UI_INFO,
-        "[Логистика]: Подгоните фуру к складу отправителя и введите /cargo load.");
+        "[Logistics]: Drive the truck to the sender's warehouse and enter /cargo load.");
     return Y_HOOKS_BREAK_RETURN_1;
 }
 
@@ -2261,7 +2261,7 @@ hook OnGameModeInit()
         sLastLogisticsCommandTick[i] = 0;
     }
 
-    printf("%s [Systems/Logistics] Модуль логистики запущен (контрактов: %d, багажников: %d).",
+    printf("%s [Systems/Logistics] Logistics module launched (contracts: %d, trunks: %d).",
         SERVER_LOG_PREFIX, loadedContracts, loadedTrunks);
     return 1;
 }
@@ -2397,7 +2397,7 @@ hook OnVehicleDeath(vehicleid, killerid)
 
     if (returnedItems > 0)
     {
-        printf("%s [Systems/Logistics] Груз уничтоженного транспорта #%d (%d позиций) возвращен на склад отправителя.",
+        printf("%s [Systems/Logistics] The cargo of the destroyed vehicle #%d (%d positions) has been returned to the sender's warehouse.",
             SERVER_LOG_PREFIX, vehicleid, returnedItems);
         Audit_Log(
             0,
@@ -2406,12 +2406,12 @@ hook OnVehicleDeath(vehicleid, killerid)
             "ENTERPRISE_WAREHOUSE",
             0,
             returnedItems,
-            "Груз уничтоженного транспорта возвращен на склад предприятия-отправителя");
+            "The cargo of the destroyed vehicle was returned to the warehouse of the sending company");
     }
 
     if (droppedItems > 0)
     {
-        printf("%s [Systems/Logistics] Остаток груза уничтоженного транспорта #%d (%d позиций) выброшен на землю.",
+        printf("%s [Systems/Logistics] The remainder of the cargo of the destroyed vehicle #%d (%d positions) was thrown to the ground.",
             SERVER_LOG_PREFIX, vehicleid, droppedItems);
         Audit_Log(
             0,
@@ -2420,7 +2420,7 @@ hook OnVehicleDeath(vehicleid, killerid)
             "WORLD_DROP",
             0,
             droppedItems,
-            "Остаток груза уничтоженного транспорта перенесен в WORLD_DROP");
+            "The remainder of the cargo of the destroyed vehicle was moved to WORLD_DROP");
     }
     return 1;
 }

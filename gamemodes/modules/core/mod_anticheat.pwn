@@ -179,17 +179,17 @@ static stock Internal_GetViolationTitleRu(E_AC_VIOLATION:violation, output[], le
 {
     switch (violation)
     {
-        case AC_VIOL_WEAPON_HACK:   format(output, len, "Оружие, отсутствующее в инвентаре");
-        case AC_VIOL_AMMO_HACK:     format(output, len, "Подмена количества патронов");
-        case AC_VIOL_TELEPORT:      format(output, len, "Телепортация по карте");
-        case AC_VIOL_SPEEDHACK:     format(output, len, "Превышение серверной скорости");
-        case AC_VIOL_AIRBREAK:      format(output, len, "Полёт без транспорта (AirBreak)");
-        case AC_VIOL_GODMODE:       format(output, len, "Бессмертие (GodMode / NOP Damage)");
-        case AC_VIOL_VEHICLE_SPOOF: format(output, len, "Подмена идентификатора транспорта");
-        case AC_VIOL_PACKET_FLOOD:  format(output, len, "Флуд синхронизационными пакетами");
-        case AC_VIOL_DIALOG_FLOOD:  format(output, len, "Флуд ответами диалогов");
-        case AC_VIOL_COMMAND_FLOOD: format(output, len, "Флуд консольными командами");
-        default:                    format(output, len, "Неизвестное нарушение");
+        case AC_VIOL_WEAPON_HACK:   format(output, len, "Weapons not in inventory");
+        case AC_VIOL_AMMO_HACK:     format(output, len, "Changing the number of cartridges");
+        case AC_VIOL_TELEPORT:      format(output, len, "Teleportation on the map");
+        case AC_VIOL_SPEEDHACK:     format(output, len, "Exceeding server speed");
+        case AC_VIOL_AIRBREAK:      format(output, len, "Flight without vehicle (AirBreak)");
+        case AC_VIOL_GODMODE:       format(output, len, "Immortality (GodMode / NOP Damage)");
+        case AC_VIOL_VEHICLE_SPOOF: format(output, len, "Substitution of vehicle ID");
+        case AC_VIOL_PACKET_FLOOD:  format(output, len, "Flood with synchronization packets");
+        case AC_VIOL_DIALOG_FLOOD:  format(output, len, "Flood dialogue responses");
+        case AC_VIOL_COMMAND_FLOOD: format(output, len, "Flooding with console commands");
+        default:                    format(output, len, "Unknown violation");
     }
     return 1;
 }
@@ -371,7 +371,7 @@ static stock Internal_SendKickNotice(playerid, const title[])
 {
     new message[224];
     format(message, sizeof(message),
-        "[Античит]: Вы отключены от сервера системой защиты от читов. Причина: %s.",
+        "[Anticheat]: You have been disconnected from the server by the anti-cheat system. Reason: %s.",
         title);
     SendClientMessage(playerid, COLOR_UI_ERROR, message);
 }
@@ -421,7 +421,7 @@ static stock Internal_BanPlayer(playerid, E_AC_VIOLATION:violation, const detail
 
     new playerName[MAX_PLAYER_NAME + 1];
     GetPlayerName(playerid, playerName, sizeof(playerName));
-    printf("%s [Core/AntiCheat] БАН: игрок %s заблокирован. Причина: %s.",
+    printf("%s [Core/AntiCheat] BAN: player %s is banned. Reason: %s.",
         SERVER_LOG_PREFIX, playerName, reason);
 
     BanEx(playerid, reason);
@@ -474,12 +474,12 @@ static stock Internal_ApplyViolation(playerid, E_AC_VIOLATION:violation, const d
 
     new const charId = Character_IsLoaded(playerid) ? Character_GetId(playerid) : 0;
     format(auditDetails, sizeof(auditDetails),
-        "%s | Игрок: %s | Счёт: %d | %s",
+        "%s | Player: %s | Score: %d | %s",
         title, playerName, sAcPlayers[playerid][E_AC_SCORE], details);
 
     Audit_Log(charId, AC_AUDIT_ACTION, code, "CHARACTER", 0, sAcPlayers[playerid][E_AC_SCORE], auditDetails);
 
-    printf("%s [Core/AntiCheat] Нарушение %s у игрока %s (счёт %d): %s.",
+    printf("%s [Core/AntiCheat] Violation of %s for player %s (score %d): %s.",
         SERVER_LOG_PREFIX, code, playerName, sAcPlayers[playerid][E_AC_SCORE], details);
 
     if (severity >= AC_SEVERITY_CRITICAL || sAcPlayers[playerid][E_AC_SCORE] >= AC_SCORE_BAN_THRESHOLD)
@@ -499,7 +499,7 @@ static stock Internal_ApplyViolation(playerid, E_AC_VIOLATION:violation, const d
         sAcPlayers[playerid][E_AC_LAST_WARNING_TICK] = nowTick;
         new message[224];
         format(message, sizeof(message),
-            "[Античит]: Зафиксировано подозрительное действие (%s). Предупреждение %d из %d.",
+            "[Anticheat]: Suspicious activity detected (%s). Warning %d from %d.",
             title, sAcPlayers[playerid][E_AC_SCORE], AC_SCORE_KICK_THRESHOLD);
         SendClientMessage(playerid, COLOR_UI_WARNING, message);
     }
@@ -567,7 +567,7 @@ static stock bool:Internal_CheckWeaponOwnership(playerid, weaponid)
     {
         new details[160];
         format(details, sizeof(details),
-            "Клиент удерживает ствол ID %d, которого нет в Слое 1", weaponid);
+            "The client is holding trunk ID %d, which is not in Layer 1", weaponid);
         Internal_RegisterSyncMismatch(playerid, AC_VIOL_WEAPON_HACK, details);
         return false;
     }
@@ -662,7 +662,7 @@ static stock Internal_CheckHealthSync(playerid, clientHealth, clientArmour)
     {
         new details[192];
         format(details, sizeof(details),
-            "Клиент сообщает HP %d / броню %d, сервер: HP %.0f / броня %.0f",
+            "Client reports HP %d / armor %d, server: HP %.0f / armor %.0f",
             clientHealth, clientArmour, cachedHealth, cachedArmour);
         Internal_ApplyViolation(playerid, AC_VIOL_GODMODE, details);
 
@@ -684,7 +684,7 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
         !Internal_IsCoordValid(z, AC_WORLD_Z_MIN, AC_WORLD_Z_MAX))
     {
 #if AC_TELEPORT_CHECK_ENABLED
-        Internal_ApplyViolation(playerid, AC_VIOL_TELEPORT, "Координаты вне допустимых границ карты");
+        Internal_ApplyViolation(playerid, AC_VIOL_TELEPORT, "Coordinates are outside the valid boundaries of the map");
         return false;
 #else
         Internal_StorePosition(playerid, x, y, z, mode);
@@ -753,7 +753,7 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
 #if AC_TELEPORT_CHECK_ENABLED
         new details[176];
         format(details, sizeof(details),
-            "Мгновенное перемещение на %.1f м за %d мс", distance, elapsedMs);
+            "Instantaneous movement by %.1f m in %d ms", distance, elapsedMs);
         Internal_ApplyViolation(playerid, AC_VIOL_TELEPORT, details);
         Internal_StorePosition(playerid, x, y, z, mode);
         return false;
@@ -781,7 +781,7 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
         {
             new details[176];
             format(details, sizeof(details),
-                "Скорость пешком %.1f м/с при серверном лимите %.1f м/с",
+                "Walking speed %.1f m/s with server limit %.1f m/s",
                 horizontalSpeed, AC_FOOT_MAX_HORIZONTAL_SPEED);
             Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, details);
             Internal_StorePosition(playerid, x, y, z, mode);
@@ -796,7 +796,7 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
             {
                 new details[176];
                 format(details, sizeof(details),
-                    "Горизонтальный полёт %.1f м/с без вертикального падения",
+                    "Horizontal flight %.1f m/s without vertical fall",
                     horizontalSpeed);
                 Internal_ApplyViolation(playerid, AC_VIOL_AIRBREAK, details);
                 sAcPlayers[playerid][E_AC_AIRBREAK_SAMPLES] = 0;
@@ -818,7 +818,7 @@ static stock bool:Internal_ValidateMovement(playerid, Float:x, Float:y, Float:z,
         {
             new details[192];
             format(details, sizeof(details),
-                "Скорость транспорта %.1f м/с при серверном лимите %.1f м/с",
+                "Vehicle speed %.1f m/s with server limit %.1f m/s",
                 vehicleSpeed, speedLimit);
             Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, details);
             Internal_StorePosition(playerid, x, y, z, mode);
@@ -851,7 +851,7 @@ static stock bool:Internal_CheckPacketFlood(playerid)
     if (sAcPlayers[playerid][E_AC_PACKET_COUNT] > AC_MAX_PACKETS_PER_SECOND)
     {
         Internal_ApplyViolation(playerid, AC_VIOL_PACKET_FLOOD,
-            "Превышена частота входящих синхронизационных пакетов");
+            "The frequency of incoming synchronization packets has been exceeded");
         sAcPlayers[playerid][E_AC_PACKET_COUNT] = 0;
         return false;
     }
@@ -879,7 +879,7 @@ static stock bool:Internal_CheckDialogFlood(playerid)
     if (sAcPlayers[playerid][E_AC_DIALOG_COUNT] > AC_MAX_DIALOGS_PER_SECOND)
     {
         Internal_ApplyViolation(playerid, AC_VIOL_DIALOG_FLOOD,
-            "Превышена частота ответов на диалоговые окна");
+            "Dialog box response rate exceeded");
         sAcPlayers[playerid][E_AC_DIALOG_COUNT] = 0;
         return false;
     }
@@ -907,7 +907,7 @@ static stock bool:Internal_CheckCommandFlood(playerid)
     if (sAcPlayers[playerid][E_AC_COMMAND_COUNT] > AC_MAX_COMMANDS_PER_SECOND)
     {
         Internal_ApplyViolation(playerid, AC_VIOL_COMMAND_FLOOD,
-            "Превышена частота ввода консольных команд");
+            "The frequency of entering console commands has been exceeded");
         sAcPlayers[playerid][E_AC_COMMAND_COUNT] = 0;
         return false;
     }
@@ -1296,14 +1296,14 @@ static stock bool:Internal_RunIntegrationTests()
     sAcTestSerialFailures = Internal_TestWeaponSerialUniqueness();
     sAcTestsEverRan++;
 
-    printf("%s [Core/AntiCheat] Тесты 9.2: роли=%s (%d) | предметы=%s (%d) | экономика=%s (%d) | порты=%s (%d) | мьютексы=%s (%d) | серийники=%s (%d).",
+    printf("%s [Core/AntiCheat] Tests 9.2: roles=%s (%d) | items=%s (%d) | economy=%s (%d) | ports=%s (%d) | mutexes=%s (%d) | serial numbers=%s (%d).",
         SERVER_LOG_PREFIX,
-        (sAcTestRolesFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestRolesFailures,
-        (sAcTestItemsFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestItemsFailures,
-        (sAcTestEconomyFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestEconomyFailures,
-        (sAcTestPortsFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestPortsFailures,
-        (sAcTestMutexFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestMutexFailures,
-        (sAcTestSerialFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestSerialFailures);
+        (sAcTestRolesFailures == 0) ? ("OK") : ("ERROR"), sAcTestRolesFailures,
+        (sAcTestItemsFailures == 0) ? ("OK") : ("ERROR"), sAcTestItemsFailures,
+        (sAcTestEconomyFailures == 0) ? ("OK") : ("ERROR"), sAcTestEconomyFailures,
+        (sAcTestPortsFailures == 0) ? ("OK") : ("ERROR"), sAcTestPortsFailures,
+        (sAcTestMutexFailures == 0) ? ("OK") : ("ERROR"), sAcTestMutexFailures,
+        (sAcTestSerialFailures == 0) ? ("OK") : ("ERROR"), sAcTestSerialFailures);
 
     return AC_AreIntegrationTestsPassed();
 }
@@ -1373,14 +1373,14 @@ hook OnGameModeInit()
     defer AC_IntegrationTests();
 
 #if AC_RUNTIME_ENABLED
-    printf("%s [Core/AntiCheat] Сетевой античит Pawn.RakNet активирован (пакеты %d/%d/%d/%d).",
+    printf("%s [Core/AntiCheat] Network anti-cheat Pawn.RakNet is activated (packages %d/%d/%d/%d).",
         SERVER_LOG_PREFIX,
         AC_PACKET_VEHICLE_SYNC,
         AC_PACKET_AIM_SYNC,
         AC_PACKET_WEAPONS_UPDATE,
         AC_PACKET_PLAYER_SYNC);
 #else
-    printf("%s [Core/AntiCheat] Античит полностью отключён для тестирования: проверки, очки подозрений, кики и баны не работают.",
+    printf("%s [Core/AntiCheat] Anti-cheat is completely disabled for testing: checks, suspicion points, kicks and bans do not work.",
         SERVER_LOG_PREFIX);
 #endif
     return 1;
@@ -1595,7 +1595,7 @@ IPacket:200(playerid, BitStream:bs)
     {
         new details[176];
         format(details, sizeof(details),
-            "Клиент управляет авто ID %d, сервер подтверждает ID %d",
+            "The client controls car ID %d, the server confirms ID %d",
             syncData[PR_vehicleId], serverVehicleId);
         Internal_ApplyViolation(playerid, AC_VIOL_VEHICLE_SPOOF, details);
         return 0;
@@ -1632,7 +1632,7 @@ IPacket:203(playerid, BitStream:bs)
 
     if (aimData[PR_camMode] > 4)
     {
-        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Недопустимый режим камеры в пакете прицеливания");
+        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Invalid camera mode in aim pack");
         return 0;
     }
 
@@ -1643,7 +1643,7 @@ IPacket:203(playerid, BitStream:bs)
 
     if (!(vectorLength >= 0.5) || !(vectorLength <= 1.5))
     {
-        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Некорректный вектор направления камеры");
+        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Incorrect camera direction vector");
         return 0;
     }
 
@@ -1655,7 +1655,7 @@ IPacket:203(playerid, BitStream:bs)
         !Internal_IsCoordValid(cy, AC_WORLD_BOUND_MIN, AC_WORLD_BOUND_MAX) ||
         !Internal_IsCoordValid(cz, AC_WORLD_Z_MIN, AC_WORLD_Z_MAX))
     {
-        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Позиция камеры вне границ карты");
+        Internal_ApplyViolation(playerid, AC_VIOL_SPEEDHACK, "Camera position outside the map boundaries");
         return 0;
     }
     return 1;
@@ -1695,7 +1695,7 @@ IPacket:204(playerid, BitStream:bs)
         {
             new details[176];
             format(details, sizeof(details),
-                "Клиентский слот %d содержит ствол ID %d без предмета в Слое 1",
+                "Client slot %d contains barrel ID %d without item in Layer 1",
                 slotId, weaponid);
             Internal_RegisterSyncMismatch(playerid, AC_VIOL_WEAPON_HACK, details);
             return 0;
@@ -1709,7 +1709,7 @@ IPacket:204(playerid, BitStream:bs)
         {
             new details[176];
             format(details, sizeof(details),
-                "Клиент сообщает %d патронов, в Слое 1 хранится %d",
+                "The client reports %d cartridges, Layer 1 stores %d",
                 clientAmmo, serverAmmo);
             Internal_RegisterSyncMismatch(playerid, AC_VIOL_AMMO_HACK, details);
             return 0;
@@ -1730,20 +1730,20 @@ CMD:acstats(playerid, params[])
 
     if (!Account_IsLogged(playerid) || Account_GetAdminLevel(playerid) < 3)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Античит]: Команда доступна только администраторам.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Anticheat]: The command is available only to administrators.");
         return 1;
     }
 
     if (!Internal_IsAntiCheatEnabled())
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Античит]: Модуль полностью отключён для тестирования. Проверки, очки и кики не работают.");
+            "[Anticheat]: The module is completely disabled for testing. Checks, points and kicks do not work.");
         return 1;
     }
 
     new message[208];
     format(message, sizeof(message),
-        "[Античит]: Проверено пакетов: %d | Нарушений: %d | Киков: %d | Банов: %d.",
+        "[Anti-cheat]: Packets checked: %d | Violations: %d | Kicks: %d | Bans: %d.",
         sAcPacketsChecked, sAcTotalViolations, sAcTotalKicks, sAcTotalBans);
     SendClientMessage(playerid, COLOR_UI_INFO, message);
 
@@ -1755,13 +1755,13 @@ CMD:acstats(playerid, params[])
             continue;
         }
         Internal_GetViolationTitleRu(E_AC_VIOLATION:i, title, sizeof(title));
-        format(message, sizeof(message), "[Античит]: %s — %d.", title, sAcViolationCounts[E_AC_VIOLATION:i]);
+        format(message, sizeof(message), "[Anticheat]: %s - %d.", title, sAcViolationCounts[E_AC_VIOLATION:i]);
         SendClientMessage(playerid, COLOR_UI_INFO, message);
     }
 
     format(message, sizeof(message),
-        "[Античит]: Интеграционные тесты 9.2: %s.",
-        AC_AreIntegrationTestsPassed() ? ("ПРОЙДЕНЫ") : ("НЕ ПРОЙДЕНЫ"));
+        "[Anticheat]: Integration tests 9.2: %s.",
+        AC_AreIntegrationTestsPassed() ? ("PASSED") : ("FAILED"));
     SendClientMessage(playerid, AC_AreIntegrationTestsPassed() ? COLOR_UI_SUCCESS : COLOR_UI_ERROR, message);
     return 1;
 }
@@ -1772,14 +1772,14 @@ CMD:actest(playerid, params[])
 
     if (!Account_IsLogged(playerid) || Account_GetAdminLevel(playerid) < 3)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Античит]: Команда доступна только администраторам.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Anticheat]: The command is available only to administrators.");
         return 1;
     }
 
     if (!Internal_IsAntiCheatEnabled())
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Античит]: Модуль полностью отключён для тестирования. Запуск проверок недоступен.");
+            "[Anticheat]: The module is completely disabled for testing. Running checks is not available.");
         return 1;
     }
 
@@ -1787,24 +1787,24 @@ CMD:actest(playerid, params[])
 
     new message[208];
     format(message, sizeof(message),
-        "[Античит/9.2] Роли: %s (%d) | Предметы: %s (%d) | Экономика: %s (%d).",
-        (sAcTestRolesFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestRolesFailures,
-        (sAcTestItemsFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestItemsFailures,
-        (sAcTestEconomyFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestEconomyFailures);
+        "[Anticheat/9.2] Roles: %s (%d) | Items: %s (%d) | Economy: %s (%d).",
+        (sAcTestRolesFailures == 0) ? ("OK") : ("ERROR"), sAcTestRolesFailures,
+        (sAcTestItemsFailures == 0) ? ("OK") : ("ERROR"), sAcTestItemsFailures,
+        (sAcTestEconomyFailures == 0) ? ("OK") : ("ERROR"), sAcTestEconomyFailures);
     SendClientMessage(playerid, COLOR_UI_INFO, message);
 
     format(message, sizeof(message),
-        "[Античит/9.2] Порты: %s (%d) | Мьютексы 24x20: %s (%d) | Серийные номера: %s (%d).",
-        (sAcTestPortsFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestPortsFailures,
-        (sAcTestMutexFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestMutexFailures,
-        (sAcTestSerialFailures == 0) ? ("ОК") : ("ОШИБКА"), sAcTestSerialFailures);
+        "[Anticheat/9.2] Ports: %s (%d) | Mutexes 24x20: %s (%d) | Serial numbers: %s (%d).",
+        (sAcTestPortsFailures == 0) ? ("OK") : ("ERROR"), sAcTestPortsFailures,
+        (sAcTestMutexFailures == 0) ? ("OK") : ("ERROR"), sAcTestMutexFailures,
+        (sAcTestSerialFailures == 0) ? ("OK") : ("ERROR"), sAcTestSerialFailures);
     SendClientMessage(playerid, COLOR_UI_INFO, message);
 
     SendClientMessage(playerid,
         AC_AreIntegrationTestsPassed() ? COLOR_UI_SUCCESS : COLOR_UI_ERROR,
         AC_AreIntegrationTestsPassed()
-            ? "[Античит/9.2] Все автоматические проверки пройдены."
-            : "[Античит/9.2] Обнаружены ошибки интеграционных проверок, см. консоль сервера.");
+            ? "[Anticheat/9.2] All automatic checks passed."
+            : "[Anticheat/9.2] Integration check errors detected, see server console.");
     return 1;
 }
 

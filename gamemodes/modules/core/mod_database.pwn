@@ -170,13 +170,13 @@ static stock Internal_ConnectDatabase()
 
         new activeCharset[32];
         mysql_get_charset(activeCharset, sizeof(activeCharset), gMySQL);
-        printf("%s [Core/Database] Успешное подключение к СУБД %s@%s:%d/%s (кодировка клиента: %s, потоков: %d).",
+        printf("%s [Core/Database] Successful connection to the DBMS %s@%s:%d/%s (client encoding: %s, threads: %d).",
             SERVER_LOG_PREFIX, user, host, port, db, activeCharset, MYSQL_ASYNC_POOL_THREADS);
     }
     else
     {
         sDatabaseConnected = false;
-        printf("%s [Core/Database] [WARN] СУБД MySQL недоступна (код ошибки: %d). Активирован автономный RAM-режим.",
+        printf("%s [Core/Database] [WARN] MySQL DBMS is unavailable (error code: %d). Offline RAM mode is activated.",
             SERVER_LOG_PREFIX, errno);
     }
 }
@@ -214,7 +214,7 @@ stock bool:DB_EnqueueDirtyQuery(E_DIRTY_ENTITY_TYPE:entityType, entityId, const 
     new const freeSlot = Iter_Free(sDirtyQueueIter);
     if (freeSlot == INVALID_ITERATOR_SLOT)
     {
-        printf("%s [Core/Database] [WARN] Очередь Dirty-Flag переполнена (%d)! Выполняется внеочередной сброс.",
+        printf("%s [Core/Database] [WARN] Dirty-Flag queue is full (%d)! An emergency reset is in progress.",
             SERVER_LOG_PREFIX, MAX_DIRTY_QUEUE_ENTRIES);
         DB_FlushDirtyBatch(DIRTY_FLUSH_BATCH_LIMIT);
 
@@ -301,12 +301,12 @@ stock DB_FlushAllDirtySync()
         new pending = mysql_unprocessed_queries(gMySQL);
         if (pending > 0)
         {
-            printf("%s [Core/Database] Ожидание завершения %d фоновых SQL-транзакций перед закрытием пула...",
+            printf("%s [Core/Database] Waiting for %d background SQL transactions to complete before closing the pool...",
                 SERVER_LOG_PREFIX, pending);
         }
     }
 
-    printf("%s [Core/Database] Выполнено принудительное сохранение очереди Dirty-Flag (обновлено сущностей: %d).",
+    printf("%s [Core/Database] Forced save of Dirty-Flag queue (updated entities: %d).",
         SERVER_LOG_PREFIX, totalFlushed);
     return totalFlushed;
 }
@@ -330,7 +330,7 @@ public OnDatabaseDirtyQueryFlushed(entityType, entityId)
 public OnQueryError(errorid, const error[], const callback[], const query[], MySQL:handle)
 {
     #pragma unused handle
-    printf("%s [SQL ERROR #%d] Колбек: '%s' | Ошибка: %s | Запрос: %s",
+    printf("%s [SQL ERROR #%d] Callback: '%s' | Error: %s | Request: %s",
         SERVER_LOG_PREFIX,
         errorid,
         (callback[0] != '\0') ? callback : "none",

@@ -139,7 +139,7 @@ static stock Internal_GetRoleplayName(playerid, output[], len = sizeof(output))
 {
     if (Survival_IsMasked(playerid))
     {
-        format(output, len, "Неизвестный в маске #%d", 100 + playerid);
+        format(output, len, "Unknown in mask #%d", 100 + playerid);
         return 1;
     }
 
@@ -259,7 +259,7 @@ CMD:inv(playerid, params[])
     #pragma unused params
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Your character has not yet been loaded.");
         return 1;
     }
     Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
@@ -278,11 +278,11 @@ CMD:hud(playerid, params[])
     HUD_SetVisible(playerid, nextState);
     if (nextState)
     {
-        SendClientMessage(playerid, COLOR_SUCCESS, "[Интерфейс]: Текстовый HUD выживания включен.");
+        SendClientMessage(playerid, COLOR_SUCCESS, "[UI]: Text survival HUD enabled.");
     }
     else
     {
-        SendClientMessage(playerid, COLOR_INFO, "[Интерфейс]: Текстовый HUD выживания скрыт.");
+        SendClientMessage(playerid, COLOR_INFO, "[UI]: Survival text HUD is hidden.");
     }
     return 1;
 }
@@ -295,26 +295,26 @@ CMD:radio(playerid, params[])
     }
     if (!Internal_HasItemInLayer1(playerid, ITEM_ID_WALKIE_TALKIE))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Связь]: В вашем внешнем инвентаре (Слой 1) нет портативной рации!");
+        SendClientMessage(playerid, COLOR_ERROR, "[Communication]: There is no walkie-talkie in your external inventory (Layer 1)!");
         return 1;
     }
 
     new freqKhz = 0;
     if (!Internal_ParseSingleInt(params, freqKhz) || freqKhz < 0 || freqKhz > 999999)
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /radio [частота в кГц, например 104500, либо 0 для выключения]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /radio [frequency in kHz, for example 104500, or 0 to turn off]");
         return 1;
     }
 
     Survival_SetRadioFreqKhz(playerid, freqKhz);
     if (freqKhz == 0)
     {
-        SendClientMessage(playerid, COLOR_INFO, "[Связь]: Портативная рация выключена.");
+        SendClientMessage(playerid, COLOR_INFO, "[Communication]: The walkie-talkie is turned off.");
     }
     else
     {
         new msg[128];
-        format(msg, sizeof(msg), "[Связь]: Вы настроили рацию на частоту %d.%03d МГц (%d кГц).", freqKhz / 1000, freqKhz % 1000, freqKhz);
+        format(msg, sizeof(msg), "[Communication]: You have tuned the radio to the frequency %d.%03d MHz (%d kHz).", freqKhz / 1000, freqKhz % 1000, freqKhz);
         SendClientMessage(playerid, COLOR_SUCCESS, msg);
     }
     return 1;
@@ -331,7 +331,7 @@ CMD:me(playerid, params[])
     new actionText[128];
     if (!Internal_ParseTrimmedText(params, actionText, sizeof(actionText)) || strlen(actionText) < 2)
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /me [действие от первого лица]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /me [first person action]");
         return 1;
     }
 
@@ -352,7 +352,7 @@ CMD:do(playerid, params[])
     new descText[128];
     if (!Internal_ParseTrimmedText(params, descText, sizeof(descText)) || strlen(descText) < 2)
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /do [описание окружения или эффекта от третьего лица]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /do [describing the environment or effect from a third person]");
         return 1;
     }
 
@@ -373,7 +373,7 @@ CMD:try(playerid, params[])
     new attemptText[112];
     if (!Internal_ParseTrimmedText(params, attemptText, sizeof(attemptText)) || strlen(attemptText) < 2)
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /try [попытка действия с вероятностным исходом]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /try [attempt to perform an action with a probabilistic outcome]");
         return 1;
     }
 
@@ -384,11 +384,11 @@ CMD:try(playerid, params[])
     new resultTag[32];
     if (isSuccess)
     {
-        format(resultTag, sizeof(resultTag), "{66BB6A}[Удачно]");
+        format(resultTag, sizeof(resultTag), "{66BB6A}[Successful]");
     }
     else
     {
-        format(resultTag, sizeof(resultTag), "{EF5350}[Неудачно]");
+        format(resultTag, sizeof(resultTag), "{EF5350}[Failed]");
     }
 
     new outMsg[192];
@@ -404,14 +404,14 @@ CMD:todo(playerid, params[])
     new fullText[144];
     if (!Internal_ParseTrimmedText(params, fullText, sizeof(fullText)) || strlen(fullText) < 3)
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /todo [фраза]*[действие]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /todo [phrase]*[action]");
         return 1;
     }
 
     new starPos = strfind(fullText, "*", true);
     if (starPos <= 0 || fullText[starPos + 1] == '\0')
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /todo [фраза]*[действие] (разделите фразу и действие звездочкой *)");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /todo [phrase]*[action] (separate the phrase and action with an asterisk *)");
         return 1;
     }
 
@@ -424,7 +424,7 @@ CMD:todo(playerid, params[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new outMsg[220];
-    format(outMsg, sizeof(outMsg), "— «%s», — сказал(а) %s, {C2A2DA}%s", speechPart, rpName, actionPart);
+    format(outMsg, sizeof(outMsg), "— “%s,” said %s, {C2A2DA}%s", speechPart, rpName, actionPart);
     Commands_SendProximityMessage(playerid, RP_RADIUS_NORMAL, COLOR_RP_TALK, outMsg);
     SetPlayerChatBubble(playerid, speechPart, COLOR_RP_TALK, RP_RADIUS_NORMAL, 6000);
     return 1;
@@ -437,7 +437,7 @@ CMD:b(playerid, params[])
     new oocText[128];
     if (!Internal_ParseTrimmedText(params, oocText, sizeof(oocText)))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /b [внеигровое OOC-сообщение]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /b [out-of-game OOC message]");
         return 1;
     }
 
@@ -457,7 +457,7 @@ CMD:shout(playerid, params[])
     new shoutText[128];
     if (!Internal_ParseTrimmedText(params, shoutText, sizeof(shoutText)))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /s [текст крика]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /s [scream text]");
         return 1;
     }
 
@@ -465,7 +465,7 @@ CMD:shout(playerid, params[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new outMsg[192];
-    format(outMsg, sizeof(outMsg), "%s [%d] кричит: %s!", rpName, playerid, shoutText);
+    format(outMsg, sizeof(outMsg), "%s [%d] shouts: %s!", rpName, playerid, shoutText);
     Commands_SendProximityMessage(playerid, RP_RADIUS_SHOUT, COLOR_RP_SHOUT, outMsg);
     SetPlayerChatBubble(playerid, shoutText, COLOR_RP_SHOUT, RP_RADIUS_SHOUT, 7000);
     ApplyAnimation(playerid, "ON_LOOKERS", "shout_01", 4.1, false, false, false, false, 0, SYNC_ALL);
@@ -480,7 +480,7 @@ CMD:whisper(playerid, params[])
     new whisperText[128];
     if (!Internal_ParseTrimmedText(params, whisperText, sizeof(whisperText)))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /w [текст шепота]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /w [whisper text]");
         return 1;
     }
 
@@ -488,7 +488,7 @@ CMD:whisper(playerid, params[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new outMsg[192];
-    format(outMsg, sizeof(outMsg), "%s [%d] шепчет: %s", rpName, playerid, whisperText);
+    format(outMsg, sizeof(outMsg), "%s [%d] whispers: %s", rpName, playerid, whisperText);
     Commands_SendProximityMessage(playerid, RP_RADIUS_WHISPER, COLOR_RP_WHISPER, outMsg);
     return 1;
 }
@@ -505,17 +505,17 @@ CMD:cuff(playerid, params[])
     new targetid = INVALID_PLAYER_ID;
     if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /cuff [id игрока]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /cuff [player id]");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Вы не можете надеть наручники на самого себя.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Bug]: You cannot handcuff yourself.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Игрок находится слишком далеко от вас.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far away from you.");
         return 1;
     }
 
@@ -523,7 +523,7 @@ CMD:cuff(playerid, params[])
     {
         if (!Internal_HasItemInLayer1(playerid, ITEM_ID_HANDCUFFS))
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: У вас в Слое 1 нет стальных наручников!");
+            SendClientMessage(playerid, COLOR_ERROR, "[Error]: You don't have steel handcuffs in Layer 1!");
             return 1;
         }
         Survival_SetCuffed(targetid, true);
@@ -534,7 +534,7 @@ CMD:cuff(playerid, params[])
         Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
         new rpMsg[160];
-        format(rpMsg, sizeof(rpMsg), "* %s завел(а) руки %s за спину и защелкнул(а) стальные наручники.", actorName, targetName);
+        format(rpMsg, sizeof(rpMsg), "* %s put %s's hands behind his back and snapped the steel handcuffs.", actorName, targetName);
         Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
     }
     else
@@ -547,7 +547,7 @@ CMD:cuff(playerid, params[])
         Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
         new rpMsg[160];
-        format(rpMsg, sizeof(rpMsg), "* %s снял(а) стальные наручники с запястий %s.", actorName, targetName);
+        format(rpMsg, sizeof(rpMsg), "* %s removed the steel handcuffs from %s's wrists.", actorName, targetName);
         Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
     }
     return 1;
@@ -562,24 +562,24 @@ CMD:frisk(playerid, params[])
     if (!Character_IsLoaded(playerid)) return 1;
     if (Survival_IsCuffed(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Вы скованы наручниками и не можете проводить досмотр.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You are handcuffed and cannot conduct a search.");
         return 1;
     }
 
     new targetid = INVALID_PLAYER_ID;
     if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /frisk [id игрока]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /frisk [player id]");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Для просмотра своего инвентаря используйте /inv.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Bug]: Use /inv to view your inventory.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Игрок находится слишком далеко от вас (максимум 3.0 м).");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
         return 1;
     }
 
@@ -589,7 +589,7 @@ CMD:frisk(playerid, params[])
     Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
     new rpMsg[160];
-    format(rpMsg, sizeof(rpMsg), "* %s прохлопал(а) верхнюю одежду и внешние карманы %s.", actorName, targetName);
+    format(rpMsg, sizeof(rpMsg), "* %s patted outer clothing and external pockets %s.", actorName, targetName);
     Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
 
     Dialogs_OpenSearchTarget(playerid, targetid, false, false);
@@ -606,31 +606,31 @@ CMD:search(playerid, params[])
     if (!Character_IsLoaded(playerid)) return 1;
     if (Survival_IsCuffed(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Вы скованы наручниками.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You are handcuffed.");
         return 1;
     }
 
     new targetid = INVALID_PLAYER_ID;
     if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /search [id игрока]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /search [player id]");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Нельзя обыскивать самого себя.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You cannot search yourself.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Игрок находится слишком далеко от вас (максимум 3.0 м).");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
         return 1;
     }
 
     new bool:isTargetRestrained = Survival_IsCuffed(targetid) || (GetPlayerSpecialAction(targetid) == SPECIAL_ACTION_HANDSUP);
     if (!isTargetRestrained)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: Для полного обыска (/search) цель должна быть в наручниках (/cuff) или с поднятыми руками!");
+        SendClientMessage(playerid, COLOR_ERROR, "[Search]: For a full search (/search), the target must be handcuffed (/cuff) or with their hands up!");
         return 1;
     }
 
@@ -641,7 +641,7 @@ CMD:search(playerid, params[])
     if (Roles_HasPerk(targetRole, PERK_DOUBLE_LAYER2) && !Roles_HasPerk(actorRole, PERK_COP_SENSE))
     {
         includeLayer2 = false;
-        SendClientMessage(playerid, COLOR_WARNING, "[Обыск]: Персонаж умело спрятал потайной карман (Слой 2) от непрофессионального обыска.");
+        SendClientMessage(playerid, COLOR_WARNING, "[Search]: The character skillfully hid the secret pocket (Layer 2) from unprofessional search.");
     }
 
     new actorName[MAX_PLAYER_NAME + 8];
@@ -650,7 +650,7 @@ CMD:search(playerid, params[])
     Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
     new rpMsg[160];
-    format(rpMsg, sizeof(rpMsg), "* %s проводит тщательный обыск всех карманов и вещей %s.", actorName, targetName);
+    format(rpMsg, sizeof(rpMsg), "* %s conducts a thorough search of all %s's pockets and belongings.", actorName, targetName);
     Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
 
     Dialogs_OpenSearchTarget(playerid, targetid, includeLayer2, true);
@@ -666,31 +666,31 @@ CMD:pickpocket(playerid, params[])
     if (!Character_IsLoaded(playerid)) return 1;
     if (Survival_IsCuffed(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Ваши руки скованы наручниками.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Your hands are handcuffed.");
         return 1;
     }
 
     new targetid = INVALID_PLAYER_ID;
     if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /pickpocket [id игрока]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /pickpocket [player id]");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Нельзя обокрасть самого себя.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You can't rob yourself.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > 2.2)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Карманник]: Подойдите вплотную к жертве (не далее 2.2 м).");
+        SendClientMessage(playerid, COLOR_ERROR, "[Pickpocket]: Get close to the victim (no further than 2.2 m).");
         return 1;
     }
 
     new roleId = Character_GetRoleId(playerid);
     if (Roles_IsValidId(roleId) && gRoleConfigs[roleId - 1][E_ROLE_ZERO_CRIMINAL_SKILLS])
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Роль]: Принципы вашей стартовой роли запрещают совершать карманные кражи.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Role]: Your starting role rules prohibit pickpocketing.");
         return 1;
     }
 
@@ -699,7 +699,7 @@ CMD:pickpocket(playerid, params[])
     {
         new waitSec = PICKPOCKET_COOLDOWN_SEC - (nowTs - sLastPickpocketTime[playerid]);
         new cdMsg[128];
-        format(cdMsg, sizeof(cdMsg), "[Карманник]: Вы недавно совершали попытку кражи. Подождите еще %d сек.", waitSec);
+        format(cdMsg, sizeof(cdMsg), "[Pickpocket]: You recently attempted theft. Wait another %d seconds.", waitSec);
         SendClientMessage(playerid, COLOR_WARNING, cdMsg);
         return 1;
     }
@@ -731,7 +731,7 @@ CMD:pickpocket(playerid, params[])
 
     if (stealItemSlot == INVALID_ITEM_SLOT)
     {
-        SendClientMessage(playerid, COLOR_GRAY, "[Карманник]: Во внешних карманах (Слой 1) этой жертвы нет мелких ценностей или наличных.");
+        SendClientMessage(playerid, COLOR_GRAY, "[Pickpocket]: There are no small valuables or cash in this victim's outer pockets (Layer 1).");
         return 1;
     }
 
@@ -764,11 +764,11 @@ CMD:pickpocket(playerid, params[])
             new msg[160];
             if (defId == ITEM_ID_CASH_BUNDLE)
             {
-                format(msg, sizeof(msg), "[Карманник]: Вы незаметно вытащили $%d наличными из внешнего кармана жертвы!", stealAmt);
+                format(msg, sizeof(msg), "[Pickpocket]: You quietly took $%d cash from the victim's outside pocket!", stealAmt);
             }
             else
             {
-                format(msg, sizeof(msg), "[Карманник]: Вы незаметно вытащили «%s» (%d шт.) из кармана жертвы!", itemName, stealAmt);
+                format(msg, sizeof(msg), "[Pickpocket]: You quietly took \"%s\" (%d pcs.) from the victim's pocket!", itemName, stealAmt);
             }
             SendClientMessage(playerid, COLOR_SUCCESS, msg);
 
@@ -782,18 +782,18 @@ CMD:pickpocket(playerid, params[])
                 dstTag,
                 defId,
                 stealAmt,
-                "Карманная кража из Слоя 1"
+                "Pickpocketing from Layer 1"
             );
 
             // Если нет перка уличного карманника, есть малый шанс, что жертва заметит пропажу позже
             if (!hasPerk && random(100) < 35)
             {
-                SendClientMessage(targetid, COLOR_WARNING, "[Интуиция]: Вам показалось, что кто-то только что коснулся вашего кармана.");
+                SendClientMessage(targetid, COLOR_WARNING, "[Intuition]: It seemed to you that someone had just touched your pocket.");
             }
         }
         else
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Карманник]: В ваших руках нет свободного места, чтобы спрятать украденное.");
+            SendClientMessage(playerid, COLOR_ERROR, "[Pickpocket]: There is no free space in your hands to hide your stolen goods.");
         }
     }
     else
@@ -805,9 +805,9 @@ CMD:pickpocket(playerid, params[])
         Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
         new alertMsg[160];
-        format(alertMsg, sizeof(alertMsg), "* %s заметил(а) руку %s в своем кармане!", targetName, actorName);
+        format(alertMsg, sizeof(alertMsg), "* %s noticed %s's hand in his pocket!", targetName, actorName);
         Commands_SendProximityMessage(playerid, RP_RADIUS_NORMAL, COLOR_WARNING, alertMsg);
-        SendClientMessage(playerid, COLOR_ERROR, "[Карманник]: Неудача! Жертва почувствовала вашу руку в кармане.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Pickpocket]: Bad luck! The victim felt your hand in his pocket.");
     }
     return 1;
 }
@@ -821,29 +821,29 @@ static stock Internal_TransferHandCash(playerid, targetid, amount_usd)
     if (!Character_IsLoaded(playerid)) return 0;
     if (Survival_IsCuffed(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Ваши руки скованы наручниками.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Your hands are handcuffed.");
         return 1;
     }
     if (targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid) || targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Укажите корректного получателя рядом с вами.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Please enter a valid recipient near you.");
         return 1;
     }
     if (amount_usd <= 0 || amount_usd > 1000000)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Сумма передачи должна быть от $1 до $1,000,000.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Transfer amount must be between $1 and $1,000,000.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Ошибка]: Игрок находится слишком далеко от вас (максимум 3.0 м).");
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
         return 1;
     }
 
     new availCash = Character_GetPhysicalCashUsd(playerid);
     if (availCash < amount_usd)
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Наличные]: У вас недостаточно физических банкнот в инвентаре!");
+        SendClientMessage(playerid, COLOR_ERROR, "[Cash]: You don't have enough physical banknotes in your inventory!");
         return 1;
     }
 
@@ -855,7 +855,7 @@ static stock Internal_TransferHandCash(playerid, targetid, amount_usd)
 
     if (!Internal_RemovePhysicalCash(playerid, amount_usd))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Наличные]: Ошибка списания пачки банкнот из инвентаря.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Cash]: Error debiting a stack of banknotes from inventory.");
         return 1;
     }
 
@@ -883,7 +883,7 @@ static stock Internal_TransferHandCash(playerid, targetid, amount_usd)
             0,
             "USD_CASH"
         );
-        SendClientMessage(playerid, COLOR_ERROR, "[Наличные]: У получателя нет места в инвентаре (Слой 1) для пачки банкнот.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Cash]: The recipient does not have space in their inventory (Layer 1) for a stack of banknotes.");
         return 1;
     }
 
@@ -899,13 +899,13 @@ static stock Internal_TransferHandCash(playerid, targetid, amount_usd)
     Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
 
     new msg[160];
-    format(msg, sizeof(msg), "[Наличные]: Вы передали %s наличными игроку %s [%d].", moneyStr, targetName, targetid);
+    format(msg, sizeof(msg), "[Cash]: You gave %s cash to player %s [%d].", moneyStr, targetName, targetid);
     SendClientMessage(playerid, COLOR_SUCCESS, msg);
 
-    format(msg, sizeof(msg), "[Наличные]: Игрок %s [%d] передал вам %s наличными.", actorName, playerid, moneyStr);
+    format(msg, sizeof(msg), "[Cash]: Player %s [%d] gave you %s cash.", actorName, playerid, moneyStr);
     SendClientMessage(targetid, COLOR_SUCCESS, msg);
 
-    format(msg, sizeof(msg), "* %s достал(а) пачку банкнот и передал(а) ее %s.", actorName, targetName);
+    format(msg, sizeof(msg), "* %s took out a stack of banknotes and handed it to %s.", actorName, targetName);
     Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, msg);
 
     new srcTag[32], dstTag[32];
@@ -918,7 +918,7 @@ static stock Internal_TransferHandCash(playerid, targetid, amount_usd)
         dstTag,
         ITEM_ID_CASH_BUNDLE,
         amount_usd,
-        "Передача физических наличных из рук в руки"
+        "Transfer of physical cash from hand to hand"
     );
     return 1;
 }
@@ -929,7 +929,7 @@ CMD:pay(playerid, params[])
     new amount = 0;
     if (!Internal_ParseTwoInts(params, targetid, amount))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /pay [id игрока] [сумма наличных USD]");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /pay [player id] [cash amount USD]");
         return 1;
     }
     return Internal_TransferHandCash(playerid, targetid, amount);
@@ -941,7 +941,7 @@ CMD:give(playerid, params[])
     new amount = 0;
     if (!Internal_ParseTwoInts(params, targetid, amount))
     {
-        SendClientMessage(playerid, COLOR_INFO, "Использование: /give [id игрока] [сумма USD] (для передачи предметов: /inv -> предмет -> «Передать человеку рядом»).");
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /give [player id] [USD amount] (to transfer items: /inv -> item -> “Give to the person nearby”).");
         return 1;
     }
     return Internal_TransferHandCash(playerid, targetid, amount);
@@ -953,7 +953,7 @@ CMD:give(playerid, params[])
 
 hook OnGameModeInit()
 {
-    printf("%s [UI/Commands] Зарегистрированы ролевые и инвентарные команды (/inv, /i, /me, /do, /try, /todo, /b, /s, /w, /frisk, /search, /pickpocket, /pay, /give).",
+    printf("%s [UI/Commands] Registered role and inventory commands (/inv, /i, /me, /do, /try, /todo, /b, /s, /w, /frisk, /search, /pickpocket, /pay, /give).",
         SERVER_LOG_PREFIX);
     return 1;
 }
@@ -962,7 +962,7 @@ hook OnPlayerText(playerid, text[])
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Чат]: Вы сможете писать в ролевой чат после входа в игровой мир.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Chat]: You will be able to write in the role-playing chat after entering the game world.");
         return 0;
     }
 
@@ -970,7 +970,7 @@ hook OnPlayerText(playerid, text[])
     Internal_GetRoleplayName(playerid, rpName, sizeof(rpName));
 
     new chatLine[192];
-    format(chatLine, sizeof(chatLine), "— %s [%d] говорит: %s", rpName, playerid, text);
+    format(chatLine, sizeof(chatLine), "— %s [%d] says: %s", rpName, playerid, text);
     Commands_SendProximityMessage(playerid, RP_RADIUS_NORMAL, COLOR_RP_TALK, chatLine);
     SetPlayerChatBubble(playerid, text, COLOR_RP_TALK, RP_RADIUS_NORMAL, 5500);
     return 0;

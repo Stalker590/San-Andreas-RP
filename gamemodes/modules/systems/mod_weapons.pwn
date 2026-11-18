@@ -309,7 +309,7 @@ hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hiti
         {
             sLastJamNoticeTick[playerid] = nowTick;
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "[Оружие]: Затвор заклинило. Передерните его и повторите попытку через мгновение.");
+                "[Weapon]: The bolt is jammed. Jerk it and try again in a moment.");
         }
         return 0;
     }
@@ -319,7 +319,7 @@ hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hiti
     {
         // Server-Authoritative: оружия нет в Слое 1 — выстрел блокируется
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Античит]: В вашем инвентаре отсутствует это оружие. Выстрел заблокирован.");
+            "[Anticheat]: This weapon is missing from your inventory. Shot blocked.");
         return 0;
     }
 
@@ -328,7 +328,7 @@ hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hiti
     {
         SetPlayerAmmo(playerid, weaponid, 0);
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Оружие]: Боезапас этого ствола исчерпан. Объедините патроны командой /combine.");
+            "[Weapon]: This barrel is depleted of ammunition. Combine cartridges with the /combine command.");
         return 0;
     }
 
@@ -388,9 +388,9 @@ hook OnPlayerWeaponShot(playerid, WEAPON:weaponid, BULLET_HIT_TYPE:hittype, hiti
         sWeaponJamUntil[playerid] = nowTick + WEAPON_JAM_BLOCK_MS;
         sLastJamNoticeTick[playerid] = nowTick;
 
-        Internal_SendProximityRoleplay(playerid, "передергивает затвор заклинившего оружия.");
+        Internal_SendProximityRoleplay(playerid, "Jerks the bolt of a jammed weapon.");
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Оружие]: Патрон перекосило, затвор заклинило! Стрельба заблокирована на 1.5 секунды.");
+            "[Weapon]: The cartridge is skewed, the bolt is jammed! Shooting is blocked for 1.5 seconds.");
         return 0;
     }
 
@@ -405,14 +405,14 @@ CMD:unload(playerid, params[])
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Оружие]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Weapon]: Your character has not yet been loaded.");
         return 1;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sLastWeaponCommandTick[playerid]) < WEAPON_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Оружие]: Не так быстро. Подождите мгновение.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Weapon]: Not so fast. Wait a moment.");
         return 1;
     }
     sLastWeaponCommandTick[playerid] = nowTick;
@@ -421,21 +421,21 @@ CMD:unload(playerid, params[])
     if (!Weapons_IsTrackedFirearm(_:heldWeapon))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Оружие]: Возьмите в руки огнестрельное оружие, чтобы разделить его боезапас.");
+            "[Weapon]: Pick up a firearm to share its ammo.");
         return 1;
     }
 
     new const srcItemSlot = Internal_FindItemSlotForWeapon(playerid, heldWeapon, true);
     if (srcItemSlot == INVALID_STORAGE_ITEM_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Оружие]: Этот ствол не найден в вашем инвентаре.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Weapon]: This gun was not found in your inventory.");
         return 1;
     }
 
     new const ammo = Storage_GetItemAmmo(srcItemSlot);
     if (ammo <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Оружие]: В этом стволе нет патронов.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Weapon]: There are no bullets in this barrel.");
         return 1;
     }
 
@@ -444,7 +444,7 @@ CMD:unload(playerid, params[])
     if (dstItemSlot == INVALID_STORAGE_ITEM_SLOT)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Оружие]: Для разрядки нужен второй такой же ствол в инвентаре. Патроны не существуют отдельным предметом.");
+            "[Weapon]: To unload, you need a second barrel of the same type in your inventory. Ammo does not exist as a separate item.");
         return 1;
     }
 
@@ -475,13 +475,13 @@ CMD:unload(playerid, params[])
     Item_GetName(defId, itemName, sizeof(itemName));
     new message[192];
     format(message, sizeof(message),
-        "[Оружие]: Вы разрядили %d патрон(ов) из «%s» во второй такой же ствол (осталось: %d / %d).",
+        "[Weapon]: You have unloaded %d cartridge(s) from \"%s\" into the second identical barrel (remaining: %d / %d).",
         amount, itemName, newSrcAmmo, newDstAmmo);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, message);
 
     new details[192];
     format(details, sizeof(details),
-        "Разрядка ствола: перенесено %d патрон(ов) между двумя экземплярами '%s'",
+        "Barrel unloading: moved %d cartridge(s) between two copies of '%s'",
         amount, itemName);
     Audit_Log(Character_GetId(playerid), "WEAPON_AMMO", "PLAYER_LAYER1", "PLAYER_LAYER1",
         defId, amount, details);
@@ -494,14 +494,14 @@ CMD:combine(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Оружие]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Weapon]: Your character has not yet been loaded.");
         return 1;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sLastWeaponCommandTick[playerid]) < WEAPON_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Оружие]: Не так быстро. Подождите мгновение.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Weapon]: Not so fast. Wait a moment.");
         return 1;
     }
     sLastWeaponCommandTick[playerid] = nowTick;
@@ -510,21 +510,21 @@ CMD:combine(playerid, params[])
     if (!Weapons_IsTrackedFirearm(_:heldWeapon))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Оружие]: Возьмите в руки огнестрельное оружие, чтобы объединить боезапас.");
+            "[Weapon]: Pick up a firearm to combine ammo.");
         return 1;
     }
 
     new const dstItemSlot = Internal_FindItemSlotForWeapon(playerid, heldWeapon, true);
     if (dstItemSlot == INVALID_STORAGE_ITEM_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Оружие]: Этот ствол не найден в вашем инвентаре.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Weapon]: This gun was not found in your inventory.");
         return 1;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Оружие]: Ошибка доступа к Слою 1 инвентаря.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Weapons]: Error accessing Inventory Layer 1.");
         return 1;
     }
 
@@ -566,7 +566,7 @@ CMD:combine(playerid, params[])
     if (totalMoved <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Оружие]: Второго ствола с патронами той же модели не найдено, либо боезапас уже заполнен.");
+            "[Weapon]: No second barrel with ammunition of the same model was found, or the ammunition is already full.");
         return 1;
     }
 
@@ -581,13 +581,13 @@ CMD:combine(playerid, params[])
     Item_GetName(defId, itemName, sizeof(itemName));
     new message[192];
     format(message, sizeof(message),
-        "[Оружие]: Вы объединили боезапас %d ствол(ов) «%s»: перенесено %d патрон(ов), итог — %d.",
+        "[Weapon]: You combined ammunition %d barrel(s) \"%s\": transferred %d cartridge(s), total - %d.",
         mergedWeapons, itemName, totalMoved, heldAmmo);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, message);
 
     new details[192];
     format(details, sizeof(details),
-        "Объединение боезапаса '%s': перенесено %d патрон(ов) из %d стволов",
+        "'%s' ammo consolidation: moved %d cartridge(s) from %d barrels",
         itemName, totalMoved, mergedWeapons);
     Audit_Log(Character_GetId(playerid), "WEAPON_AMMO", "PLAYER_LAYER1", "PLAYER_LAYER1",
         defId, totalMoved, details);
@@ -613,9 +613,9 @@ hook OnGameModeInit()
 
     // Контрольная формула DoD 5.1: 200 патронов M4 = 2.4 кг боезапаса
     new const m4AmmoWeight = Item_GetAmmoUnitWeight(23) * 200;
-    printf("%s [Systems/Weapons] Оружейная физика инициализирована (200 патронов M4 = %d г: %s).",
+    printf("%s [Systems/Weapons] Weapon physics initialized (200 rounds of M4 = %d g: %s).",
         SERVER_LOG_PREFIX,
         m4AmmoWeight,
-        (m4AmmoWeight == 2400) ? ("УСПЕШНО") : ("ОШИБКА"));
+        (m4AmmoWeight == 2400) ? ("SUCCESS") : ("ERROR"));
     return 1;
 }

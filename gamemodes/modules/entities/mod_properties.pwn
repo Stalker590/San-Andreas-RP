@@ -237,14 +237,14 @@ stock Properties_GetTypeTitleRu(E_PROPERTY_TYPE:propType, output[], len = sizeof
 {
     switch (propType)
     {
-        case PROPERTY_TYPE_TRAILER:    format(output, len, "Трейлер");
-        case PROPERTY_TYPE_APARTMENT:  format(output, len, "Квартира");
-        case PROPERTY_TYPE_HOUSE:      format(output, len, "Дом");
-        case PROPERTY_TYPE_MANSION:    format(output, len, "Особняк");
-        case PROPERTY_TYPE_COMMERCIAL: format(output, len, "Коммерческое помещение");
-        case PROPERTY_TYPE_WAREHOUSE:  format(output, len, "Склад");
-        case PROPERTY_TYPE_GARAGE:     format(output, len, "Гараж");
-        default:                       format(output, len, "Неизвестный объект");
+        case PROPERTY_TYPE_TRAILER:    format(output, len, "Trailer");
+        case PROPERTY_TYPE_APARTMENT:  format(output, len, "Apartment");
+        case PROPERTY_TYPE_HOUSE:      format(output, len, "House");
+        case PROPERTY_TYPE_MANSION:    format(output, len, "Mansion");
+        case PROPERTY_TYPE_COMMERCIAL: format(output, len, "Commercial space");
+        case PROPERTY_TYPE_WAREHOUSE:  format(output, len, "Warehouse");
+        case PROPERTY_TYPE_GARAGE:     format(output, len, "Garage");
+        default:                       format(output, len, "Unknown object");
     }
     return 1;
 }
@@ -266,19 +266,19 @@ static stock Internal_GetPropertyLabelText(property_db_id, output[], len = sizeo
     if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_PRIVATE)
     {
         format(output, len,
-            "%s #%d\nОбъект в частной собственности\n/property",
+            "%s #%d\nPrivate property\n/property",
             typeName, property_db_id);
     }
     else if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_STATE_FOR_RENT)
     {
         format(output, len,
-            "%s #%d\nАренда: %s в день\n/property",
+            "%s #%d\nRent: %s per day\n/property",
             typeName, property_db_id, rentStr);
     }
     else
     {
         format(output, len,
-            "%s #%d\nЦена: %s\n/property",
+            "%s #%d\nPrice: %s\n/property",
             typeName, property_db_id, priceStr);
     }
     return 1;
@@ -652,7 +652,7 @@ static stock Internal_LoadPropertiesSync()
     if (!DB_IsConnected())
     {
         Internal_SeedBuiltinProperties();
-        printf("%s [Entities/Properties] База недоступна: загружен встроенный реестр из 12 объектов.",
+        printf("%s [Entities/Properties] The database is unavailable: the built-in registry of 12 objects has been loaded.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -730,7 +730,7 @@ static stock Internal_LoadPropertiesSync()
     if (Iter_Count(PropertyIter) == 0)
     {
         Internal_SeedBuiltinProperties();
-        printf("%s [Entities/Properties] Таблица properties пуста: применен встроенный реестр.",
+        printf("%s [Entities/Properties] The properties table is empty: the built-in registry is applied.",
             SERVER_LOG_PREFIX);
     }
     return 1;
@@ -896,7 +896,7 @@ static stock bool:Internal_CommandAllowed(playerid)
     if ((nowTick - sPropertyLastCommandTick[playerid]) < PROPERTY_COMMAND_COOLDOWN_MS)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Не так быстро: дождитесь завершения предыдущей операции.");
+            "Not so fast: Wait for the previous operation to complete.");
         return false;
     }
     sPropertyLastCommandTick[playerid] = nowTick;
@@ -981,7 +981,7 @@ static stock Internal_OpenPropertyMenu(playerid, property_db_id)
     new const slot = Properties_FindByDbId(property_db_id);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Объект недвижимости не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The property was not found.");
         return 0;
     }
 
@@ -991,39 +991,39 @@ static stock Internal_OpenPropertyMenu(playerid, property_db_id)
 
     if (sPropertyInsideDbId[playerid] == property_db_id)
     {
-        strcat(body, "Информация об объекте\n", sizeof(body));
+        strcat(body, "Object information\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_INFO;
-        strcat(body, "Открыть домашнее хранилище\n", sizeof(body));
+        strcat(body, "Open home storage\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_STORAGE;
-        strcat(body, "Оплатить коммунальные услуги\n", sizeof(body));
+        strcat(body, "Pay utilities\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_PAY_UTILS;
-        strcat(body, "Запереть или отпереть дверь\n", sizeof(body));
+        strcat(body, "Lock or unlock the door\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_LOCK;
         if (sProperties[slot][E_PROP_GARAGE_CAPACITY] > 0)
         {
-            strcat(body, "Управление гаражом (/vpark, /vunpark)\n", sizeof(body));
+            strcat(body, "Garage management (/vpark, /vunpark)\n", sizeof(body));
             sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_GARAGE;
         }
-        strcat(body, "Выйти на улицу\n", sizeof(body));
+        strcat(body, "Go outside\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_EXIT;
     }
     else
     {
-        strcat(body, "Информация об объекте\n", sizeof(body));
+        strcat(body, "Object information\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_INFO;
-        strcat(body, "Войти внутрь\n", sizeof(body));
+        strcat(body, "Go inside\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_ENTER;
         if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_STATE_FOR_SALE)
         {
-            strcat(body, "Купить объект\n", sizeof(body));
+            strcat(body, "Buy object\n", sizeof(body));
             sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_BUY;
         }
         else if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_STATE_FOR_RENT)
         {
-            strcat(body, "Арендовать объект\n", sizeof(body));
+            strcat(body, "Rent an object\n", sizeof(body));
             sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_RENT;
         }
-        strcat(body, "Проверить замок и следы взлома\n", sizeof(body));
+        strcat(body, "Check the lock and signs of forced entry\n", sizeof(body));
         sPropertyMenuAction[playerid][count++] = PROPERTY_MENU_LOCK;
     }
 
@@ -1033,10 +1033,10 @@ static stock Internal_OpenPropertyMenu(playerid, property_db_id)
     new typeName[PROPERTY_TYPE_NAME_LEN], caption[160];
     Properties_GetTypeTitleRu(sProperties[slot][E_PROP_TYPE], typeName, sizeof(typeName));
     format(caption, sizeof(caption),
-        "{FFC800}%s #%d {FFFFFF}| Объект недвижимости", typeName, property_db_id);
+        "{FFC800}%s #%d {FFFFFF}| Property", typeName, property_db_id);
 
     ShowPlayerDialog(playerid, DIALOG_PROPERTY_MAIN, DIALOG_STYLE_LIST, caption, body,
-        "Выбрать", "Закрыть");
+        "Select", "Close");
     return 1;
 }
 
@@ -1057,41 +1057,41 @@ static stock Internal_ShowPropertyInfo(playerid, property_db_id)
     if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_PRIVATE)
     {
         if (sProperties[slot][E_PROP_IS_RENTED])
-            format(ownerText, sizeof(ownerText), "арендуется персонажем #%d", sProperties[slot][E_PROP_OWNER_CHAR_ID]);
+            format(ownerText, sizeof(ownerText), "rented by character #%d", sProperties[slot][E_PROP_OWNER_CHAR_ID]);
         else
-            format(ownerText, sizeof(ownerText), "в собственности персонажа #%d", sProperties[slot][E_PROP_OWNER_CHAR_ID]);
+            format(ownerText, sizeof(ownerText), "owned by character #%d", sProperties[slot][E_PROP_OWNER_CHAR_ID]);
     }
     else if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_STATE_FOR_RENT)
     {
-        format(ownerText, sizeof(ownerText), "государственная аренда");
+        format(ownerText, sizeof(ownerText), "government lease");
     }
     else
     {
-        format(ownerText, sizeof(ownerText), "государственная продажа");
+        format(ownerText, sizeof(ownerText), "government sale");
     }
 
     new body[896];
     format(body, sizeof(body),
-        "{FFC800}Тип объекта:{FFFFFF} %s\n" \
-        "{FFC800}Статус:{FFFFFF} %s\n" \
-        "{FFC800}Цена покупки:{FFFFFF} %s\n" \
-        "{FFC800}Аренда в сутки:{FFFFFF} %s\n" \
-        "{FFC800}Коммунальный долг:{FFFFFF} %s\n" \
-        "{FFC800}Коммуникации:{FFFFFF} %s\n" \
-        "{FFC800}Замок:{FFFFFF} сложность %d, %s\n" \
-        "{FFC800}Гараж:{FFFFFF} %d мест\n" \
-        "{FFC800}Вход:{FFFFFF} %.1f, %.1f, %.1f",
+        "{FFC800}Object type:{FFFFFF} %s\n" \
+        "{FFC800}Status:{FFFFFF} %s\n" \
+        "{FFC800}Purchase price:{FFFFFF} %s\n" \
+        "{FFC800}Rent per day:{FFFFFF} %s\n" \
+        "{FFC800}Utility debt:{FFFFFF} %s\n" \
+        "{FFC800}Communications:{FFFFFF} %s\n" \
+        "{FFC800}Castle:{FFFFFF} difficulty %d, %s\n" \
+        "{FFC800}Garage:{FFFFFF} %d spaces\n" \
+        "{FFC800}Input:{FFFFFF} %.1f, %.1f, %.1f",
         typeName, ownerText, priceStr, rentStr, debtStr,
-        sProperties[slot][E_PROP_UTILITIES_ACTIVE] ? ("подключены") : ("отключены за долг"),
+        sProperties[slot][E_PROP_UTILITIES_ACTIVE] ? ("connected") : ("disconnected for debt"),
         sProperties[slot][E_PROP_LOCK_LEVEL],
-        sProperties[slot][E_PROP_IS_LOCKED] ? ("заперт") : ("открыт"),
+        sProperties[slot][E_PROP_IS_LOCKED] ? ("locked") : ("open"),
         sProperties[slot][E_PROP_GARAGE_CAPACITY],
         sProperties[slot][E_PROP_EXT_X],
         sProperties[slot][E_PROP_EXT_Y],
         sProperties[slot][E_PROP_EXT_Z]);
 
     ShowPlayerDialog(playerid, DIALOG_PROPERTY_INFO, DIALOG_STYLE_MSGBOX,
-        "{FFC800}Информация об объекте", body, "Назад", "Закрыть");
+        "{FFC800}Object information", body, "Back", "Close");
     return 1;
 }
 
@@ -1126,7 +1126,7 @@ static stock Internal_AcquireProperty(playerid, property_db_id, bool:rent)
     }
     if (sProperties[slot][E_PROP_OWNERSHIP] == PROPERTY_OWN_PRIVATE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Объект уже находится в частной собственности.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The property is already privately owned.");
         return 0;
     }
 
@@ -1140,17 +1140,17 @@ static stock Internal_AcquireProperty(playerid, property_db_id, bool:rent)
     }
     if (cost <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Стоимость объекта не определена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The cost of the object has not been determined.");
         return 0;
     }
     if (!Internal_PlayerCanAfford(playerid, cost))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно средств для оформления объекта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are not enough funds to decorate the property.");
         return 0;
     }
-    if (!Internal_ChargePlayer(playerid, cost, "Покупка или аренда недвижимости"))
+    if (!Internal_ChargePlayer(playerid, cost, "Buying or renting property"))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить сделку.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay for the transaction.");
         return 0;
     }
 
@@ -1169,14 +1169,14 @@ static stock Internal_AcquireProperty(playerid, property_db_id, bool:rent)
     Properties_GetTypeTitleRu(sProperties[slot][E_PROP_TYPE], typeName, sizeof(typeName));
     Utils_FormatMoney(cost, costStr);
     format(msg, sizeof(msg),
-        "Сделка оформлена: %s #%d %s за %s. Ключи находятся в инвентаре.",
-        typeName, property_db_id, rent ? ("арендован") : ("приобретен"), costStr);
+        "The transaction is completed: %s #%d %s for %s. The keys are in inventory.",
+        typeName, property_db_id, rent ? ("rented") : ("purchased"), costStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid),
         rent ? "PROPERTY_RENT" : "PROPERTY_BUY",
         "BANK", "PROPERTY", 0, cost,
-        rent ? "Аренда объекта недвижимости" : "Покупка объекта недвижимости");
+        rent ? "Renting a property" : "Purchasing a property");
     return 1;
 }
 
@@ -1190,7 +1190,7 @@ static stock Internal_EnterProperty(playerid, property_db_id)
     if (sProperties[slot][E_PROP_IS_LOCKED] && !Internal_PlayerHasPropertyKeyOrOwner(playerid, property_db_id))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Дверь заперта. Нужен ключ, взлом отмычками (/lockpick) или выбивание двери.");
+            "The door is locked. You need a key, lockpicking (/lockpick) or knocking down the door.");
         return 0;
     }
 
@@ -1205,7 +1205,7 @@ static stock Internal_EnterProperty(playerid, property_db_id)
 
     new typeName[PROPERTY_TYPE_NAME_LEN], msg[192];
     Properties_GetTypeTitleRu(sProperties[slot][E_PROP_TYPE], typeName, sizeof(typeName));
-    format(msg, sizeof(msg), "Вы вошли в объект «%s #%d».", typeName, property_db_id);
+    format(msg, sizeof(msg), "You have entered the object \"%s #%d\".", typeName, property_db_id);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     return 1;
 }
@@ -1215,7 +1215,7 @@ static stock Internal_ExitProperty(playerid)
     new const propertyDbId = sPropertyInsideDbId[playerid];
     if (propertyDbId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Вы не находитесь внутри объекта недвижимости.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "You are not inside the property.");
         return 0;
     }
     new const slot = Properties_FindByDbId(propertyDbId);
@@ -1233,7 +1233,7 @@ static stock Internal_ExitProperty(playerid)
     SetPlayerVirtualWorld(playerid, 0);
     SetCameraBehindPlayer(playerid);
     sPropertyInsideDbId[playerid] = 0;
-    SendClientMessage(playerid, COLOR_UI_INFO, "Вы вышли на улицу.");
+    SendClientMessage(playerid, COLOR_UI_INFO, "You went outside.");
     return 1;
 }
 
@@ -1241,12 +1241,12 @@ static stock Internal_OpenPropertyStorage(playerid, property_db_id)
 {
     if (sPropertyInsideDbId[playerid] != property_db_id)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Хранилище доступно только внутри объекта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Storage is only accessible within the object.");
         return 0;
     }
     if (!Internal_PlayerHasPropertyKeyOrOwner(playerid, property_db_id))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вас нет доступа к хранилищу этого объекта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You do not have access to this object's storage.");
         return 0;
     }
 
@@ -1263,7 +1263,7 @@ static stock Internal_OpenPropertyStorage(playerid, property_db_id)
     }
     if (!Storage_IsValidSlot(storageSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Хранилище объекта недоступно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Object storage is unavailable.");
         return 0;
     }
 
@@ -1280,30 +1280,30 @@ static stock Internal_PayUtilities(playerid, property_db_id)
     }
     if (!Internal_PlayerHasPropertyKeyOrOwner(playerid, property_db_id))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Только владелец или арендатор может оплачивать счета.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Only the owner or tenant can pay the bills.");
         return 0;
     }
 
     new const debt = sProperties[slot][E_PROP_UTILITY_DEBT_USD];
     if (debt <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Задолженность по коммунальным услугам отсутствует.");
+        SendClientMessage(playerid, COLOR_UI_INFO, "There is no debt for utility services.");
         if (!sProperties[slot][E_PROP_UTILITIES_ACTIVE])
         {
             sProperties[slot][E_PROP_UTILITIES_ACTIVE] = true;
             Internal_UpdatePropertyDb(slot);
-            SendClientMessage(playerid, COLOR_UI_SUCCESS, "Коммуникации снова подключены.");
+            SendClientMessage(playerid, COLOR_UI_SUCCESS, "Communications are connected again.");
         }
         return 1;
     }
     if (!Internal_PlayerCanAfford(playerid, debt))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно средств для погашения задолженности.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are insufficient funds to pay off the debt.");
         return 0;
     }
-    if (!Internal_ChargePlayer(playerid, debt, "Оплата коммунальных услуг"))
+    if (!Internal_ChargePlayer(playerid, debt, "Payment of utilities"))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить коммунальные услуги.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay utilities.");
         return 0;
     }
 
@@ -1313,11 +1313,11 @@ static stock Internal_PayUtilities(playerid, property_db_id)
 
     new debtStr[32], msg[192];
     Utils_FormatMoney(debt, debtStr);
-    format(msg, sizeof(msg), "Коммунальный долг %s погашен. Коммуникации подключены.", debtStr);
+    format(msg, sizeof(msg), "The utility debt %s has been repaid. Communications are connected.", debtStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "PROPERTY_UTILITIES", "BANK", "PROPERTY", 0, debt,
-        "Оплата коммунальных услуг объекта недвижимости");
+        "Payment of utilities for the property");
     return 1;
 }
 
@@ -1352,13 +1352,13 @@ static stock Internal_ConfiscateProperty(slot)
         if (Character_IsLoaded(playerid) && Character_GetId(playerid) == oldOwner)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Ваш объект недвижимости конфискован государством за длительную неуплату коммунальных услуг.");
+                "Your property has been confiscated by the state for long-term failure to pay utility bills.");
             break;
         }
     }
 
     Audit_Log(oldOwner, "PROPERTY_CONFISCATE", "PROPERTY", "STATE", 0, 0,
-        "Государственная конфискация объекта за долги");
+        "State confiscation of an object for debts");
     return 1;
 }
 
@@ -1486,7 +1486,7 @@ static stock Internal_RunPropertyBilling()
                     Character_GetId(playerid) == sProperties[slot][E_PROP_OWNER_CHAR_ID])
                 {
                     SendClientMessage(playerid, COLOR_UI_ERROR,
-                        "Коммунальные службы отключили свет и воду из-за задолженности. Оплатите счет: /property.");
+                        "Utilities turned off electricity and water due to debt. Pay your invoice: /property.");
                     break;
                 }
             }
@@ -1506,17 +1506,17 @@ public bool:Properties_TryLockpickNearest(playerid)
     new const slot = Properties_GetNearestProperty(playerid, PROPERTY_INTERACT_RADIUS, propertyDbId);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет двери или транспортного средства для взлома.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no door or vehicle nearby to break into.");
         return false;
     }
     if (!sProperties[slot][E_PROP_IS_LOCKED])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Дверь этого объекта уже открыта.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The door to this facility is already open.");
         return false;
     }
     if (Internal_PlayerHasPropertyKeyOrOwner(playerid, propertyDbId))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "У вас есть ключ: взлом не требуется.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "You have the key: no hacking required.");
         return false;
     }
 
@@ -1535,9 +1535,9 @@ public bool:Properties_TryLockpickNearest(playerid)
         Internal_UpdatePropertyDb(slot);
         Skills_Add(playerid, SKILL_LOCKPICKING, 2);
         SendClientMessage(playerid, COLOR_UI_SUCCESS,
-            "Дверной замок вскрыт! Можно войти внутрь командой /property.");
+            "The door lock has been opened! You can get inside with the /property command.");
         Audit_Log(Character_GetId(playerid), "PROPERTY_LOCKPICK", "PROPERTY", "CHARACTER",
-            0, 1, "Успешное вскрытие дверного замка");
+            0, 1, "Successfully opening a door lock");
         return true;
     }
 
@@ -1548,7 +1548,7 @@ public bool:Properties_TryLockpickNearest(playerid)
         0, 0);
     Skills_Add(playerid, SKILL_LOCKPICKING, 1);
     SendClientMessage(playerid, COLOR_UI_ERROR,
-        "Замок не поддался, на двери остались характерные царапины.");
+        "The lock did not budge, and characteristic scratches remained on the door.");
     return false;
 }
 
@@ -1599,12 +1599,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Utils_FormatMoney(sProperties[slot][E_PROP_PRICE_USD], priceStr);
                     new body[256];
                     format(body, sizeof(body),
-                        "Вы хотите купить объект за %s?\nПосле покупки ключи будут выданы в инвентарь.",
+                        "Do you want to buy an object for %s?\nAfter the purchase, the keys will be issued to the inventory.",
                         priceStr);
                     sPropertyConfirmAction[playerid] = PROPERTY_CONFIRM_BUY;
                     sPropertyPendingDbId[playerid] = propertyDbId;
                     ShowPlayerDialog(playerid, DIALOG_PROPERTY_CONFIRM, DIALOG_STYLE_MSGBOX,
-                        "{FFC800}Подтверждение покупки", body, "Купить", "Отмена");
+                        "{FFC800}Purchase Confirmation", body, "Buy", "Cancel");
                 }
                 case PROPERTY_MENU_RENT:
                 {
@@ -1617,12 +1617,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     Utils_FormatMoney(sProperties[slot][E_PROP_RENT_PER_DAY_USD], rentStr);
                     new body[256];
                     format(body, sizeof(body),
-                        "Аренда объекта составит %s в сутки.\nПервый платеж списывается сразу.",
+                        "The rent of the object will be %s per day.\nThe first payment is debited immediately.",
                         rentStr);
                     sPropertyConfirmAction[playerid] = PROPERTY_CONFIRM_RENT;
                     sPropertyPendingDbId[playerid] = propertyDbId;
                     ShowPlayerDialog(playerid, DIALOG_PROPERTY_CONFIRM, DIALOG_STYLE_MSGBOX,
-                        "{FFC800}Подтверждение аренды", body, "Арендовать", "Отмена");
+                        "{FFC800}Rental confirmation", body, "Rent", "Cancel");
                 }
                 case PROPERTY_MENU_STORAGE:
                 {
@@ -1641,20 +1641,20 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     }
                     if (!Internal_PlayerHasPropertyKeyOrOwner(playerid, propertyDbId))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Для управления замком нужен ключ или владение.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "To operate a lock you need a key or possession.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     sProperties[slot][E_PROP_IS_LOCKED] = !sProperties[slot][E_PROP_IS_LOCKED];
                     Internal_UpdatePropertyDb(slot);
                     if (sProperties[slot][E_PROP_IS_LOCKED])
-                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Дверь заперта.");
+                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "The door is locked.");
                     else
-                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Дверь отперта.");
+                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "The door is unlocked.");
                 }
                 case PROPERTY_MENU_GARAGE:
                 {
                     SendClientMessage(playerid, COLOR_UI_INFO,
-                        "Для гаража используйте /vpark — поставить транспорт, /vunpark — выгнать транспорт.");
+                        "For a garage, use /vpark - place vehicles, /vunpark - drive vehicles out.");
                 }
             }
             return Y_HOOKS_BREAK_RETURN_1;
@@ -1737,7 +1737,7 @@ hook OnPlayerSpawn(playerid)
         {
             sPropertyInsideDbId[playerid] = sProperties[slot][E_PROP_DB_ID];
             SendClientMessage(playerid, COLOR_UI_INFO,
-                "Вы находитесь внутри объекта недвижимости. Для выхода используйте /property.");
+                "You are inside the property. To exit, use /property.");
             break;
         }
     }
@@ -1761,7 +1761,7 @@ hook OnGameModeInit()
     sPropertyBillingCounter = 0;
 
     Internal_LoadPropertiesSync();
-    printf("%s [Entities/Properties] Загружено объектов недвижимости: %d.",
+    printf("%s [Entities/Properties] Loaded property entities: %d.",
         SERVER_LOG_PREFIX, Iter_Count(PropertyIter));
     return 1;
 }
@@ -1804,7 +1804,7 @@ CMD:property(playerid, params[])
     if (slot < 0)
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "Рядом нет объекта недвижимости. Подойдите к двери или найдите объект по 3D-метке.");
+            "There is no property nearby. Approach the door or find the object using the 3D marker.");
         return 1;
     }
 
@@ -1831,7 +1831,7 @@ CMD:payutils(playerid, params[])
         new const slot = Properties_GetNearestProperty(playerid, PROPERTY_INTERACT_RADIUS, propertyDbId);
         if (slot < 0)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Подойдите к объекту недвижимости.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "Approach the property.");
             return 1;
         }
     }
@@ -1853,7 +1853,7 @@ CMD:kickdoor(playerid, params[])
     if (Character_GetRoleId(playerid) != ROLE_ID_EX_SWAT)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Выбивать двери с одного удара может только бывший спецназовец SWAT.");
+            "Only a former SWAT commando can knock down doors with one blow.");
         return 1;
     }
 
@@ -1861,21 +1861,21 @@ CMD:kickdoor(playerid, params[])
     new const slot = Properties_GetNearestProperty(playerid, PROPERTY_INTERACT_RADIUS, propertyDbId);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет двери объекта недвижимости.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no property door nearby.");
         return 1;
     }
     if (!sProperties[slot][E_PROP_IS_LOCKED])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Дверь уже открыта.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The door is already open.");
         return 1;
     }
 
     sProperties[slot][E_PROP_IS_LOCKED] = false;
     Internal_UpdatePropertyDb(slot);
     SendClientMessage(playerid, COLOR_UI_SUCCESS,
-        "Вы выбили дверь с одного удара! Объект открыт для входа.");
+        "You knocked down the door with one blow! The facility is open for entry.");
     Audit_Log(Character_GetId(playerid), "PROPERTY_KICK_DOOR", "CHARACTER", "PROPERTY", 0, 1,
-        "Выбивание двери недвижимости ролью SWAT");
+        "Knocking down a property door as a SWAT");
     return 1;
 }
 
@@ -1897,13 +1897,13 @@ CMD:plock(playerid, params[])
         new const slot = Properties_GetNearestProperty(playerid, PROPERTY_INTERACT_RADIUS, propertyDbId);
         if (slot < 0)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Подойдите к объекту недвижимости.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "Approach the property.");
             return 1;
         }
     }
     if (!Internal_PlayerHasPropertyKeyOrOwner(playerid, propertyDbId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Для управления замком нужен ключ или владение.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "To operate a lock you need a key or possession.");
         return 1;
     }
 
@@ -1915,9 +1915,9 @@ CMD:plock(playerid, params[])
     sProperties[slot][E_PROP_IS_LOCKED] = !sProperties[slot][E_PROP_IS_LOCKED];
     Internal_UpdatePropertyDb(slot);
     if (sProperties[slot][E_PROP_IS_LOCKED])
-        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Дверь объекта заперта.");
+        SendClientMessage(playerid, COLOR_UI_SUCCESS, "The facility door is locked.");
     else
-        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Дверь объекта отперта.");
+        SendClientMessage(playerid, COLOR_UI_SUCCESS, "The facility door is unlocked.");
     return 1;
 }
 
@@ -1939,34 +1939,34 @@ CMD:propertykey(playerid, params[])
         new const slot = Properties_GetNearestProperty(playerid, PROPERTY_INTERACT_RADIUS, propertyDbId);
         if (slot < 0)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Подойдите к объекту недвижимости.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "Approach the property.");
             return 1;
         }
     }
     if (!Properties_IsOwner(playerid, propertyDbId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Только владелец может заказать дубликат ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Only the owner can order a duplicate key.");
         return 1;
     }
     if (Character_GetPhysicalCashUsd(playerid) < PROPERTY_KEY_COPY_COST_USD)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недостаточно наличных для дубликата ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Insufficient cash for duplicate keys.");
         return 1;
     }
     if (!Character_RemovePhysicalCashUsd(playerid, PROPERTY_KEY_COPY_COST_USD))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось оплатить дубликат ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to pay for duplicate keys.");
         return 1;
     }
     if (!Internal_IssuePropertyKey(playerid, propertyDbId))
     {
         Character_AddPhysicalCashUsd(playerid, PROPERTY_KEY_COPY_COST_USD);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В инвентаре нет места для ключей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no room for keys in the inventory.");
         return 1;
     }
 
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Дубликат ключей от объекта выдан.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "A duplicate of the object keys has been issued.");
     Audit_Log(Character_GetId(playerid), "PROPERTY_KEY_COPY", "CHARACTER", "PROPERTY",
-        0, PROPERTY_KEY_COPY_COST_USD, "Изготовление дубликата ключей недвижимости");
+        0, PROPERTY_KEY_COPY_COST_USD, "Making a duplicate of property keys");
     return 1;
 }

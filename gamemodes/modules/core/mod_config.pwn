@@ -277,17 +277,17 @@ stock Config_GetStorageTypeTitleRu(E_STORAGE_TYPE:type, output[], len = sizeof(o
 {
     switch (type)
     {
-        case STORAGE_PLAYER_LAYER1:        format(output, len, "Внешние карманы и разгрузка (Слой 1)");
-        case STORAGE_PLAYER_LAYER2:        format(output, len, "Потайные карманы (Слой 2)");
-        case STORAGE_VEHICLE_GLOVEBOX:     format(output, len, "Бардачок транспорта");
-        case STORAGE_VEHICLE_TRUNK:        format(output, len, "Багажное отделение");
-        case STORAGE_PROPERTY_STASH:       format(output, len, "Стационарный шкаф недвижимости");
-        case STORAGE_ORG_VAULT:            format(output, len, "Бронированный сейф организации");
-        case STORAGE_ENTERPRISE_WAREHOUSE: format(output, len, "Промышленный склад предприятия");
-        case STORAGE_NESTED_BAG:           format(output, len, "Переносная сумка / рюкзак");
-        case STORAGE_WORLD_DROP:           format(output, len, "Предметы на земле / схрон");
-        case STORAGE_CORPSE_LOOT:          format(output, len, "Обыск тела погибшего");
-        default:                           format(output, len, "Неизвестное хранилище");
+        case STORAGE_PLAYER_LAYER1:        format(output, len, "Outer pockets and vest (Layer 1)");
+        case STORAGE_PLAYER_LAYER2:        format(output, len, "Hidden pockets (Layer 2)");
+        case STORAGE_VEHICLE_GLOVEBOX:     format(output, len, "Vehicle glovebox");
+        case STORAGE_VEHICLE_TRUNK:        format(output, len, "Vehicle trunk");
+        case STORAGE_PROPERTY_STASH:       format(output, len, "Property storage cabinet");
+        case STORAGE_ORG_VAULT:            format(output, len, "Organization armored vault");
+        case STORAGE_ENTERPRISE_WAREHOUSE: format(output, len, "Enterprise warehouse");
+        case STORAGE_NESTED_BAG:           format(output, len, "Portable bag / backpack");
+        case STORAGE_WORLD_DROP:           format(output, len, "Ground items / stash");
+        case STORAGE_CORPSE_LOOT:          format(output, len, "Corpse looting");
+        default:                           format(output, len, "Unknown storage");
     }
     return 1;
 }
@@ -303,7 +303,7 @@ hook OnGameModeInit()
         gPlayerSessionToken[i] = 1;
         gLastPlayerPacketTick[i] = 0;
     }
-    printf("%s [Core/Config] Модуль констант инициализирован (MAX_ACTIVE_STORAGES = %d, MAX_STORAGE_ITEMS = %d).",
+    printf("%s [Core/Config] Constant module initialized (MAX_ACTIVE_STORAGES = %d, MAX_STORAGE_ITEMS = %d).",
         SERVER_LOG_PREFIX, MAX_ACTIVE_STORAGES, MAX_STORAGE_ITEMS);
     return 1;
 }

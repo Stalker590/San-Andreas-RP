@@ -163,7 +163,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
 {
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Your character has not yet been loaded.");
         return 0;
     }
 
@@ -187,14 +187,14 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
 
     if (!Storage_IsValidSlot(targetStorage))
     {
-        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Ошибка доступа к контейнеру инвентаря.");
+        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Error accessing inventory container.");
         return 0;
     }
 
     if (!Storage_AreItemsReady(targetStorage))
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Инвентарь]: Инвентарь еще загружается. Повторите команду через мгновение.");
+            "[Inventory]: Inventory is still loading. Repeat the command after a moment.");
         return 0;
     }
 
@@ -216,7 +216,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             titleBuf,
             sizeof(titleBuf),
-            "Инвентарь: Слой 1 (Внешний) | Вес: %d.%02d/%d.%02d кг | Объем: %d.%02d/%d.%02d л",
+            "Inventory: Layer 1 (External) | Weight: %d.%02d/%d.%02d kg | Volume: %d.%02d/%d.%02d l",
             curWeightG / 1000, (curWeightG % 1000) / 10,
             maxWeightG / 1000, (maxWeightG % 1000) / 10,
             curVolumeMl / 1000, (curVolumeMl % 1000) / 10,
@@ -228,7 +228,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             titleBuf,
             sizeof(titleBuf),
-            "Инвентарь: Слой 2 (Потайной) | Вес: %d.%02d/%d.%02d кг | Объем: %d.%02d/%d.%02d л",
+            "Inventory: Layer 2 (Secret) | Weight: %d.%02d/%d.%02d kg | Volume: %d.%02d/%d.%02d l",
             curWeightG / 1000, (curWeightG % 1000) / 10,
             maxWeightG / 1000, (maxWeightG % 1000) / 10,
             curVolumeMl / 1000, (curVolumeMl % 1000) / 10,
@@ -240,7 +240,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             titleBuf,
             sizeof(titleBuf),
-            "Рюкзак / Сумка (Вложенный) | Вес: %d.%02d/%d.%02d кг | Объем: %d.%02d/%d.%02d л",
+            "Backpack/Bag (Nested) | Weight: %d.%02d/%d.%02d kg | Volume: %d.%02d/%d.%02d l",
             curWeightG / 1000, (curWeightG % 1000) / 10,
             maxWeightG / 1000, (maxWeightG % 1000) / 10,
             curVolumeMl / 1000, (curVolumeMl % 1000) / 10,
@@ -250,7 +250,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
 
     static dialogBody[3584];
     dialogBody[0] = '\0';
-    strcat(dialogBody, "Предмет / Действие\tКол-во / Патр.\tСостояние\tВес (кг)\tОбъем (л)\n", sizeof(dialogBody));
+    strcat(dialogBody, "Item / Action\tQty / Pat.\tCondition\tWeight (kg)\tVolume (l)\n", sizeof(dialogBody));
 
     // Первая строка: быстрое переключение между Слоем 1 и Слоем 2
     if (viewMode == INV_VIEW_LAYER_1)
@@ -261,7 +261,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             switchRow,
             sizeof(switchRow),
-            "{FFD54F}>> Переключить: Слой 2 (Потайной карман)\t-\t-\t%d.%02d/%d.%02d\t-\n",
+            "{FFD54F}>> Switch: Layer 2 (Secret Pocket)\t-\t-\t%d.%02d/%d.%02d\t-\n",
             l2W / 1000, (l2W % 1000) / 10,
             l2MaxW / 1000, (l2MaxW % 1000) / 10
         );
@@ -276,7 +276,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             switchRow,
             sizeof(switchRow),
-            "{FFD54F}<< Вернуться: Слой 1 (Внешний инвентарь)\t-\t-\t%d.%02d/%d.%02d\t-\n",
+            "{FFD54F}<< Return: Layer 1 (External Inventory)\t-\t-\t%d.%02d/%d.%02d\t-\n",
             l1W / 1000, (l1W % 1000) / 10,
             l1MaxW / 1000, (l1MaxW % 1000) / 10
         );
@@ -294,7 +294,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         format(
             extRow,
             sizeof(extRow),
-            "{81D4FA}[Открыть ближайшее хранилище / сверток рядом]\t-\t-\t%d.%02d кг\t-\n",
+            "{81D4FA}[Open nearest storage / package nearby]\t-\t-\t%d.%02d kg\t-\n",
             extW / 1000, (extW % 1000) / 10
         );
         strcat(dialogBody, extRow, sizeof(dialogBody));
@@ -318,14 +318,14 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         if (defId == ITEM_ID_CLOTHING_OUTFIT)
         {
             new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-            format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
+            format(itemName, sizeof(itemName), "Clothes set (skin %d)", outfitSkin);
             if (Character_IsOutfitItemEquipped(playerid, itemSlot))
             {
-                format(statusStr, sizeof(statusStr), "{66CC66}Надето{FFFFFF}");
+                format(statusStr, sizeof(statusStr), "{66CC66}Equipped{FFFFFF}");
             }
             else
             {
-                format(statusStr, sizeof(statusStr), "{AFAFAF}В сумке{FFFFFF}");
+                format(statusStr, sizeof(statusStr), "{AFAFAF}In bag{FFFFFF}");
             }
         }
         else
@@ -343,7 +343,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         new qtyStr[32];
         if (Item_GetGtaWeaponId(defId) >= 22)
         {
-            format(qtyStr, sizeof(qtyStr), "%d шт. (%d патр.)", amount, ammo);
+            format(qtyStr, sizeof(qtyStr), "%d pcs. (%d rds.)", amount, ammo);
         }
         else if (defId == ITEM_ID_CASH_BUNDLE)
         {
@@ -351,7 +351,7 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         }
         else
         {
-            format(qtyStr, sizeof(qtyStr), "%d шт.", amount);
+            format(qtyStr, sizeof(qtyStr), "%d pcs.", amount);
         }
 
         new rowLine[192];
@@ -377,8 +377,8 @@ stock Dialogs_OpenInventory(playerid, E_INV_VIEW_MODE:viewMode = INV_VIEW_LAYER_
         DIALOG_STYLE_TABLIST_HEADERS,
         titleBuf,
         dialogBody,
-        "Действие",
-        "Закрыть"
+        "Action",
+        "Close"
     );
     return 1;
 }
@@ -395,7 +395,7 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
 
     if (!Storage_OpenForPlayer(playerid, ext_storage_slot))
     {
-        SendClientMessage(playerid, COLOR_WARNING, "[Хранилище]: Этот контейнер сейчас занят другим игроком. Подождите секунду.");
+        SendClientMessage(playerid, COLOR_WARNING, "[Storage]: This container is currently occupied by another player. Wait a second.");
         return 0;
     }
 
@@ -406,10 +406,10 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
     new typeTitle[48];
     switch (stType)
     {
-        case STORAGE_WORLD_DROP:  format(typeTitle, sizeof(typeTitle), "Сверток на земле");
-        case STORAGE_CORPSE_LOOT: format(typeTitle, sizeof(typeTitle), "Вещи погибшего (Труп)");
-        case STORAGE_NESTED_BAG:  format(typeTitle, sizeof(typeTitle), "Вложенная сумка / рюкзак");
-        default:                  format(typeTitle, sizeof(typeTitle), "Внешнее хранилище");
+        case STORAGE_WORLD_DROP:  format(typeTitle, sizeof(typeTitle), "Bundle on the ground");
+        case STORAGE_CORPSE_LOOT: format(typeTitle, sizeof(typeTitle), "Belongings of the deceased (Corpse)");
+        case STORAGE_NESTED_BAG:  format(typeTitle, sizeof(typeTitle), "Inserted bag/backpack");
+        default:                  format(typeTitle, sizeof(typeTitle), "External storage");
     }
 
     new curW = Storage_GetCurrentWeight(ext_storage_slot);
@@ -421,7 +421,7 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
     format(
         header,
         sizeof(header),
-        "%s | Вес: %d.%02d/%d.%02d кг | Объем: %d.%02d/%d.%02d л",
+        "%s | Weight: %d.%02d/%d.%02d kg | Volume: %d.%02d/%d.%02d l",
         typeTitle,
         curW / 1000, (curW % 1000) / 10,
         maxW / 1000, (maxW % 1000) / 10,
@@ -431,10 +431,10 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
 
     static body[3584];
     body[0] = '\0';
-    strcat(body, "Предмет в контейнере\tКол-во / Патр.\tСостояние\tВес (кг)\tОбъем (л)\n", sizeof(body));
+    strcat(body, "Item in container\tQty/Pat.\tCondition\tWeight (kg)\tVolume (l)\n", sizeof(body));
 
     // Первая строка — вернуться в собственный инвентарь, чтобы положить предмет сюда
-    strcat(body, "{FFD54F}<< Открыть свой инвентарь (Положить предмет)\t-\t-\t-\t-\n", sizeof(body));
+    strcat(body, "{FFD54F}<< Open your inventory (Place item)\t-\t-\t-\t-\n", sizeof(body));
     sPlayerDialogRowMap[playerid][sPlayerDialogRowCount[playerid]++] = INV_ROW_SWITCH_LAYER_1;
 
     new itemSlot = Storage_GetFirstItemSlot(ext_storage_slot);
@@ -452,8 +452,8 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
         if (defId == ITEM_ID_CLOTHING_OUTFIT)
         {
             new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-            format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
-            format(statusStr, sizeof(statusStr), "{AFAFAF}В сумке{FFFFFF}");
+            format(itemName, sizeof(itemName), "Clothes set (skin %d)", outfitSkin);
+            format(statusStr, sizeof(statusStr), "{AFAFAF}In bag{FFFFFF}");
         }
         else
         {
@@ -466,7 +466,7 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
         new qtyStr[32];
         if (Item_GetGtaWeaponId(defId) >= 22)
         {
-            format(qtyStr, sizeof(qtyStr), "%d шт. (%d патр.)", amount, ammo);
+            format(qtyStr, sizeof(qtyStr), "%d pcs. (%d rds.)", amount, ammo);
         }
         else if (defId == ITEM_ID_CASH_BUNDLE)
         {
@@ -474,7 +474,7 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
         }
         else
         {
-            format(qtyStr, sizeof(qtyStr), "%d шт.", amount);
+            format(qtyStr, sizeof(qtyStr), "%d pcs.", amount);
         }
 
         new line[192];
@@ -500,8 +500,8 @@ stock Dialogs_OpenExternalContainer(playerid, ext_storage_slot)
         DIALOG_STYLE_TABLIST_HEADERS,
         header,
         body,
-        "Забрать",
-        "Закрыть"
+        "Pick up",
+        "Close"
     );
     return 1;
 }
@@ -523,7 +523,7 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
 
     static body[3584];
     body[0] = '\0';
-    strcat(body, "Слой\tПредмет\tКол-во / Патр.\tСерийный № / Инфо\tВес (кг)\n", sizeof(body));
+    strcat(body, "Layer\tItem\tQty/Pat.\tSerial No./Info\tWeight (kg)\n", sizeof(body));
 
     new storages[2];
     storages[0] = Character_GetLayer1Slot(targetid);
@@ -540,11 +540,11 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
         new layerLabel[20];
         if (sIdx == 0)
         {
-            format(layerLabel, sizeof(layerLabel), "Слой 1 (Внеш.)");
+            format(layerLabel, sizeof(layerLabel), "Layer 1 (External)");
         }
         else
         {
-            format(layerLabel, sizeof(layerLabel), "Слой 2 (Тайник)");
+            format(layerLabel, sizeof(layerLabel), "Layer 2 (Cache)");
         }
 
         new itemSlot = Storage_GetFirstItemSlot(stSlot);
@@ -560,7 +560,7 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
             if (defId == ITEM_ID_CLOTHING_OUTFIT)
             {
                 new const outfitSkin = Storage_GetItemMetaInt1(itemSlot);
-                format(itemName, sizeof(itemName), "Комплект одежды (скин %d)", outfitSkin);
+                format(itemName, sizeof(itemName), "Clothes set (skin %d)", outfitSkin);
             }
 
             new metaStr[ITEM_META_STR_LEN];
@@ -569,11 +569,11 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
             {
                 if (Character_IsOutfitItemEquipped(targetid, itemSlot))
                 {
-                    format(metaStr, sizeof(metaStr), "{66CC66}Надето{FFFFFF}");
+                    format(metaStr, sizeof(metaStr), "{66CC66}Equipped{FFFFFF}");
                 }
                 else
                 {
-                    format(metaStr, sizeof(metaStr), "{AFAFAF}В сумке{FFFFFF}");
+                    format(metaStr, sizeof(metaStr), "{AFAFAF}In bag{FFFFFF}");
                 }
             }
             else if (metaStr[0] == '\0')
@@ -588,11 +588,11 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
             }
             else if (Item_GetGtaWeaponId(defId) >= 22)
             {
-                format(qtyBuf, sizeof(qtyBuf), "%d шт. (%d п.)", amount, ammo);
+                format(qtyBuf, sizeof(qtyBuf), "%d pcs. (%d p.)", amount, ammo);
             }
             else
             {
-                format(qtyBuf, sizeof(qtyBuf), "%d шт.", amount);
+                format(qtyBuf, sizeof(qtyBuf), "%d pcs.", amount);
             }
 
             new rowLine[192];
@@ -618,7 +618,7 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
 
     if (sPlayerDialogRowCount[actorid] == 0)
     {
-        strcat(body, "-\tПри досмотре ничего не обнаружено\t-\t-\t0.00\n", sizeof(body));
+        strcat(body, "-\tNothing was found during inspection\t-\t-\t0.00\n", sizeof(body));
     }
 
     new targetName[MAX_PLAYER_NAME + 1];
@@ -627,21 +627,21 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
     new title[128];
     if (allowConfiscate)
     {
-        format(title, sizeof(title), "Полный обыск: %s [%d] (Изъятие доступно)", targetName, targetid);
+        format(title, sizeof(title), "Full search: %s [%d] (Confiscation available)", targetName, targetid);
     }
     else
     {
-        format(title, sizeof(title), "Поверхностный досмотр (Слой 1): %s [%d]", targetName, targetid);
+        format(title, sizeof(title), "Surface inspection (Layer 1): %s [%d]", targetName, targetid);
     }
 
     new actionBtn[24];
     if (allowConfiscate)
     {
-        format(actionBtn, sizeof(actionBtn), "Изъять");
+        format(actionBtn, sizeof(actionBtn), "Seize");
     }
     else
     {
-        format(actionBtn, sizeof(actionBtn), "Ок");
+        format(actionBtn, sizeof(actionBtn), "Ok");
     }
 
     ShowPlayerDialog(
@@ -651,7 +651,7 @@ stock Dialogs_OpenSearchTarget(actorid, targetid, bool:includeLayer2, bool:allow
         title,
         body,
         actionBtn,
-        "Закрыть"
+        "Close"
     );
     return 1;
 }
@@ -668,7 +668,7 @@ hook OnGameModeInit()
         sPlayerNestedBagSlot[i] = INVALID_STORAGE_SLOT;
         Dialogs_ResetPlayerState(i);
     }
-    printf("%s [UI/Dialogs] Диалоговый маршрутизатор инвентаря (Слой 1/Слой 2/NESTED_BAG) и клавиши Y (2.5 м) инициализирован.",
+    printf("%s [UI/Dialogs] Inventory dialog router (Layer 1/Layer 2/NESTED_BAG) and Y keys (2.5m) initialized.",
         SERVER_LOG_PREFIX);
     return 1;
 }
@@ -704,7 +704,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
     {
         if (Survival_IsCuffed(playerid))
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Действие]: Ваши руки скованы наручниками!");
+            SendClientMessage(playerid, COLOR_ERROR, "[Action]: Your hands are handcuffed!");
             return 1;
         }
 
@@ -713,37 +713,37 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 
         new menuStr[512];
         menuStr[0] = '\0';
-        strcat(menuStr, "1. Открыть личный инвентарь — Слой 1 (Внешний)\n", sizeof(menuStr));
-        strcat(menuStr, "2. Открыть потайной карман — Слой 2 (Скрытый)\n", sizeof(menuStr));
+        strcat(menuStr, "1. Open personal inventory - Layer 1 (External)\n", sizeof(menuStr));
+        strcat(menuStr, "2. Open the secret pocket - Layer 2 (Hidden)\n", sizeof(menuStr));
 
         if (Storage_IsValidSlot(nearSlot))
         {
             new E_STORAGE_TYPE:stType = Storage_GetType(nearSlot);
             if (stType == STORAGE_CORPSE_LOOT)
             {
-                strcat(menuStr, "3. {FFAB91}Обыскать вещи погибшего рядом (2.5 м)\n", sizeof(menuStr));
+                strcat(menuStr, "3. {FFAB91}Search the deceased’s belongings nearby (2.5 m)\n", sizeof(menuStr));
             }
             else
             {
-                strcat(menuStr, "3. {81D4FA}Осмотреть сверток / контейнер рядом (2.5 м)\n", sizeof(menuStr));
+                strcat(menuStr, "3. {81D4FA}Inspect the package/container nearby (2.5 m)\n", sizeof(menuStr));
             }
         }
         else
         {
-            strcat(menuStr, "3. {90A4AE}Поблизости нет предметов на земле (2.5 м)\n", sizeof(menuStr));
+            strcat(menuStr, "3. {90A4AE}There are no objects on the ground nearby (2.5 m)\n", sizeof(menuStr));
         }
 
-        strcat(menuStr, "4. Карточка персонажа и паспортные данные (/stats)\n", sizeof(menuStr));
-        strcat(menuStr, "5. Навыки и характеристики персонажа (/skills)", sizeof(menuStr));
+        strcat(menuStr, "4. Character card and passport data (/stats)\n", sizeof(menuStr));
+        strcat(menuStr, "5. Character skills and characteristics (/skills)", sizeof(menuStr));
 
         ShowPlayerDialog(
             playerid,
             DIALOG_INV_CONTEXT_MENU_Y,
             DIALOG_STYLE_LIST,
-            "Контекстное меню взаимодействия (Клавиша Y)",
+            "Interaction Context Menu (Y Key)",
             menuStr,
-            "Выбрать",
-            "Закрыть"
+            "Select",
+            "Close"
         );
     }
     return 1;
@@ -764,7 +764,7 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
     Item_GetName(defId, itemName, sizeof(itemName));
 
     new title[128];
-    format(title, sizeof(title), "Предмет: %s (%d шт.)", itemName, amount);
+    format(title, sizeof(title), "Item: %s (%d pcs.)", itemName, amount);
 
     new actions[512];
     actions[0] = '\0';
@@ -772,23 +772,23 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
     {
         if (Storage_GetItemMetaInt2(item_slot) == CLOTHING_STATE_EQUIPPED)
         {
-            strcat(actions, "1. {FFC800}Снять и убрать в сумку{FFFFFF}\n", sizeof(actions));
+            strcat(actions, "1. {FFC800}Remove and put in bag{FFFFFF}\n", sizeof(actions));
         }
         else
         {
-            strcat(actions, "1. {66CC66}Надеть на себя{FFFFFF}\n", sizeof(actions));
+            strcat(actions, "1. {66CC66}Put on {FFFFFF}\n", sizeof(actions));
         }
     }
     else
     {
-        strcat(actions, "1. Использовать / Экипировать\n", sizeof(actions));
+        strcat(actions, "1. Use/Equip\n", sizeof(actions));
     }
-    strcat(actions, "2. Открыть (для вложенного рюкзака / сумки)\n", sizeof(actions));
-    strcat(actions, "3. Разделить / Объединить пачку\n", sizeof(actions));
-    strcat(actions, "4. Переложить в другой слой (Слой 1 <-> Слой 2)\n", sizeof(actions));
-    strcat(actions, "5. Переложить во внешнее хранилище\n", sizeof(actions));
-    strcat(actions, "6. Выбросить на землю\n", sizeof(actions));
-    strcat(actions, "7. Передать человеку рядом", sizeof(actions));
+    strcat(actions, "2. Open (for enclosed backpack/bag)\n", sizeof(actions));
+    strcat(actions, "3. Split / Combine pack\n", sizeof(actions));
+    strcat(actions, "4. Transfer to another layer (Layer 1 <-> Layer 2)\n", sizeof(actions));
+    strcat(actions, "5. Transfer to external storage\n", sizeof(actions));
+    strcat(actions, "6. Throw \n onto the ground", sizeof(actions));
+    strcat(actions, "7. Pass it to the person nearby", sizeof(actions));
 
     ShowPlayerDialog(
         playerid,
@@ -796,8 +796,8 @@ static stock Internal_ShowItemActionMenu(playerid, item_slot)
         DIALOG_STYLE_LIST,
         title,
         actions,
-        "Выбрать",
-        "Назад"
+        "Select",
+        "Back"
     );
     return 1;
 }
@@ -828,19 +828,19 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             Character_SyncLayer1Weapons(playerid);
             Character_SyncInventorySkin(playerid);
             Survival_RecalculateEncumbrance(playerid);
-            SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет перемещен в ваш внешний инвентарь (Слой 1).");
+            SendClientMessage(playerid, COLOR_SUCCESS, "[Inventory]: The item has been moved to your external inventory (Layer 1).");
         }
         else if (res == STORAGE_RES_WEIGHT_EXCEEDED)
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Недостаточно грузоподъемности! Превышен лимит веса Слоя 1.");
+            SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Insufficient carrying capacity! Layer 1 weight limit exceeded.");
         }
         else if (res == STORAGE_RES_VOLUME_EXCEEDED)
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: В инвентаре недостаточно свободного объема (литров).");
+            SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: There is not enough free capacity (liters) in inventory.");
         }
         else
         {
-            SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Не удалось переместить предмет (код ограничения контейнера).");
+            SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Failed to move item (container restriction code).");
         }
 
         if (Storage_IsValidSlot(extSlot))
@@ -873,7 +873,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             new defId = Storage_GetItemDefId(itemSlot);
             if (!Item_IsStackable(defId) || avail <= 1 || amount >= avail)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Укажите количество меньше текущего размера пачки для разделения.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Specify a quantity less than the current pack size to split.");
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 return 1;
             }
@@ -886,7 +886,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             if (Storage_RemoveItem(srcSlot, itemSlot, amount))
             {
                 Storage_AddItem(srcSlot, defId, amount, 0, dura, meta1, meta2, metaStr);
-                SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Пачка успешно разделена на две части.");
+                SendClientMessage(playerid, COLOR_SUCCESS, "[Inventory]: The pack has been successfully divided into two parts.");
             }
             Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
         }
@@ -902,23 +902,23 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
                 Character_SyncLayer1Weapons(playerid);
                 Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
-                SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет успешно переложен в другой слой инвентаря.");
+                SendClientMessage(playerid, COLOR_SUCCESS, "[Inventory]: The item has been successfully moved to another inventory layer.");
             }
             else if (res == STORAGE_RES_LAYER2_FORBIDDEN)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Этот предмет слишком крупный для потайного кармана (Слой 2)!");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: This item is too large for a secret pocket (Layer 2)!");
             }
             else if (res == STORAGE_RES_WEIGHT_EXCEEDED)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Превышен лимит веса целевого слоя!");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Target layer weight limit exceeded!");
             }
             else if (res == STORAGE_RES_VOLUME_EXCEEDED)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Превышен лимит объема целевого слоя!");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Target layer volume limit exceeded!");
             }
             else
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Перемещение отклонено системой инвентаря.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Move rejected by inventory system.");
             }
             Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
         }
@@ -931,7 +931,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
             }
             if (!Storage_IsValidSlot(extSlot))
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Рядом нет открытого внешнего хранилища (радиус 2.5 м).");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: There is no open external storage nearby (2.5m radius).");
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 return 1;
             }
@@ -942,15 +942,15 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
                 Character_SyncLayer1Weapons(playerid);
                 Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
-                SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Предмет переложен во внешнее хранилище.");
+                SendClientMessage(playerid, COLOR_SUCCESS, "[Inventory]: The item has been moved to external storage.");
             }
             else if (res == STORAGE_RES_NESTING_LIMIT)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Запрещено вкладывать сумку/контейнер внутрь другой сумки!");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: It is prohibited to place a bag/container inside another bag!");
             }
             else
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: В хранилище недостаточно места по весу или объему.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Storage space is insufficient by weight or volume.");
             }
             Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
         }
@@ -969,7 +969,7 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
 
             if (!Storage_IsValidSlot(dropSlot))
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Достигнут лимит мировых контейнеров на земле.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: The limit of world containers on earth has been reached.");
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 return 1;
             }
@@ -981,12 +981,12 @@ static stock Internal_ExecutePendingItemOp(playerid, amount)
                 Character_SyncLayer1Weapons(playerid);
                 Character_SyncInventorySkin(playerid);
                 Survival_RecalculateEncumbrance(playerid);
-                SendClientMessage(playerid, COLOR_INFO, "[Инвентарь]: Вы положили предмет на землю.");
+                SendClientMessage(playerid, COLOR_INFO, "[Inventory]: You placed an item on the ground.");
             }
             else
             {
                 Storage_DestroyExpiredOrEmpty(dropSlot);
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Не удалось выбросить предмет на землю.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Failed to throw item on the ground.");
             }
             Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
         }
@@ -1017,7 +1017,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     }
                     else
                     {
-                        SendClientMessage(playerid, COLOR_GRAY, "[Осмотр]: В радиусе 2.5 метров нет лежащих предметов или открытых хранилищ.");
+                        SendClientMessage(playerid, COLOR_GRAY, "[Inspection]: There are no lying objects or open storage within a radius of 2.5 meters.");
                     }
                 }
                 case 3: Character_ShowStatsDialog(playerid);
@@ -1062,7 +1062,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 }
                 else
                 {
-                    SendClientMessage(playerid, COLOR_WARNING, "[Инвентарь]: Контейнер рядом больше недоступен.");
+                    SendClientMessage(playerid, COLOR_WARNING, "[Inventory]: The container nearby is no longer available.");
                     Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 }
                 return Y_HOOKS_BREAK_RETURN_1;
@@ -1104,14 +1104,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!Item_IsContainer(defId))
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Этот предмет не является сумкой, рюкзаком или контейнером.");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: This item is not a bag, backpack or container.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     new nestedSlot = Storage_GetItemNestedSlot(itemSlot);
                     if (!Storage_IsValidSlot(nestedSlot))
                     {
-                        SendClientMessage(playerid, COLOR_WARNING, "[Инвентарь]: Внутреннее отделение этой сумки пусто или еще не инициализировано.");
+                        SendClientMessage(playerid, COLOR_WARNING, "[Inventory]: The interior of this bag is empty or has not yet been initialized.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
@@ -1123,20 +1123,20 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if (!Item_IsStackable(defId))
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Этот предмет не складывается в пачки.");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: This item cannot be stacked.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     new merged = Internal_MergeSimilarStacks(srcSlot, itemSlot);
                     if (merged > 0)
                     {
-                        SendClientMessage(playerid, COLOR_SUCCESS, "[Инвентарь]: Однотипные пачки предмета объединены.");
+                        SendClientMessage(playerid, COLOR_SUCCESS, "[Inventory]: Similar item packs are combined.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (amount <= 1)
                     {
-                        SendClientMessage(playerid, COLOR_GRAY, "[Инвентарь]: В пачке всего 1 шт., разделение невозможно.");
+                        SendClientMessage(playerid, COLOR_GRAY, "[Inventory]: There is only 1 piece in a pack, division is not possible.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
@@ -1145,10 +1145,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         playerid,
                         DIALOG_INV_INPUT_AMOUNT,
                         DIALOG_STYLE_INPUT,
-                        "Разделение пачки предметов",
-                        "Введите количество единиц, которое нужно отделить в новую пачку:",
-                        "Отделить",
-                        "Отмена"
+                        "Separating a stack of items",
+                        "Enter the number of units to be separated into a new pack:",
+                        "Separate",
+                        "Cancel"
                     );
                 }
                 case 3: // 4. Переложить в другой слой (Слой 1 <-> Слой 2)
@@ -1160,10 +1160,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                             playerid,
                             DIALOG_INV_INPUT_AMOUNT,
                             DIALOG_STYLE_INPUT,
-                            "Перемещение между слоями инвентаря",
-                            "Введите количество единиц для перемещения в другой слой:",
-                            "Переложить",
-                            "Отмена"
+                            "Moving between inventory layers",
+                            "Enter the number of units to move to another layer:",
+                            "Rearrange",
+                            "Cancel"
                         );
                     }
                     else
@@ -1181,10 +1181,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                             playerid,
                             DIALOG_INV_INPUT_AMOUNT,
                             DIALOG_STYLE_INPUT,
-                            "Перемещение во внешнее хранилище",
-                            "Введите количество единиц для перемещения в контейнер рядом:",
-                            "Переложить",
-                            "Отмена"
+                            "Moving to external storage",
+                            "Enter the number of units to move into the nearby container:",
+                            "Rearrange",
+                            "Cancel"
                         );
                     }
                     else
@@ -1202,10 +1202,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                             playerid,
                             DIALOG_INV_INPUT_AMOUNT,
                             DIALOG_STYLE_INPUT,
-                            "Выбросить предмет на землю",
-                            "Введите количество единиц, которое вы хотите выбросить на землю:",
-                            "Выбросить",
-                            "Отмена"
+                            "Throw an item on the ground",
+                            "Enter the number of units you want to drop on the ground:",
+                            "Throw away",
+                            "Cancel"
                         );
                     }
                     else
@@ -1231,7 +1231,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                     if (nearestId == INVALID_PLAYER_ID)
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Поблизости нет игроков для передачи предмета (до 3.0 м).");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: There are no players nearby to transfer the item (up to 3.0 m).");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
@@ -1239,7 +1239,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new targetLayer1 = Character_GetLayer1Slot(nearestId);
                     if (!Storage_IsValidSlot(targetLayer1))
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Ошибка доступа к инвентарю получателя.");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Error accessing recipient's inventory.");
                         Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
@@ -1262,23 +1262,23 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         GetPlayerName(nearestId, targetName, sizeof(targetName));
 
                         new alertMsg[128];
-                        format(alertMsg, sizeof(alertMsg), "[Передача]: Вы передали «%s» игроку %s.", itemNameBuf, targetName);
+                        format(alertMsg, sizeof(alertMsg), "[Transfer]: You passed \"%s\" to player %s.", itemNameBuf, targetName);
                         SendClientMessage(playerid, COLOR_SUCCESS, alertMsg);
 
-                        format(alertMsg, sizeof(alertMsg), "[Передача]: Вы получили «%s» от %s.", itemNameBuf, actorName);
+                        format(alertMsg, sizeof(alertMsg), "[Transmission]: You received \"%s\" from %s.", itemNameBuf, actorName);
                         SendClientMessage(nearestId, COLOR_SUCCESS, alertMsg);
                     }
                     else if (res == STORAGE_RES_WEIGHT_EXCEEDED)
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: У получателя переполнен инвентарь по весу.");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: The recipient's inventory is full by weight.");
                     }
                     else if (res == STORAGE_RES_VOLUME_EXCEEDED)
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: У получателя недостаточно места по объему (литров).");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: The recipient does not have enough space in terms of volume (liters).");
                     }
                     else
                     {
-                        SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Не удалось передать предмет.");
+                        SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Failed to transfer item.");
                     }
                     Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 }
@@ -1296,7 +1296,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new qty = strval(inputtext);
             if (qty <= 0)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Инвентарь]: Введите корректное положительное число.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Inventory]: Please enter a valid positive number.");
                 Dialogs_OpenInventory(playerid, sPlayerInvViewMode[playerid]);
                 return Y_HOOKS_BREAK_RETURN_1;
             }
@@ -1339,10 +1339,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         playerid,
                         DIALOG_INV_INPUT_AMOUNT,
                         DIALOG_STYLE_INPUT,
-                        "Забрать предмет из хранилища",
-                        "Введите количество единиц, которое вы хотите забрать в Слой 1:",
-                        "Забрать",
-                        "Отмена"
+                        "Pick up an item from storage",
+                        "Enter the number of units you want to take into Layer 1:",
+                        "Pick up",
+                        "Cancel"
                     );
                 }
                 else
@@ -1363,12 +1363,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new targetid = sPlayerSearchTarget[playerid];
             if (targetid == INVALID_PLAYER_ID || !Character_IsLoaded(targetid))
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: Обыскиваемый игрок покинул сервер.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Search]: The player being searched has left the server.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > 3.5)
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: Игрок находится слишком далеко от вас.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Search]: The player is too far from you.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (listitem < 0 || listitem >= sPlayerDialogRowCount[playerid])
@@ -1401,17 +1401,17 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 Survival_RecalculateEncumbrance(playerid);
 
                 new msg[160];
-                format(msg, sizeof(msg), "[Обыск]: Вы изъяли «%s» (%d шт.) у задержанного.", itemName, amount);
+                format(msg, sizeof(msg), "[Search]: You seized “%s” (%d pcs.) from the detainee.", itemName, amount);
                 SendClientMessage(playerid, COLOR_SUCCESS, msg);
 
-                format(msg, sizeof(msg), "[Обыск]: При обыске у вас изъяли «%s» (%d шт.).", itemName, amount);
+                format(msg, sizeof(msg), "[Search]: During the search, “%s” (%d pcs.) was confiscated from you.", itemName, amount);
                 SendClientMessage(targetid, COLOR_WARNING, msg);
 
                 Dialogs_OpenSearchTarget(playerid, targetid, sPlayerSearchIncludeLayer2[playerid], true);
             }
             else
             {
-                SendClientMessage(playerid, COLOR_ERROR, "[Обыск]: В вашем инвентаре (Слой 1) недостаточно места для изъятия предмета.");
+                SendClientMessage(playerid, COLOR_ERROR, "[Search]: There is not enough space in your inventory (Layer 1) to retrieve the item.");
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }

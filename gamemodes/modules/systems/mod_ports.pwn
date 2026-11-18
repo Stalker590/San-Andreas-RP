@@ -151,10 +151,10 @@ stock Ports_GetPortNameRu(port_id, output[], len = sizeof(output))
 {
     switch (port_id)
     {
-        case 1: format(output, len, "Порт Лос-Сантоса");
-        case 2: format(output, len, "Порт Сан-Фиерро");
-        case 3: format(output, len, "Транспортный хаб Лас-Вентураса");
-        default: format(output, len, "Торговый порт");
+        case 1: format(output, len, "Port of Los Santos");
+        case 2: format(output, len, "Port of San Fierro");
+        case 3: format(output, len, "Las Venturas Freight Hub");
+        default: format(output, len, "Commercial port");
     }
     return 1;
 }
@@ -324,7 +324,7 @@ static stock Internal_LoadPortQuotesSync()
     if (!DB_IsConnected())
     {
         Internal_SeedBuiltinPortQuotes();
-        printf("%s [Systems/Ports] MySQL недоступен: загружены встроенные котировки портов (%d записей).",
+        printf("%s [Systems/Ports] MySQL unavailable: built-in port quotes loaded (%d entries).",
             SERVER_LOG_PREFIX, TOTAL_BUILTIN_PORT_QUOTES);
         return TOTAL_BUILTIN_PORT_QUOTES;
     }
@@ -337,7 +337,7 @@ static stock Internal_LoadPortQuotesSync()
     if (!cache_is_valid(cache))
     {
         Internal_SeedBuiltinPortQuotes();
-        printf("%s [Systems/Ports] [WARN] Не удалось прочитать port_market_quotes: загружены встроенные котировки.",
+        printf("%s [Systems/Ports] [WARN] Failed to read port_market_quotes: embedded quotes loaded.",
             SERVER_LOG_PREFIX);
         return TOTAL_BUILTIN_PORT_QUOTES;
     }
@@ -365,7 +365,7 @@ static stock Internal_LoadPortQuotesSync()
     }
     cache_delete(cache);
 
-    printf("%s [Systems/Ports] Котировки портов загружены из MySQL (записей: %d).",
+    printf("%s [Systems/Ports] Port quotes loaded from MySQL (entries: %d).",
         SERVER_LOG_PREFIX, loadedQuotes);
     return loadedQuotes;
 }
@@ -448,7 +448,7 @@ static stock Internal_DropCashToWorld(playerid, amountUsd)
     }
 
     SendClientMessage(playerid, COLOR_UI_WARNING,
-        "Наличные не поместились в инвентарь и выданы отдельной пачкой на земле.");
+        "The cash did not fit into inventory and was issued in a separate bundle on the ground.");
     return 1;
 }
 
@@ -473,7 +473,7 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
     new const quoteSlot = Internal_FindQuoteSlot(port_id, item_def_id);
     if (quoteSlot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Этот товар не торгуется в данном порту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: This item is not traded in this port.");
         return 0;
     }
 
@@ -485,21 +485,21 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
     }
     if (amount <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: На складе порта нет этого товара.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: The port warehouse does not have this item.");
         return 0;
     }
 
     new const buyPrice = sPortQuotes[quoteSlot][E_QUOTE_BUY_PRICE_USD];
     if (buyPrice <= 0 || amount > (2000000000 / buyPrice))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Слишком большая сумма сделки.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: The transaction amount is too large.");
         return 0;
     }
     new const totalCost = buyPrice * amount;
     if (Character_GetPhysicalCashUsd(playerid) < totalCost)
     {
         new msg[160];
-        format(msg, sizeof(msg), "[Порт]: Недостаточно наличных. Требуется $%d.", totalCost);
+        format(msg, sizeof(msg), "[Port]: Not enough cash. Requires $%d.", totalCost);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 0;
     }
@@ -507,7 +507,7 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Inventory unavailable.");
         return 0;
     }
 
@@ -532,13 +532,13 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
         finalVolumeMl > Storage_GetMaxVolume(layer1Slot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Порт]: Партия не помещается в инвентарь. Уменьшите количество.");
+            "[Port]: The batch does not fit into inventory. Reduce the quantity.");
         return 0;
     }
 
     if (!Character_RemovePhysicalCashUsd(playerid, totalCost))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Не удалось списать наличные.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Cash debit failed.");
         return 0;
     }
 
@@ -558,7 +558,7 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
     {
         Character_AddPhysicalCashUsd(playerid, totalCost, CASH_FLAG_CLEAN);
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Порт]: Не удалось выдать товар. Деньги возвращены.");
+            "[Port]: Failed to issue the item. The money has been returned.");
         return 0;
     }
 
@@ -572,14 +572,14 @@ static stock Internal_ExecutePortImport(playerid, port_id, item_def_id, requeste
 
     new msg[192];
     format(msg, sizeof(msg),
-        "[Порт]: Импорт выполнен: %s (количество: %d) за $%d. Остаток в порту: %d.",
+        "[Port]: Import completed: %s (quantity: %d) for $%d. Balance in port: %d.",
         itemName, amount, totalCost, sPortQuotes[quoteSlot][E_QUOTE_CURRENT_STOCK]);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new portName[48], auditDetails[192];
     Ports_GetPortNameRu(port_id, portName, sizeof(portName));
     format(auditDetails, sizeof(auditDetails),
-        "Импорт '%s' (кол-во: %d) через %s за $%d. Выручка зачислена портовой администрации.",
+        "Import '%s' (Qty: %d) via %s for $%d. The proceeds are credited to the port authority.",
         itemName, amount, portName, totalCost);
     Audit_Log(
         Character_GetId(playerid),
@@ -677,7 +677,7 @@ stock Ports_SellCargoToPort(playerid, port_id, item_def_id, amount, source_ent_i
     new const quoteSlot = Internal_FindQuoteSlot(port_id, item_def_id);
     if (quoteSlot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Этот товар не принимается в данном порту.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: This item is not accepted at this port.");
         return 0;
     }
 
@@ -760,13 +760,13 @@ stock Ports_SellCargoToPort(playerid, port_id, item_def_id, amount, source_ent_i
 
     new msg[224];
     format(msg, sizeof(msg),
-        "[Порт]: Экспорт %s (количество: %d) через %s. Выручка: $%d (владельцу $%d, водителю $%d, пошлина $%d).",
+        "[Port]: Export %s (quantity: %d) via %s. Revenue: $%d (owner $%d, driver $%d, toll $%d).",
         itemName, amount, portName, totalRevenue, ownerShare, truckerShare, taxShare);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[224];
     format(auditDetails, sizeof(auditDetails),
-        "Экспорт '%s' (кол-во: %d) через %s. Выручка $%d: владелец $%d, дальнобойщик $%d, пошлина $%d.",
+        "Export '%s' (Qty: %d) via %s. Revenue $%d: owner $%d, trucker $%d, toll $%d.",
         itemName, amount, portName, totalRevenue, ownerShare, truckerShare, taxShare);
     Audit_Log(
         trucker_char_id,
@@ -825,7 +825,7 @@ static stock Internal_ShowPortQuotes(playerid, port_id)
         new itemName[64], rowLine[192];
         Item_GetName(sPortQuotes[quoteSlot][E_QUOTE_ITEM_DEF_ID], itemName);
         format(rowLine, sizeof(rowLine),
-            "%s | покупка: $%d | продажа: $%d | запас: %d / цель: %d",
+            "%s | purchase: $%d | sale: $%d | stock: %d / target: %d",
             itemName,
             sPortQuotes[quoteSlot][E_QUOTE_BUY_PRICE_USD],
             sPortQuotes[quoteSlot][E_QUOTE_SELL_PRICE_USD],
@@ -839,12 +839,12 @@ static stock Internal_ShowPortQuotes(playerid, port_id)
 
     if (quoteCount <= 0)
     {
-        format(sPortDialogBuffer, sizeof(sPortDialogBuffer), "В порту «%s» сейчас нет активных котировок.", portName);
+        format(sPortDialogBuffer, sizeof(sPortDialogBuffer), "The port \"%s\" currently has no active quotes.", portName);
     }
 
     new title[96];
-    format(title, sizeof(title), "Котировки: %s", portName);
-    ShowPlayerDialog(playerid, DIALOG_PORT_QUOTES, DIALOG_STYLE_MSGBOX, title, sPortDialogBuffer, "Понятно", "");
+    format(title, sizeof(title), "Quotes: %s", portName);
+    ShowPlayerDialog(playerid, DIALOG_PORT_QUOTES, DIALOG_STYLE_MSGBOX, title, sPortDialogBuffer, "Understood", "");
     return 1;
 }
 
@@ -871,7 +871,7 @@ static stock Internal_ShowPortImportItems(playerid, port_id)
         new itemName[64], rowLine[160];
         Item_GetName(sPortQuotes[quoteSlot][E_QUOTE_ITEM_DEF_ID], itemName);
         format(rowLine, sizeof(rowLine),
-            "%s | цена импорта: $%d | в наличии: %d",
+            "%s | import price: $%d | in stock: %d",
             itemName,
             sPortQuotes[quoteSlot][E_QUOTE_BUY_PRICE_USD],
             sPortQuotes[quoteSlot][E_QUOTE_CURRENT_STOCK]);
@@ -884,21 +884,21 @@ static stock Internal_ShowPortImportItems(playerid, port_id)
 
     if (sPortDialogRowCount[playerid] <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Порт]: Склад порта пуст.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Port]: The port warehouse is empty.");
         return 0;
     }
 
     sPortPendingPort[playerid] = port_id;
     new title[96];
-    format(title, sizeof(title), "Импорт через %s", portName);
+    format(title, sizeof(title), "Import via %s", portName);
     ShowPlayerDialog(
         playerid,
         DIALOG_PORT_IMPORT_ITEM,
         DIALOG_STYLE_LIST,
         title,
         sPortDialogBuffer,
-        "Выбрать",
-        "Отмена");
+        "Select",
+        "Cancel");
     return 1;
 }
 
@@ -907,12 +907,12 @@ static stock Internal_ShowPortMenu(playerid, port_id)
     new portName[48], body[512];
     Ports_GetPortNameRu(port_id, portName, sizeof(portName));
     format(body, sizeof(body),
-        "1. Котировки порта\n2. Импорт товаров\n3. Сдать груз из фуры (экспорт)\n4. Информация о порте");
+        "1. Port quotes \n2. Import of goods\n3. Hand over cargo from a truck (export)\n4. Port information");
 
     sPortPendingPort[playerid] = port_id;
     new title[96];
     format(title, sizeof(title), "%s", portName);
-    ShowPlayerDialog(playerid, DIALOG_PORT_MENU, DIALOG_STYLE_LIST, title, body, "Выбрать", "Закрыть");
+    ShowPlayerDialog(playerid, DIALOG_PORT_MENU, DIALOG_STYLE_LIST, title, body, "Select", "Close");
     return 1;
 }
 
@@ -926,12 +926,12 @@ CMD:port(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Мертвый персонаж не может работать с грузом.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: A dead character cannot handle cargo.");
         return 1;
     }
 
@@ -946,7 +946,7 @@ CMD:port(playerid, params[])
     if (portId <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Порт]: Подойдите к портовому терминалу в Лос-Сантосе, Сан-Фиерро или Лас-Вентурасе.");
+            "[Port]: Go to the port terminal in Los Santos, San Fierro or Las Venturas.");
         return 1;
     }
 
@@ -996,9 +996,9 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new portName[48], body[512];
                     Ports_GetPortNameRu(portId, portName, sizeof(portName));
                     format(body, sizeof(body),
-                        "Порт: %s\n\nЗдесь принимают экспортные грузы.\nИмпорт оплачивается наличными, экспортная выручка делится 90%% / 5%% / 5%%.\nДля экспорта загрузите груз по контракту и пригоните фуру к терминалу.",
+                        "Port: %s\n\nExport cargo is accepted here.\nImport is paid in cash, export proceeds are divided 90%% / 5%% / 5%%.\nFor export, load the cargo under the contract and drive the truck to the terminal.",
                         portName);
-                    ShowPlayerDialog(playerid, DIALOG_PORT_QUOTES, DIALOG_STYLE_MSGBOX, "Информация о порте", body, "Понятно", "");
+                    ShowPlayerDialog(playerid, DIALOG_PORT_QUOTES, DIALOG_STYLE_MSGBOX, "Port information", body, "Understood", "");
                 }
             }
             return Y_HOOKS_BREAK_RETURN_1;
@@ -1027,7 +1027,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new itemName[64], body[256];
             Item_GetName(itemDefId, itemName);
             format(body, sizeof(body),
-                "Товар: %s\nЦена импорта: $%d за единицу\nВведите количество:",
+                "Product: %s\nImport price: $%d per unit\nEnter quantity:",
                 itemName,
                 Ports_GetBuyPrice(portId, itemDefId));
 
@@ -1035,10 +1035,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 playerid,
                 DIALOG_PORT_IMPORT_AMOUNT,
                 DIALOG_STYLE_INPUT,
-                "Импорт товара",
+                "Import of goods",
                 body,
-                "Купить",
-                "Отмена");
+                "Buy",
+                "Cancel");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -1057,7 +1057,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (inputtext[idx] < '0' || inputtext[idx] > '9')
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Введите целое положительное число.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Enter a positive integer.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             while (inputtext[idx] >= '0' && inputtext[idx] <= '9')
@@ -1065,7 +1065,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 amount = (amount * 10) + (inputtext[idx] - '0');
                 if (amount > 2000000000)
                 {
-                    SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Слишком большое количество.");
+                    SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Number too large.");
                     return Y_HOOKS_BREAK_RETURN_1;
                 }
                 idx++;
@@ -1076,7 +1076,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (amount <= 0 || inputtext[idx] != '\0')
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "[Порт]: Введите целое положительное число.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "[Port]: Enter a positive integer.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -1098,7 +1098,7 @@ static stock Internal_CreatePortLabels()
     {
         Ports_GetPortNameRu(portIndex + 1, portName, sizeof(portName));
         format(labelText, sizeof(labelText),
-            "%s\nТерминал импорта и экспорта\nВведите /port для открытия",
+            "%s\nImport and Export Terminal\nEnter /port to open",
             portName);
 
         sPortLabel[portIndex] = CreateDynamic3DTextLabel(
@@ -1129,7 +1129,7 @@ hook OnGameModeInit()
         sLastPortCommandTick[i] = 0;
     }
 
-    printf("%s [Systems/Ports] Модуль портов запущен (котировок: %d).",
+    printf("%s [Systems/Ports] The ports module is running (quotes: %d).",
         SERVER_LOG_PREFIX, loadedQuotes);
     return 1;
 }

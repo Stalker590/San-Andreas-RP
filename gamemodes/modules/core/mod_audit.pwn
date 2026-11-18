@@ -265,7 +265,7 @@ stock Audit_Log(
 stock Audit_FlushBufferSync()
 {
     new const flushed = Internal_FlushAuditBufferToDb();
-    printf("%s [Core/Audit] Буфер аудита синхронизирован (сброшено записей: %d, всего за сессию: %d).",
+    printf("%s [Core/Audit] The audit buffer is synchronized (records reset: %d, total for session: %d).",
         SERVER_LOG_PREFIX, flushed, sTotalAuditEventsLogged);
     return flushed;
 }
@@ -322,10 +322,10 @@ hook OnGameModeInit()
         "AUDIT_SUBSYSTEM",
         0,
         1,
-        "Инициализация подсистемы аудита транзакций SAN ANDREAS RP"
+        "Initializing the SAN ANDREAS RP transaction audit subsystem"
     );
 
-    printf("%s [Core/Audit] Подсистема аудита инициализирована (емкость пакетного буфера: %d записей / 5 сек).",
+    printf("%s [Core/Audit] The audit subsystem has been initialized (batch buffer capacity: %d records / 5 sec).",
         SERVER_LOG_PREFIX, AUDIT_BUFFER_CAPACITY);
     return 1;
 }

@@ -158,22 +158,22 @@ static stock sCraftDialogBuffer[CRAFT_DIALOG_BUFFER_LEN];
 // Этилонные таблицы для автономного режима (когда MySQL недоступен)
 static stock const sBuiltinEnterprises[TOTAL_BUILTIN_ENTERPRISES][E_ENTERPRISE_DATA] =
 {
-    { true, 1,  "Железорудный карьер Хантер-Куорри",           ENTERPRISE_MINE_ORE,   ENTERPRISE_OWN_STATE,   0, 1,  22, INVALID_STORAGE_SLOT, 1500000, 14, 595.4,  872.6,  -42.5, 0 },
-    { true, 2,  "Нефтедобывающий участок Октан-Спрингс",        ENTERPRISE_OIL_RIG,    ENTERPRISE_OWN_STATE,   0, 1,  23, INVALID_STORAGE_SLOT, 1500000, 16, 261.2,  1411.8, 10.6,  0 },
-    { true, 3,  "Лесозаготовительный комплекс Эйнджел-Пайн",    ENTERPRISE_SAWMILL,    ENTERPRISE_OWN_STATE,   0, 1,  24, INVALID_STORAGE_SLOT, 1000000, 12, -533.8, -179.4, 78.4,  0 },
-    { true, 4,  "Аграрный зерновой комплекс Флинт-Каунти",      ENTERPRISE_FARM,       ENTERPRISE_OWN_STATE,   0, 1,  25, INVALID_STORAGE_SLOT, 1000000, 10, -382.1, -1426.3, 25.7, 0 },
-    { true, 5,  "Нефтеперерабатывающий завод Грин-Палмс",       ENTERPRISE_REFINERY,   ENTERPRISE_OWN_STATE,   0, 1,  26, INVALID_STORAGE_SLOT, 2500000, 8,  248.4,  1396.2, 10.6,  0 },
-    { true, 6,  "Металлургический комбинат Оушен-Докс",         ENTERPRISE_METALLURGY, ENTERPRISE_OWN_STATE,   0, 1,  27, INVALID_STORAGE_SLOT, 2500000, 10, 2180.5, -2253.8, 13.5, 0 },
-    { true, 7,  "Сборочный завод Истер-Бейсин",                 ENTERPRISE_FACTORY,    ENTERPRISE_OWN_UNOWNED, 0, 0,  28, INVALID_STORAGE_SLOT, 1200000, 12, -1042.6, -664.2, 32.0, 850000 },
-    { true, 8,  "Универсам Айдлвуд 24/7",                       ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  29, INVALID_STORAGE_SLOT, 400000,  5,  1352.3, -1759.2, 13.5, 250000 },
-    { true, 9,  "Универсам Джунипер-Хилл 24/7",                 ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  30, INVALID_STORAGE_SLOT, 400000,  5,  -2442.6, 754.8, 35.2,  250000 },
-    { true, 10, "Торговый дом Крик Лас-Вентурас",               ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  31, INVALID_STORAGE_SLOT, 400000,  5,  2194.2, 1991.0, 12.3,  275000 },
-    { true, 11, "Топливная станция Айдлвуд",                    ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  32, INVALID_STORAGE_SLOT, 600000,  5,  1940.1, -1772.9, 13.4, 350000 },
-    { true, 12, "Топливная станция Истер-Бейсин",               ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  33, INVALID_STORAGE_SLOT, 600000,  5,  -1676.3, 413.2, 7.2,   350000 },
-    { true, 13, "Топливная станция Изумрудный Остров",          ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  34, INVALID_STORAGE_SLOT, 600000,  5,  2115.2, 920.1, 10.8,  375000 },
-    { true, 14, "Авторазборка Восточного Лос-Сантоса",          ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 19, 35, INVALID_STORAGE_SLOT, 300000,  8,  2403.5, -1406.2, 24.0, 0 },
-    { true, 15, "Подпольный гараж Доэрти",                      ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 20, 36, INVALID_STORAGE_SLOT, 350000,  8,  -2051.8, 178.4, 28.8,  0 },
-    { true, 16, "Авторазборка Рэдсэндс-Уэст",                   ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 21, 37, INVALID_STORAGE_SLOT, 400000,  8,  1658.4, 2196.1, 10.8, 0 }
+    { true, 1,  "Hunter Quarry Iron Mine",           ENTERPRISE_MINE_ORE,   ENTERPRISE_OWN_STATE,   0, 1,  22, INVALID_STORAGE_SLOT, 1500000, 14, 595.4,  872.6,  -42.5, 0 },
+    { true, 2,  "Octane Springs Oil Field",        ENTERPRISE_OIL_RIG,    ENTERPRISE_OWN_STATE,   0, 1,  23, INVALID_STORAGE_SLOT, 1500000, 16, 261.2,  1411.8, 10.6,  0 },
+    { true, 3,  "Angel Pine Logging Complex",    ENTERPRISE_SAWMILL,    ENTERPRISE_OWN_STATE,   0, 1,  24, INVALID_STORAGE_SLOT, 1000000, 12, -533.8, -179.4, 78.4,  0 },
+    { true, 4,  "Flint County Grain Farm",      ENTERPRISE_FARM,       ENTERPRISE_OWN_STATE,   0, 1,  25, INVALID_STORAGE_SLOT, 1000000, 10, -382.1, -1426.3, 25.7, 0 },
+    { true, 5,  "Green Palms Oil Refinery",       ENTERPRISE_REFINERY,   ENTERPRISE_OWN_STATE,   0, 1,  26, INVALID_STORAGE_SLOT, 2500000, 8,  248.4,  1396.2, 10.6,  0 },
+    { true, 6,  "Ocean Docks Steel Mill",         ENTERPRISE_METALLURGY, ENTERPRISE_OWN_STATE,   0, 1,  27, INVALID_STORAGE_SLOT, 2500000, 10, 2180.5, -2253.8, 13.5, 0 },
+    { true, 7,  "Easter Basin Assembly Plant",                 ENTERPRISE_FACTORY,    ENTERPRISE_OWN_UNOWNED, 0, 0,  28, INVALID_STORAGE_SLOT, 1200000, 12, -1042.6, -664.2, 32.0, 850000 },
+    { true, 8,  "Idlewood 24/7 Supermarket",                       ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  29, INVALID_STORAGE_SLOT, 400000,  5,  1352.3, -1759.2, 13.5, 250000 },
+    { true, 9,  "Juniper Hill 24/7 Supermarket",                 ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  30, INVALID_STORAGE_SLOT, 400000,  5,  -2442.6, 754.8, 35.2,  250000 },
+    { true, 10, "Las Venturas Creek Trading House",               ENTERPRISE_RETAIL_SHOP, ENTERPRISE_OWN_UNOWNED, 0, 0,  31, INVALID_STORAGE_SLOT, 400000,  5,  2194.2, 1991.0, 12.3,  275000 },
+    { true, 11, "Idlewood Gas Station",                    ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  32, INVALID_STORAGE_SLOT, 600000,  5,  1940.1, -1772.9, 13.4, 350000 },
+    { true, 12, "Easter Basin Gas Station",               ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  33, INVALID_STORAGE_SLOT, 600000,  5,  -1676.3, 413.2, 7.2,   350000 },
+    { true, 13, "Emerald Isle Gas Station",          ENTERPRISE_GAS_STATION, ENTERPRISE_OWN_UNOWNED, 0, 0,  34, INVALID_STORAGE_SLOT, 600000,  5,  2115.2, 920.1, 10.8,  375000 },
+    { true, 14, "East Los Santos Chop Shop",          ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 19, 35, INVALID_STORAGE_SLOT, 300000,  8,  2403.5, -1406.2, 24.0, 0 },
+    { true, 15, "Doherty Underground Garage",                      ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 20, 36, INVALID_STORAGE_SLOT, 350000,  8,  -2051.8, 178.4, 28.8,  0 },
+    { true, 16, "Redsands West Chop Shop",                   ENTERPRISE_CHOP_SHOP,   ENTERPRISE_OWN_PRIVATE, 0, 21, 37, INVALID_STORAGE_SLOT, 400000,  8,  1658.4, 2196.1, 10.8, 0 }
 };
 
 static stock const sFallbackRecipeMeta[TOTAL_FALLBACK_RECIPES][E_FALLBACK_RECIPE] =
@@ -479,17 +479,17 @@ static stock Internal_GetEnterpriseTypeTitleRu(E_ENTERPRISE_TYPE:type, output[],
 {
     switch (type)
     {
-        case ENTERPRISE_MINE_ORE:    format(output, len, "Рудный карьер");
-        case ENTERPRISE_OIL_RIG:     format(output, len, "Нефтедобыча");
-        case ENTERPRISE_SAWMILL:     format(output, len, "Лесопилка");
-        case ENTERPRISE_FARM:        format(output, len, "Ферма");
-        case ENTERPRISE_REFINERY:    format(output, len, "Нефтепереработка");
-        case ENTERPRISE_METALLURGY:  format(output, len, "Металлургия");
-        case ENTERPRISE_FACTORY:     format(output, len, "Сборочный завод");
-        case ENTERPRISE_RETAIL_SHOP: format(output, len, "Розничный магазин");
-        case ENTERPRISE_GAS_STATION: format(output, len, "Автозаправка");
-        case ENTERPRISE_CHOP_SHOP:   format(output, len, "Авторазборка");
-        default:                     format(output, len, "Предприятие");
+        case ENTERPRISE_MINE_ORE:    format(output, len, "Ore quarry");
+        case ENTERPRISE_OIL_RIG:     format(output, len, "Oil production");
+        case ENTERPRISE_SAWMILL:     format(output, len, "Sawmill");
+        case ENTERPRISE_FARM:        format(output, len, "Farm");
+        case ENTERPRISE_REFINERY:    format(output, len, "Oil refining");
+        case ENTERPRISE_METALLURGY:  format(output, len, "Metallurgy");
+        case ENTERPRISE_FACTORY:     format(output, len, "Assembly plant");
+        case ENTERPRISE_RETAIL_SHOP: format(output, len, "Retail store");
+        case ENTERPRISE_GAS_STATION: format(output, len, "Gas station");
+        case ENTERPRISE_CHOP_SHOP:   format(output, len, "Auto disassembly");
+        default:                     format(output, len, "Enterprise");
     }
     return 1;
 }
@@ -498,9 +498,9 @@ static stock Internal_GetOwnershipTitleRu(E_ENTERPRISE_OWNERSHIP:ownership, outp
 {
     switch (ownership)
     {
-        case ENTERPRISE_OWN_STATE:   format(output, len, "Государственное");
-        case ENTERPRISE_OWN_PRIVATE: format(output, len, "Частное");
-        default:                     format(output, len, "Бесхозное");
+        case ENTERPRISE_OWN_STATE:   format(output, len, "State");
+        case ENTERPRISE_OWN_PRIVATE: format(output, len, "Private");
+        default:                     format(output, len, "Unowned");
     }
     return 1;
 }
@@ -509,13 +509,13 @@ static stock Internal_GetStationTitleRu(E_CRAFT_STATION:station, output[], len =
 {
     switch (station)
     {
-        case CRAFT_STATION_HAND:                format(output, len, "Ручная работа");
-        case CRAFT_STATION_WORKBENCH_WEAPON:    format(output, len, "Оружейный верстак");
-        case CRAFT_STATION_WORKBENCH_CHEM:      format(output, len, "Химический верстак");
-        case CRAFT_STATION_FACTORY_REFINERY:    format(output, len, "Нефтепереработка");
-        case CRAFT_STATION_FACTORY_METALLURGY:  format(output, len, "Металлургический цех");
-        case CRAFT_STATION_FACTORY_ASSEMBLY:    format(output, len, "Сборочный цех");
-        default:                                format(output, len, "Верстак");
+        case CRAFT_STATION_HAND:                format(output, len, "Handmade");
+        case CRAFT_STATION_WORKBENCH_WEAPON:    format(output, len, "Weapon workbench");
+        case CRAFT_STATION_WORKBENCH_CHEM:      format(output, len, "Chemical workbench");
+        case CRAFT_STATION_FACTORY_REFINERY:    format(output, len, "Oil refining");
+        case CRAFT_STATION_FACTORY_METALLURGY:  format(output, len, "Metallurgical shop");
+        case CRAFT_STATION_FACTORY_ASSEMBLY:    format(output, len, "Assembly shop");
+        default:                                format(output, len, "Workbench");
     }
     return 1;
 }
@@ -622,7 +622,7 @@ static stock Internal_RefreshEnterpriseLabel(enterprise_id)
     Internal_GetOwnershipTitleRu(sEnterprises[enterprise_id][E_ENT_OWNERSHIP], ownerTitle, sizeof(ownerTitle));
 
     format(labelText, sizeof(labelText),
-        "%s\n%s | %s\nЗарплата: $%d/кг\nКоманды: /mine /deliver /craft /market /enterprise",
+        "%s\n%s | %s\nSalary: $%d/kg\nTeams: /mine /deliver /craft /market /enterprise",
         sEnterprises[enterprise_id][E_ENT_NAME],
         typeTitle,
         ownerTitle,
@@ -632,7 +632,7 @@ static stock Internal_RefreshEnterpriseLabel(enterprise_id)
         sEnterprises[enterprise_id][E_ENT_AUCTION_PRICE_USD] > 0)
     {
         new auctionLine[64];
-        format(auctionLine, sizeof(auctionLine), "\nАукцион: /auction ($%d)",
+        format(auctionLine, sizeof(auctionLine), "\nAuction: /auction ($%d)",
             sEnterprises[enterprise_id][E_ENT_AUCTION_PRICE_USD]);
         strcat(labelText, auctionLine, sizeof(labelText));
     }
@@ -691,7 +691,7 @@ static stock Internal_LoadEnterprisesSync()
     if (!DB_IsConnected())
     {
         Internal_LoadBuiltinEnterprises();
-        printf("%s [Systems/Crafting] MySQL недоступен: загружен встроенный реестр предприятий (%d записей).",
+        printf("%s [Systems/Crafting] MySQL is unavailable: the built-in enterprise registry is loaded (%d entries).",
             SERVER_LOG_PREFIX, TOTAL_BUILTIN_ENTERPRISES);
         return TOTAL_BUILTIN_ENTERPRISES;
     }
@@ -704,7 +704,7 @@ static stock Internal_LoadEnterprisesSync()
     if (!cache_is_valid(cache))
     {
         Internal_LoadBuiltinEnterprises();
-        printf("%s [Systems/Crafting] [WARN] Не удалось прочитать enterprises: загружен встроенный реестр.",
+        printf("%s [Systems/Crafting] [WARN] Failed to read enterprises: embedded registry loaded.",
             SERVER_LOG_PREFIX);
         return TOTAL_BUILTIN_ENTERPRISES;
     }
@@ -758,7 +758,7 @@ static stock Internal_LoadEnterprisesSync()
         }
     }
 
-    printf("%s [Systems/Crafting] Реестр предприятий загружен из MySQL (записей: %d).",
+    printf("%s [Systems/Crafting] Business registry loaded from MySQL (records: %d).",
         SERVER_LOG_PREFIX, loadedCount);
     return loadedCount;
 }
@@ -874,7 +874,7 @@ static stock Internal_LoadRecipesSync()
     if (!DB_IsConnected())
     {
         Internal_SeedFallbackRecipes();
-        printf("%s [Systems/Crafting] MySQL недоступен: загружен встроенный набор рецептов (%d шт.).",
+        printf("%s [Systems/Crafting] MySQL is unavailable: the built-in set of recipes has been loaded (%d pcs.).",
             SERVER_LOG_PREFIX, TOTAL_FALLBACK_RECIPES);
         return TOTAL_FALLBACK_RECIPES;
     }
@@ -887,7 +887,7 @@ static stock Internal_LoadRecipesSync()
     if (!cache_is_valid(recipeCache))
     {
         Internal_SeedFallbackRecipes();
-        printf("%s [Systems/Crafting] [WARN] Не удалось прочитать craft_recipes: загружен встроенный набор.",
+        printf("%s [Systems/Crafting] [WARN] Failed to read craft_recipes: built-in set loaded.",
             SERVER_LOG_PREFIX);
         return TOTAL_FALLBACK_RECIPES;
     }
@@ -954,7 +954,7 @@ static stock Internal_LoadRecipesSync()
         cache_delete(inputCache);
     }
 
-    printf("%s [Systems/Crafting] Рецепты крафта загружены из MySQL (рецептов: %d).",
+    printf("%s [Systems/Crafting] Crafting recipes loaded from MySQL (recipes: %d).",
         SERVER_LOG_PREFIX, loadedRecipes);
     return loadedRecipes;
 }
@@ -1496,7 +1496,7 @@ static stock Internal_DropItemsToWorld(
     new const dropSlot = Storage_CreateWorldDrop(x, y, z, interior, virtualWorld, itemIds[0]);
     if (dropSlot == INVALID_STORAGE_SLOT)
     {
-        printf("%s [Systems/Crafting] [ERROR] Не удалось создать WORLD_DROP для возврата предметов (%s).",
+        printf("%s [Systems/Crafting] [ERROR] Failed to create WORLD_DROP to return items (%s).",
             SERVER_LOG_PREFIX, reason);
         return 0;
     }
@@ -1536,7 +1536,7 @@ static stock Internal_DropItemsToWorld(
     if (playerid >= 0 && playerid < MAX_PLAYERS && IsPlayerConnected(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Предметы возвращены на землю рядом с вами: продолжите работу или подберите их.");
+            "Items have been returned to the ground near you: continue working or pick them up.");
     }
     return droppedCount;
 }
@@ -1582,7 +1582,7 @@ static stock Internal_RefundCraftJob(playerid)
 
     return Internal_DropItemsToWorld(
         playerid, itemIds, amounts, count, x, y, z, interior, virtualWorld,
-        "возврат ингредиентов прерванного крафта");
+        "return of interrupted crafting ingredients");
 }
 
 // =============================================================================
@@ -1658,7 +1658,7 @@ public OnCraftingJobComplete(playerid, token)
         amounts[0] = outputItemAmount;
         Internal_DropItemsToWorld(
             playerid, itemIds, amounts, 1, x, y, z, interior, virtualWorld,
-            "переполнение инвентаря при завершении крафта");
+            "Inventory overflow when crafting is completed");
     }
 
     new itemName[64];
@@ -1667,14 +1667,14 @@ public OnCraftingJobComplete(playerid, token)
     if (delivered)
     {
         new msg[160];
-        format(msg, sizeof(msg), "[Производство]: Готово: %s (количество: %d). Предмет добавлен в инвентарь.",
+        format(msg, sizeof(msg), "[Production]: Ready: %s (Quantity: %d). The item has been added to inventory.",
             itemName, outputItemAmount);
         SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     }
     else
     {
         new msg[160];
-        format(msg, sizeof(msg), "[Производство]: Готово: %s (количество: %d). Инвентарь переполнен, предмет выброшен на землю.",
+        format(msg, sizeof(msg), "[Production]: Ready: %s (Quantity: %d). The inventory is full, the item is thrown to the ground.",
             itemName, outputItemAmount);
         SendClientMessage(playerid, COLOR_UI_WARNING, msg);
     }
@@ -1688,7 +1688,7 @@ public OnCraftingJobComplete(playerid, token)
 
     new auditDetails[160];
     format(auditDetails, sizeof(auditDetails),
-        "Крафт предмета '%s' (кол-во: %d) на верстаке. Рецепт #%d.",
+        "Craft the item '%s' (quantity: %d) at the workbench. Recipe #%d.",
         itemName, outputItemAmount, sRecipes[recipeSlot][E_RECIPE_DB_ID]);
     Audit_Log(
         Character_GetId(playerid),
@@ -1713,24 +1713,24 @@ CMD:mine(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Добыча]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Loot]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Добыча]: Мертвый персонаж не может работать.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Loot]: A dead character cannot work.");
         return 1;
     }
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Добыча]: Выйдите из транспорта, чтобы работать.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Loot]: Get out of the vehicle to work.");
         return 1;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sLastMiningTick[playerid]) < CRAFT_MINING_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Добыча]: Инструмент остывает. Подождите несколько секунд.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Production]: The tool is cooling down. Wait a few seconds.");
         return 1;
     }
 
@@ -1738,7 +1738,7 @@ CMD:mine(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Добыча]: Подойдите к шахте, нефтевышке, лесопилке или ферме.");
+            "[Mining]: Approach a mine, oil rig, sawmill or farm.");
         return 1;
     }
 
@@ -1746,14 +1746,14 @@ CMD:mine(playerid, params[])
     if (!Internal_IsPrimaryEnterpriseType(type))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Добыча]: Здесь не ведется первичная добыча сырья.");
+            "[Extraction]: Primary extraction of raw materials is not carried out here.");
         return 1;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Добыча]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Loot]: Inventory unavailable.");
         return 1;
     }
 
@@ -1763,7 +1763,7 @@ CMD:mine(playerid, params[])
     {
         new msg[160];
         format(msg, sizeof(msg),
-            "[Добыча]: Недостаточный навык горного дела и лесоповала: требуется %d, у вас %d.",
+            "[Mining]: Insufficient mining and logging skill: required %d, you have %d.",
             requiredSkill, playerSkill);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 1;
@@ -1775,7 +1775,7 @@ CMD:mine(playerid, params[])
         new toolName[64];
         Item_GetName(requiredTool, toolName);
         new msg[160];
-        format(msg, sizeof(msg), "[Добыча]: Для работы нужен инструмент: %s.", toolName);
+        format(msg, sizeof(msg), "[Extraction]: To work you need a tool: %s.", toolName);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 1;
     }
@@ -1783,7 +1783,7 @@ CMD:mine(playerid, params[])
     new const resourceItemId = Internal_GetPrimaryResourceItem(type);
     if (resourceItemId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Добыча]: На этом объекте нет доступного ресурса.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Extraction]: There is no resource available at this facility.");
         return 1;
     }
 
@@ -1812,7 +1812,7 @@ CMD:mine(playerid, params[])
     if (addResult != STORAGE_RES_OK)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Добыча]: Инвентарь переполнен. Освободите место или сдайте сырье на склад.");
+            "[Loot]: Inventory is full. Free up space or put raw materials into storage.");
         return 1;
     }
 
@@ -1823,7 +1823,7 @@ CMD:mine(playerid, params[])
     Item_GetName(resourceItemId, itemName);
     Utils_FormatWeightGrams(Item_CalculateInstanceWeight(resourceItemId, baseYield), weightStr);
     format(msg, sizeof(msg),
-        "[Добыча]: Вы добыли %s (количество: %d, вес: %s). Навык: %d.",
+        "[Loot]: You have mined %s (quantity: %d, weight: %s). Skill: %d.",
         itemName, baseYield, weightStr, Skills_Get(playerid, SKILL_MINING_LOGGING));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     return 1;
@@ -1836,12 +1836,12 @@ CMD:deliver(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Склад]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Warehouse]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Склад]: Мертвый персонаж не может сдавать сырье.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Warehouse]: A dead character cannot donate raw materials.");
         return 1;
     }
 
@@ -1849,7 +1849,7 @@ CMD:deliver(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Склад]: Подойдите вплотную к складу предприятия, чтобы сдать сырье.");
+            "[Warehouse]: Go close to the company's warehouse to hand over raw materials.");
         return 1;
     }
 
@@ -1857,21 +1857,21 @@ CMD:deliver(playerid, params[])
     if (!Internal_IsPrimaryEnterpriseType(type))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Склад]: Это предприятие не принимает первичное сырье по сдельной зарплате.");
+            "[Warehouse]: This company does not accept primary raw materials on a piece rate basis.");
         return 1;
     }
 
     new const warehouseSlot = Enterprise_GetWarehouseSlot(enterpriseId);
     if (!Storage_IsValidSlot(warehouseSlot) || !Storage_AreItemsReady(warehouseSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Склад]: Склад предприятия еще загружается. Повторите через секунду.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Warehouse]: The company's warehouse is still loading. Repeat in a second.");
         return 1;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Склад]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Warehouse]: Inventory unavailable.");
         return 1;
     }
 
@@ -1882,7 +1882,7 @@ CMD:deliver(playerid, params[])
         new itemName[64];
         Item_GetName(resourceItemId, itemName);
         new msg[160];
-        format(msg, sizeof(msg), "[Склад]: У вас нет продукции этого предприятия (%s).", itemName);
+        format(msg, sizeof(msg), "[Warehouse]: You do not have products from this company (%s).", itemName);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 1;
     }
@@ -1894,7 +1894,7 @@ CMD:deliver(playerid, params[])
     if (payoutUsd <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Склад]: Партия слишком мала для выплаты. Добудьте больше сырья.");
+            "[Warehouse]: The lot is too small to pay out. Get more raw materials.");
         return 1;
     }
 
@@ -1902,7 +1902,7 @@ CMD:deliver(playerid, params[])
     {
         new msg[192];
         format(msg, sizeof(msg),
-            "[Склад]: В кассе предприятия недостаточно средств. Требуется $%d, доступно $%d.",
+            "[Warehouse]: There are not enough funds in the company's cash register. $%d required, $%d available.",
             payoutUsd, Enterprise_GetReserve(enterpriseId));
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return 1;
@@ -1919,7 +1919,7 @@ CMD:deliver(playerid, params[])
         finalVolumeMl > Storage_GetMaxVolume(layer1Slot))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Склад]: После выплаты наличные не поместятся в инвентарь. Сдайте меньшую партию.");
+            "[Warehouse]: After payment, cash will not be placed in inventory. Submit a smaller batch.");
         return 1;
     }
 
@@ -1933,7 +1933,7 @@ CMD:deliver(playerid, params[])
     if (movedAmount <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Склад]: Не удалось переместить сырье на склад. Попробуйте еще раз.");
+            "[Warehouse]: Failed to move raw materials to warehouse. Try again.");
         return 1;
     }
 
@@ -1957,9 +1957,9 @@ CMD:deliver(playerid, params[])
             Internal_DropItemsToWorld(
                 playerid, cashIds, cashAmounts, 1, px, py, pz,
                 GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid),
-                "выплата зарплаты наличными");
+                "salary payment in cash");
             SendClientMessage(playerid, COLOR_UI_WARNING,
-                "[Склад]: Наличные не поместились в инвентарь и выданы отдельной пачкой на земле.");
+                "[Warehouse]: Cash did not fit into inventory and was issued in a separate stack on the ground.");
         }
         Enterprise_TakeReserve(enterpriseId, actualPayoutUsd);
     }
@@ -1970,13 +1970,13 @@ CMD:deliver(playerid, params[])
     Item_GetName(resourceItemId, itemName);
     Utils_FormatWeightGrams(actualWeightG, weightStr);
     format(msg, sizeof(msg),
-        "[Склад]: Принято %s: %d шт. (%s). Начислено $%d из кассы предприятия.",
+        "[Stock]: Accepted %s: %d pcs. (%s). $%d was accrued from the company's cash register.",
         itemName, movedAmount, weightStr, actualPayoutUsd);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new auditDetails[192];
     format(auditDetails, sizeof(auditDetails),
-        "Сдача сырья '%s' (кол-во: %d, вес: %d г) на склад предприятия #%d. Выплата: $%d.",
+        "Delivery of raw materials '%s' (quantity: %d, weight: %d g) to the warehouse of the enterprise #%d. Payout: $%d.",
         itemName, movedAmount, actualWeightG, Enterprise_GetDbId(enterpriseId), actualPayoutUsd);
     Audit_Log(
         Character_GetId(playerid),
@@ -1995,29 +1995,29 @@ CMD:craft(playerid, params[])
 
     if (!Character_IsLoaded(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Ваш персонаж еще не загружен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: Your character has not yet been loaded.");
         return 1;
     }
     if (!Character_IsAlive(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Мертвый персонаж не может работать за верстаком.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: A dead character cannot work at a workbench.");
         return 1;
     }
     if (IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Выйдите из транспорта, чтобы работать за верстаком.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: Get out of the vehicle to work at the workbench.");
         return 1;
     }
     if (sCraftJob[playerid][E_JOB_ACTIVE])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Крафт]: Вы уже выполняете производственный заказ.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Crafting]: You are already completing a production order.");
         return 1;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sLastCraftCommandTick[playerid]) < CRAFT_COMMAND_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Крафт]: Не так быстро. Подождите мгновение.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Craft]: Not so fast. Wait a moment.");
         return 1;
     }
     sLastCraftCommandTick[playerid] = nowTick;
@@ -2026,7 +2026,7 @@ CMD:craft(playerid, params[])
     if (enterpriseId == INVALID_ENTERPRISE_ID)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Крафт]: Подойдите к заводу, металлургии, НПЗ или авторазборке.");
+            "[Crafting]: Go to a factory, metallurgy, refinery or auto dismantling station.");
         return 1;
     }
 
@@ -2071,7 +2071,7 @@ CMD:craft(playerid, params[])
         }
         else
         {
-            format(skillName, sizeof(skillName), "Без навыка");
+            format(skillName, sizeof(skillName), "Without skill");
         }
 
         Item_GetName(sRecipes[recipeSlot][E_RECIPE_OUTPUT_ITEM_ID], outputName);
@@ -2097,8 +2097,8 @@ CMD:craft(playerid, params[])
         }
 
         format(rowLine, sizeof(rowLine),
-            "%s%s | %s | %d сек | %s %d/%d | сырье: %s",
-            skillOk ? ("") : ("[НЕДОСТУПНО] "),
+            "%s%s | %s | %d sec | %s %d/%d | raw material: %s",
+            skillOk ? ("") : ("[UNAVAILABLE]"),
             outputName,
             stationTitle,
             timeSec,
@@ -2115,22 +2115,22 @@ CMD:craft(playerid, params[])
     if (sCraftDialogRecipeCount[playerid] <= 0)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Крафт]: Для этого предприятия нет доступных рецептов.");
+            "[Crafting]: There are no recipes available for this craft.");
         return 1;
     }
 
     new title[96];
     new enterpriseName[64];
     Enterprise_GetName(enterpriseId, enterpriseName);
-    format(title, sizeof(title), "Производство: %s", enterpriseName);
+    format(title, sizeof(title), "Production: %s", enterpriseName);
     ShowPlayerDialog(
         playerid,
         DIALOG_CRAFT_RECIPES,
         DIALOG_STYLE_LIST,
         title,
         sCraftDialogBuffer,
-        "Изготовить",
-        "Закрыть");
+        "Make",
+        "Close");
     return 1;
 }
 
@@ -2157,20 +2157,20 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     }
     if (!Character_IsLoaded(playerid) || IsPlayerInAnyVehicle(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Действие недоступно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: Action not available.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
     if (listitem < 0 || listitem >= sCraftDialogRecipeCount[playerid] ||
         listitem >= MAX_VISIBLE_CRAFT_RECIPES)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Некорректный выбор рецепта.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: Incorrect recipe selection.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
     new const recipeSlot = sCraftDialogRecipeMap[playerid][listitem];
     if (recipeSlot < 0 || recipeSlot >= MAX_CRAFT_RECIPES || !sRecipes[recipeSlot][E_RECIPE_VALID])
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Рецепт не найден.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Craft]: Recipe not found.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2181,20 +2181,20 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             sRecipes[recipeSlot][E_RECIPE_STATION]))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Крафт]: Вы отошли от верстака или этот цех не выполняет выбранный рецепт.");
+            "[Crafting]: You have moved away from the workbench or this workshop does not fulfill the selected recipe.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
     if (sCraftJob[playerid][E_JOB_ACTIVE])
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "[Крафт]: Вы уже выполняете производственный заказ.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "[Crafting]: You are already completing a production order.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
     new const layer1Slot = Character_GetLayer1Slot(playerid);
     if (!Storage_IsValidSlot(layer1Slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "[Крафт]: Инвентарь недоступен.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "[Crafting]: Inventory not available.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2207,7 +2207,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     {
         new msg[192];
         format(msg, sizeof(msg),
-            "[Крафт]: Недостаточный навык: требуется %d, у вас %d.",
+            "[Crafting]: Insufficient skill: required %d, you have %d.",
             sRecipes[recipeSlot][E_RECIPE_MIN_SKILL_LEVEL], skillValue);
         SendClientMessage(playerid, COLOR_UI_ERROR, msg);
         return Y_HOOKS_BREAK_RETURN_1;
@@ -2238,7 +2238,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             Item_GetName(sRecipes[recipeSlot][E_RECIPE_INPUT_ITEM_ID][i], itemName);
             new msg[192];
             format(msg, sizeof(msg),
-                "[Крафт]: Не хватает сырья: %s (нужно %d, есть %d).",
+                "[Crafting]: Not enough raw materials: %s (need %d, have %d).",
                 itemName, needed, haveAmount);
             SendClientMessage(playerid, COLOR_UI_ERROR, msg);
             return Y_HOOKS_BREAK_RETURN_1;
@@ -2249,7 +2249,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     if (!Storage_AcquireMutex(layer1Slot, playerid))
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "[Крафт]: Инвентарь занят другим действием. Закройте окно инвентаря и повторите.");
+            "[Crafting]: Inventory is occupied by another action. Close the inventory window and repeat.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2290,7 +2290,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             Storage_ReleaseMutex(layer1Slot);
         }
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "[Крафт]: Не удалось списать сырье. Операция отменена, ингредиенты возвращены.");
+            "[Craft]: Failed to write off raw materials. The operation was cancelled, the ingredients were returned.");
         return Y_HOOKS_BREAK_RETURN_1;
     }
 
@@ -2349,7 +2349,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     new outputName[64], msg[192];
     Item_GetName(sRecipes[recipeSlot][E_RECIPE_OUTPUT_ITEM_ID], outputName);
     format(msg, sizeof(msg),
-        "[Крафт]: Заказ запущен: %s (количество: %d). Время изготовления: %d сек.",
+        "[Crafting]: Order started: %s (quantity: %d). Production time: %d sec.",
         outputName, outputAmount, craftTimeSec);
     SendClientMessage(playerid, COLOR_UI_INFO, msg);
     return Y_HOOKS_BREAK_RETURN_1;
@@ -2418,7 +2418,7 @@ hook OnGameModeInit()
         sLastMiningTick[i] = 0;
     }
 
-    printf("%s [Systems/Crafting] Модуль производства запущен (предприятий: %d, рецептов: %d).",
+    printf("%s [Systems/Crafting] Production module launched (enterprises: %d, recipes: %d).",
         SERVER_LOG_PREFIX, loadedEnterprises, loadedRecipes);
     return 1;
 }

@@ -18,11 +18,11 @@ SET @db_name := DATABASE();
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `admin_roles` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(48) NOT NULL COMMENT 'Русское название ранга для UI',
-    `level` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1..99 кастомные; 100 Root. Только сортировка',
-    `is_root` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = Root-администратор, полный обход RBAC',
-    `is_system` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = системная роль, запрещено удалять',
-    `permissions_mask` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Битовая маска быстрых разрешений',
+    `name` VARCHAR(48) NOT NULL COMMENT 'English rank name for UI',
+    `level` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1..99 custom; 100 Root. Sorting/display only',
+    `is_root` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = Root administrator, full RBAC bypass',
+    `is_system` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = system role, cannot be deleted',
+    `permissions_mask` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Bitmask of quick permissions',
     `chat_color_hex` CHAR(6) NOT NULL DEFAULT 'FFFFFF',
     `created_by_account_id` INT UNSIGNED DEFAULT NULL,
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS `admin_punishments` (
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = @db_name AND TABLE_NAME = 'accounts' AND COLUMN_NAME = 'admin_role_id') = 0,
-    'ALTER TABLE `accounts` ADD COLUMN `admin_role_id` INT UNSIGNED DEFAULT NULL COMMENT ''Активная админ-роль; NULL = нет прав'' AFTER `admin_level`',
+    'ALTER TABLE `accounts` ADD COLUMN `admin_role_id` INT UNSIGNED DEFAULT NULL COMMENT ''Active admin role; NULL = no rights'' AFTER `admin_level`',
     'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
@@ -86,21 +86,21 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = @db_name AND TABLE_NAME = 'audit_logs' AND COLUMN_NAME = 'admin_account_id') = 0,
-    'ALTER TABLE `audit_logs` ADD COLUMN `admin_account_id` INT UNSIGNED DEFAULT NULL COMMENT ''ID админ-аккаунта'' AFTER `actor_char_id`',
+    'ALTER TABLE `audit_logs` ADD COLUMN `admin_account_id` INT UNSIGNED DEFAULT NULL COMMENT ''Admin account ID'' AFTER `actor_char_id`',
     'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = @db_name AND TABLE_NAME = 'audit_logs' AND COLUMN_NAME = 'target_account_id') = 0,
-    'ALTER TABLE `audit_logs` ADD COLUMN `target_account_id` INT UNSIGNED DEFAULT NULL COMMENT ''ID аккаунта-цели'' AFTER `admin_account_id`',
+    'ALTER TABLE `audit_logs` ADD COLUMN `target_account_id` INT UNSIGNED DEFAULT NULL COMMENT ''Target account ID'' AFTER `admin_account_id`',
     'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 SET @sql := IF(
     (SELECT COUNT(*) FROM information_schema.COLUMNS
      WHERE TABLE_SCHEMA = @db_name AND TABLE_NAME = 'audit_logs' AND COLUMN_NAME = 'target_char_id') = 0,
-    'ALTER TABLE `audit_logs` ADD COLUMN `target_char_id` INT UNSIGNED DEFAULT NULL COMMENT ''ID персонажа-цели'' AFTER `target_account_id`',
+    'ALTER TABLE `audit_logs` ADD COLUMN `target_char_id` INT UNSIGNED DEFAULT NULL COMMENT ''Target character ID'' AFTER `target_account_id`',
     'SELECT 1');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
@@ -126,7 +126,7 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 -- -----------------------------------------------------------------------------
 INSERT INTO `admin_roles`
     (`name`, `level`, `is_root`, `is_system`, `permissions_mask`, `chat_color_hex`)
-SELECT 'Root-администратор', 100, 1, 1, 18446744073709551615, 'FFD700'
+SELECT 'Root Administrator', 100, 1, 1, 18446744073709551615, 'FFD700'
 WHERE NOT EXISTS (SELECT 1 FROM `admin_roles` WHERE `is_root` = 1);
 
 -- Защита от случайного дублирования Root-роли на уровне приложения дополняется

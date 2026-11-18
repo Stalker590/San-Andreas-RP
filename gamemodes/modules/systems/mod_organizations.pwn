@@ -193,27 +193,27 @@ static stock sOrgVaultUnlockedBy[MAX_ORGANIZATIONS];
 
 static stock const sBuiltinOrgs[21][E_BUILTIN_ORG] =
 {
-    { 1,  "Правительство штата Сан-Андреас", "GOV",   ORG_STATUS_STATE_AGENCY,  5,  1,  100000000, 100100, 1481.0,  -1771.0, 18.8 },
-    { 2,  "Полицейский департамент Лос-Сантоса", "LSPD", ORG_STATUS_STATE_AGENCY, 23, 2,  5000000,  101100, 1554.9,  -1675.6, 16.2 },
-    { 3,  "Полицейский департамент Сан-Фиерро", "SFPD", ORG_STATUS_STATE_AGENCY, 23, 3, 5000000, 102100, -1605.5, 710.8,   13.9 },
-    { 4,  "Полицейский департамент Лас-Вентураса", "LVPD", ORG_STATUS_STATE_AGENCY, 23, 4, 5000000, 103100, 2287.0, 2431.8, 10.8 },
-    { 5,  "Департамент Шерифа округа", "SASD", ORG_STATUS_STATE_AGENCY, 23, 5, 4500000, 104100, 627.6,  -571.8, 17.9 },
-    { 6,  "Национальная Гвардия Лос-Сантоса", "LSA", ORG_STATUS_STATE_AGENCY, 3, 6, 8000000, 105100, 2728.5, -2451.4, 17.6 },
-    { 7,  "Военно-морские силы Сан-Фиерро", "SFA", ORG_STATUS_STATE_AGENCY, 3, 7, 8000000, 106100, -1346.8, 492.4, 11.2 },
-    { 8,  "Военный гарнизон Зоны 69", "LVA", ORG_STATUS_STATE_AGENCY, 3, 8, 10000000, 107100, 213.8, 1872.5, 13.1 },
-    { 9,  "Федеральное бюро расследований", "FBI", ORG_STATUS_STATE_AGENCY, 31, 9, 12000000, 108100, -2442.2, 502.3, 30.1 },
-    { 10, "Центральное разведывательное управление", "CIA", ORG_STATUS_STATE_AGENCY, 63, 10, 15000000, 109100, 1245.5, -764.2, 92.1 },
-    { 11, "Иммиграционная и таможенная служба", "ICE", ORG_STATUS_STATE_AGENCY, 23, 11, 4000000, 110100, 55.6, -1531.9, 5.1 },
-    { 12, "Департамент здравоохранения и скорой помощи", "EMS", ORG_STATUS_STATE_AGENCY, 1, 12, 6000000, 112100, 1172.8, -1323.4, 15.4 },
-    { 13, "ЧВК «Блэквотер Сан-Андреас»", "PMC", ORG_STATUS_PRIVATE_CORP, 3, 13, 7500000, 200100, 2504.3, 2772.9, 10.8 },
-    { 14, "Управление портов и логистики", "PORT", ORG_STATUS_STATE_AGENCY, 17, 14, 10000000, 201100, 2746.1, -2437.2, 13.6 },
-    { 15, "Телерадиокомпания Сан-Андреас", "NEWS", ORG_STATUS_PRIVATE_CORP, 1, 15, 2500000, 202100, 777.8, -1330.2, 13.5 },
-    { 16, "Семьи Гроув-Стрит", "GROVE", ORG_STATUS_UNREGISTERED, 0, 16, 0, 420100, 2495.3, -1690.7, 14.8 },
-    { 17, "Банда Баллас", "BALLAS", ORG_STATUS_UNREGISTERED, 0, 17, 0, 420200, 2000.2, -1114.1, 27.1 },
-    { 18, "Лос-Сантос Вагос", "VAGOS", ORG_STATUS_UNREGISTERED, 0, 18, 0, 420300, 2808.5, -1176.9, 25.4 },
-    { 19, "Варриос Лос-Ацтекас", "AZTEC", ORG_STATUS_UNREGISTERED, 0, 19, 0, 420400, 1882.4, -2023.7, 13.5 },
-    { 20, "Синдикат Триад Сан-Фиерро", "TRIAD", ORG_STATUS_UNREGISTERED, 0, 20, 0, 420500, -2172.6, 680.1, 55.2 },
-    { 21, "Криминальная семья Лас-Вентураса", "MAFIA", ORG_STATUS_UNREGISTERED, 0, 21, 0, 420600, 2196.4, 1677.1, 12.4 }
+    { 1,  "State Government of San Andreas", "GOV",   ORG_STATUS_STATE_AGENCY,  5,  1,  100000000, 100100, 1481.0,  -1771.0, 18.8 },
+    { 2,  "Los Santos Police Department", "LSPD", ORG_STATUS_STATE_AGENCY, 23, 2,  5000000,  101100, 1554.9,  -1675.6, 16.2 },
+    { 3,  "San Fierro Police Department", "SFPD", ORG_STATUS_STATE_AGENCY, 23, 3, 5000000, 102100, -1605.5, 710.8,   13.9 },
+    { 4,  "Las Venturas Police Department", "LVPD", ORG_STATUS_STATE_AGENCY, 23, 4, 5000000, 103100, 2287.0, 2431.8, 10.8 },
+    { 5,  "County Sheriff's Department", "SASD", ORG_STATUS_STATE_AGENCY, 23, 5, 4500000, 104100, 627.6,  -571.8, 17.9 },
+    { 6,  "Los Santos National Guard", "LSA", ORG_STATUS_STATE_AGENCY, 3, 6, 8000000, 105100, 2728.5, -2451.4, 17.6 },
+    { 7,  "San Fierro Naval Forces", "SFA", ORG_STATUS_STATE_AGENCY, 3, 7, 8000000, 106100, -1346.8, 492.4, 11.2 },
+    { 8,  "Area 69 Military Garrison", "LVA", ORG_STATUS_STATE_AGENCY, 3, 8, 10000000, 107100, 213.8, 1872.5, 13.1 },
+    { 9,  "Federal Bureau of Investigation", "FBI", ORG_STATUS_STATE_AGENCY, 31, 9, 12000000, 108100, -2442.2, 502.3, 30.1 },
+    { 10, "Central Intelligence Agency", "CIA", ORG_STATUS_STATE_AGENCY, 63, 10, 15000000, 109100, 1245.5, -764.2, 92.1 },
+    { 11, "Immigration and Customs Enforcement", "ICE", ORG_STATUS_STATE_AGENCY, 23, 11, 4000000, 110100, 55.6, -1531.9, 5.1 },
+    { 12, "Department of Health and Emergency Services", "EMS", ORG_STATUS_STATE_AGENCY, 1, 12, 6000000, 112100, 1172.8, -1323.4, 15.4 },
+    { 13, "Blackwater San Andreas PMC", "PMC", ORG_STATUS_PRIVATE_CORP, 3, 13, 7500000, 200100, 2504.3, 2772.9, 10.8 },
+    { 14, "Port Authority and Logistics", "PORT", ORG_STATUS_STATE_AGENCY, 17, 14, 10000000, 201100, 2746.1, -2437.2, 13.6 },
+    { 15, "San Andreas News Network", "NEWS", ORG_STATUS_PRIVATE_CORP, 1, 15, 2500000, 202100, 777.8, -1330.2, 13.5 },
+    { 16, "Grove Street Families", "GROVE", ORG_STATUS_UNREGISTERED, 0, 16, 0, 420100, 2495.3, -1690.7, 14.8 },
+    { 17, "Ballas Gang", "BALLAS", ORG_STATUS_UNREGISTERED, 0, 17, 0, 420200, 2000.2, -1114.1, 27.1 },
+    { 18, "Los Santos Vagos", "VAGOS", ORG_STATUS_UNREGISTERED, 0, 18, 0, 420300, 2808.5, -1176.9, 25.4 },
+    { 19, "Varrios Los Aztecas", "AZTEC", ORG_STATUS_UNREGISTERED, 0, 19, 0, 420400, 1882.4, -2023.7, 13.5 },
+    { 20, "San Fierro Triad Syndicate", "TRIAD", ORG_STATUS_UNREGISTERED, 0, 20, 0, 420500, -2172.6, 680.1, 55.2 },
+    { 21, "Las Venturas Crime Family", "MAFIA", ORG_STATUS_UNREGISTERED, 0, 21, 0, 420600, 2196.4, 1677.1, 12.4 }
 };
 
 // =============================================================================
@@ -243,10 +243,10 @@ stock Organizations_GetStatusTitleRu(E_ORG_LEGAL_STATUS:status, output[], len = 
 {
     switch (status)
     {
-        case ORG_STATUS_UNREGISTERED: format(output, len, "Незарегистрированная группировка");
-        case ORG_STATUS_PRIVATE_CORP: format(output, len, "Частная корпорация");
-        case ORG_STATUS_STATE_AGENCY: format(output, len, "Государственное ведомство");
-        default:                      format(output, len, "Неизвестный статус");
+        case ORG_STATUS_UNREGISTERED: format(output, len, "Unregistered Organization");
+        case ORG_STATUS_PRIVATE_CORP: format(output, len, "Private Corporation");
+        case ORG_STATUS_STATE_AGENCY: format(output, len, "State Agency");
+        default:                      format(output, len, "Unknown Status");
     }
     return 1;
 }
@@ -367,7 +367,7 @@ static stock Internal_AddOrganization(
     new const slot = Iter_Free(OrganizationIter);
     if (slot == INVALID_ITERATOR_SLOT)
     {
-        printf("%s [Systems/Organizations] [ERROR] Пул организаций переполнен (MAX_ORGANIZATIONS = %d).",
+        printf("%s [Systems/Factions] [ERROR] The organization pool is full (MAX_ORGANIZATIONS = %d).",
             SERVER_LOG_PREFIX, MAX_ORGANIZATIONS);
         return -1;
     }
@@ -460,11 +460,11 @@ static stock Internal_SeedDefaultRanks(org_slot)
 
     new const rankTitles[5][ORG_RANK_TITLE_LEN] =
     {
-        "Стажер", "Сотрудник", "Специалист", "Заместитель руководителя", "Руководитель"
+        "Intern", "Employee", "Specialist", "Deputy Director", "Director"
     };
     new const rankTitlesCrime[5][ORG_RANK_TITLE_LEN] =
     {
-        "Новичок", "Боец", "Авторитет", "Правая рука", "Лидер"
+        "Rookie", "Soldier", "Enforcer", "Right Hand", "Leader"
     };
     new const rankPerms[5] = { 3, 7, 15, 31, 63 };
 
@@ -530,7 +530,7 @@ static stock Internal_LoadOrganizationsSync()
     if (!DB_IsConnected())
     {
         Internal_SeedBuiltinOrganizations();
-        printf("%s [Systems/Organizations] База недоступна: загружены 21 системная фракция из встроенного реестра.",
+        printf("%s [Systems/Factions] The database is unavailable: 21 system factions from the built-in registry have been loaded.",
             SERVER_LOG_PREFIX);
         return 0;
     }
@@ -625,7 +625,7 @@ static stock Internal_LoadOrganizationsSync()
     if (Iter_Count(OrganizationIter) == 0)
     {
         Internal_SeedBuiltinOrganizations();
-        printf("%s [Systems/Organizations] Таблица organizations пуста: применен встроенный реестр 21 фракции.",
+        printf("%s [Systems/Factions] The factions table is empty: the built-in registry of 21 factions has been applied.",
             SERVER_LOG_PREFIX);
     }
     else
@@ -1137,7 +1137,7 @@ public Organizations_SendFinancialAlert(source_org_id, actor_char_id, amount, co
         {
             new alert[256];
             format(alert, sizeof(alert),
-                "[Финансовая аналитика] Подозрительная операция на %d USD. %s",
+                "[Financial analytics] Suspicious transaction on %d USD. %s",
                 amount, details);
             SendClientMessage(playerid, COLOR_UI_WARNING, alert);
         }
@@ -1156,7 +1156,7 @@ static stock Internal_GetEntryRankIndex(org_slot)
     for (new r = 0; r < sOrgs[org_slot][E_ORG_RANK_COUNT]; r++)
     {
         if (sOrgRanks[org_slot][r][E_ORG_RANK_VALID] &&
-            !strcmp(sOrgRanks[org_slot][r][E_ORG_RANK_TITLE], "Сотрудник организации", false))
+            !strcmp(sOrgRanks[org_slot][r][E_ORG_RANK_TITLE], "Organization Employee", false))
         {
             return r;
         }
@@ -1178,7 +1178,7 @@ static stock Internal_CanManageOrganization(playerid, E_ORG_PERM:perm)
     if (!Organizations_PlayerHasPermission(playerid, perm))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Недостаточно прав: ваша должность не имеет соответствующего разрешения.");
+            "Insufficient permissions: Your position does not have the appropriate permissions.");
         return 0;
     }
     return 1;
@@ -1190,7 +1190,7 @@ static stock bool:Internal_OrgCommandAllowed(playerid)
     if ((nowTick - sOrgLastCommandTick[playerid]) < ORG_COMMAND_COOLDOWN_MS)
     {
         SendClientMessage(playerid, COLOR_UI_WARNING,
-            "Не так быстро: дождитесь завершения предыдущей операции.");
+            "Not so fast: Wait for the previous operation to complete.");
         return false;
     }
     sOrgLastCommandTick[playerid] = nowTick;
@@ -1282,11 +1282,11 @@ static stock Internal_FormatRadioFreq(freq, output[], len = sizeof(output))
 {
     if (freq <= 0)
     {
-        format(output, len, "не настроена");
+        format(output, len, "not configured");
     }
     else
     {
-        format(output, len, "%d.%d МГц", freq / 1000, (freq % 1000) / 100);
+        format(output, len, "%d.%d MHz", freq / 1000, (freq % 1000) / 100);
     }
     return 1;
 }
@@ -1299,7 +1299,7 @@ static stock Internal_ShowOrgList(playerid)
 {
     new rowCount = 0;
     sOrgDialogBuffer[0] = '\0';
-    strcat(sOrgDialogBuffer, "Создать новую организацию\n", sizeof(sOrgDialogBuffer));
+    strcat(sOrgDialogBuffer, "Create a new organization\n", sizeof(sOrgDialogBuffer));
 
     foreach (new slot : OrganizationIter)
     {
@@ -1330,10 +1330,10 @@ static stock Internal_ShowOrgList(playerid)
         playerid,
         DIALOG_ORG_LIST,
         DIALOG_STYLE_LIST,
-        "{FFC800}Реестр организаций штата Сан-Андреас",
+        "{FFC800}Register of Factions of the State of San Andreas",
         sOrgDialogBuffer,
-        "Выбрать",
-        "Закрыть");
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -1342,7 +1342,7 @@ static stock Internal_ShowOrgInfo(playerid, org_db_id)
     new const slot = Organizations_FindByDbId(org_db_id);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Организация не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Organization not found.");
         return 0;
     }
 
@@ -1353,33 +1353,33 @@ static stock Internal_ShowOrgInfo(playerid, org_db_id)
 
     new body[768];
     format(body, sizeof(body),
-        "{FFC800}Название:{FFFFFF} %s\n" \
-        "{FFC800}Тег:{FFFFFF} %s\n" \
-        "{FFC800}Правовой статус:{FFFFFF} %s\n" \
-        "{FFC800}Системная фракция:{FFFFFF} %s\n" \
-        "{FFC800}Флаги хартии:{FFFFFF} %d\n" \
-        "{FFC800}Радиочастота:{FFFFFF} %s\n" \
-        "{FFC800}Штаб-квартира:{FFFFFF} %.1f, %.1f, %.1f\n" \
-        "{FFC800}Безналичный счет:{FFFFFF} %s (%s)\n" \
-        "{FFC800}Должностей в иерархии:{FFFFFF} %d",
+        "{FFC800}Name:{FFFFFF} %s\n" \
+        "{FFC800}Tag:{FFFFFF} %s\n" \
+        "{FFC800}Legal status:{FFFFFF} %s\n" \
+        "{FFC800}System faction:{FFFFFF} %s\n" \
+        "{FFC800}Charter flags:{FFFFFF} %d\n" \
+        "{FFC800}Radio Frequency:{FFFFFF} %s\n" \
+        "{FFC800}Headquarters:{FFFFFF} %.1f, %.1f, %.1f\n" \
+        "{FFC800}Non-cash account:{FFFFFF} %s (%s)\n" \
+        "{FFC800}Positions in the hierarchy:{FFFFFF} %d",
         sOrgs[slot][E_ORG_NAME],
         sOrgs[slot][E_ORG_TAG],
         statusName,
-        sOrgs[slot][E_ORG_IS_PERMANENT] ? ("да") : ("нет"),
+        sOrgs[slot][E_ORG_IS_PERMANENT] ? ("Yes") : ("No"),
         sOrgs[slot][E_ORG_CHARTER_FLAGS],
         radioText,
         sOrgs[slot][E_ORG_HQ_X], sOrgs[slot][E_ORG_HQ_Y], sOrgs[slot][E_ORG_HQ_Z],
         bankText,
-        sOrgs[slot][E_ORG_BANK_FROZEN] ? ("заморожен") : ("активен"),
+        sOrgs[slot][E_ORG_BANK_FROZEN] ? ("frozen") : ("active"),
         sOrgs[slot][E_ORG_RANK_COUNT]);
 
     ShowPlayerDialog(
         playerid,
         DIALOG_ORG_INFO,
         DIALOG_STYLE_MSGBOX,
-        "{FFC800}Карточка организации",
+        "{FFC800}Organization card",
         body,
-        "Закрыть",
+        "Close",
         "");
     return 1;
 }
@@ -1396,59 +1396,59 @@ static stock Internal_ShowOrgMenu(playerid)
     new const slot = Organizations_FindByDbId(orgId);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Ваша организация не найдена в реестре.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your organization was not found in the registry.");
         return 0;
     }
 
     new count = 0;
     sOrgDialogBuffer[0] = '\0';
-    strcat(sOrgDialogBuffer, "Информация об организации\n", sizeof(sOrgDialogBuffer));
+    strcat(sOrgDialogBuffer, "Information about the organization\n", sizeof(sOrgDialogBuffer));
     sOrgMenuAction[playerid][count++] = ORG_MENU_INFO;
 
-    strcat(sOrgDialogBuffer, "Иерархия должностей и матрица прав доступа\n", sizeof(sOrgDialogBuffer));
+    strcat(sOrgDialogBuffer, "Hierarchy of positions and access rights matrix\n", sizeof(sOrgDialogBuffer));
     sOrgMenuAction[playerid][count++] = ORG_MENU_RANKS;
 
     if (Organizations_PlayerHasPermission(playerid, ORG_PERM_RANKS))
     {
-        strcat(sOrgDialogBuffer, "Конструктор должностей и подразделений\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Designer of positions and departments\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_RANK_BUILDER;
 
-        strcat(sOrgDialogBuffer, "Юридический статус и хартия\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Legal status and charter\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_CHARTER;
     }
 
     if (Organizations_PlayerHasPermission(playerid, ORG_PERM_HIRE))
     {
-        strcat(sOrgDialogBuffer, "Список сотрудников и управление кадрами\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Employee List and HR Management\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_MEMBERS;
     }
 
     if (Organizations_PlayerHasPermission(playerid, ORG_PERM_ARMORY))
     {
-        strcat(sOrgDialogBuffer, "Открыть бронированную казну-сейф\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Open armored treasury-safe\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_VAULT;
     }
 
     if (Organizations_PlayerHasPermission(playerid, ORG_PERM_BANK))
     {
-        strcat(sOrgDialogBuffer, "Безналичный счет организации\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Non-cash account of the organization\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_BANK;
     }
 
     if (Organizations_PlayerHasPermission(playerid, ORG_PERM_RADIO))
     {
-        strcat(sOrgDialogBuffer, "Настройка радиочастоты\n", sizeof(sOrgDialogBuffer));
+        strcat(sOrgDialogBuffer, "Radio Frequency Setting\n", sizeof(sOrgDialogBuffer));
         sOrgMenuAction[playerid][count++] = ORG_MENU_RADIO;
     }
 
-    strcat(sOrgDialogBuffer, "Покинуть организацию\n", sizeof(sOrgDialogBuffer));
+    strcat(sOrgDialogBuffer, "Leave organization\n", sizeof(sOrgDialogBuffer));
     sOrgMenuAction[playerid][count++] = ORG_MENU_LEAVE;
 
     sOrgMenuActionCount[playerid] = count;
 
     new caption[160];
     format(caption, sizeof(caption),
-        "{FFC800}%s [%s] {FFFFFF}| Панель управления",
+        "{FFC800}%s [%s] {FFFFFF}| Control panel",
         sOrgs[slot][E_ORG_NAME], sOrgs[slot][E_ORG_TAG]);
     ShowPlayerDialog(
         playerid,
@@ -1456,8 +1456,8 @@ static stock Internal_ShowOrgMenu(playerid)
         DIALOG_STYLE_LIST,
         caption,
         sOrgDialogBuffer,
-        "Выбрать",
-        "Закрыть");
+        "Select",
+        "Close");
     return 1;
 }
 
@@ -1467,7 +1467,7 @@ static stock Internal_ShowRankList(playerid, bool:editMode)
     new const slot = Organizations_FindByDbId(orgId);
     if (slot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Организация не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Organization not found.");
         return 0;
     }
 
@@ -1480,7 +1480,7 @@ static stock Internal_ShowRankList(playerid, bool:editMode)
             continue;
         }
         new row[192];
-        format(row, sizeof(row), "%d. %s | оклад: %d USD | права: %d\n",
+        format(row, sizeof(row), "%d. %s | salary: %d USD | rights: %d\n",
             sOrgRanks[slot][r][E_ORG_RANK_ORDER],
             sOrgRanks[slot][r][E_ORG_RANK_TITLE],
             sOrgRanks[slot][r][E_ORG_RANK_SALARY_USD],
@@ -1496,7 +1496,7 @@ static stock Internal_ShowRankList(playerid, bool:editMode)
 
     if (count == 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "В организации еще нет настроенных должностей.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "There are no positions configured in the organization yet.");
         return 0;
     }
 
@@ -1504,10 +1504,10 @@ static stock Internal_ShowRankList(playerid, bool:editMode)
         playerid,
         DIALOG_ORG_RANKS,
         DIALOG_STYLE_LIST,
-        editMode ? ("{FFC800}Конструктор должностей организации") : ("{FFC800}Иерархия должностей организации"),
+        editMode ? ("{FFC800}Organization position constructor") : ("{FFC800}Hierarchy of organizational positions"),
         sOrgDialogBuffer,
-        editMode ? ("Изменить") : ("Закрыть"),
-        "Назад");
+        editMode ? ("Edit") : ("Close"),
+        "Back");
     return 1;
 }
 
@@ -1524,11 +1524,11 @@ static stock Internal_ShowRankEdit(playerid, rank_index)
 
     new body[512];
     format(body, sizeof(body),
-        "{FFC800}Должность:{FFFFFF} %s\n" \
-        "{FFC800}Порядок в иерархии:{FFFFFF} %d\n" \
-        "{FFC800}Оклад:{FFFFFF} %d USD\n" \
-        "{FFC800}Маска прав доступа:{FFFFFF} %d\n\n" \
-        "1 — рация, 2 — автопарк, 4 — оружейка и склад, 8 — найм и увольнение, 16 — казна и банк, 32 — управление рангами.",
+        "{FFC800}Position:{FFFFFF} %s\n" \
+        "{FFC800}Order in hierarchy:{FFFFFF} %d\n" \
+        "{FFC800}Salary:{FFFFFF} %d USD\n" \
+        "{FFC800}Permission mask:{FFFFFF} %d\n\n" \
+        "1 - walkie-talkie, 2 - vehicle depot, 4 - armory and warehouse, 8 - hiring and firing, 16 - treasury and bank, 32 - rank management.",
         sOrgRanks[slot][rank_index][E_ORG_RANK_TITLE],
         sOrgRanks[slot][rank_index][E_ORG_RANK_ORDER],
         sOrgRanks[slot][rank_index][E_ORG_RANK_SALARY_USD],
@@ -1538,13 +1538,13 @@ static stock Internal_ShowRankEdit(playerid, rank_index)
         playerid,
         DIALOG_ORG_RANK_EDIT,
         DIALOG_STYLE_LIST,
-        "{FFC800}Редактирование должности",
-        "Изменить название должности\n" \
-        "Изменить оклад\n" \
-        "Настроить права доступа должности\n" \
-        "Удалить должность",
-        "Выбрать",
-        "Назад");
+        "{FFC800}Editing position",
+        "Change job title\n" \
+        "Change salary\n" \
+        "Configure position permissions\n" \
+        "Delete position",
+        "Select",
+        "Back");
     return 1;
 }
 
@@ -1562,12 +1562,12 @@ static stock Internal_ShowRankPermissions(playerid, rank_index)
 
     new body[512];
     format(body, sizeof(body),
-        "%s рация и управление связью\n" \
-        "%s доступ к автопарку\n" \
-        "%s доступ к оружейке и складу\n" \
-        "%s найм, увольнение и повышение\n" \
-        "%s доступ к казне и банковскому счету\n" \
-        "%s управление должностями и хартией",
+        "%s walkie-talkie and communication control\n" \
+        "%s access to the vehicle fleet\n" \
+        "%s access to armory and warehouse\n" \
+        "%s hiring, firing and promotion\n" \
+        "%s access to treasury and bank account\n" \
+        "%s management of positions and charter",
         (mask & _:ORG_PERM_RADIO) ? ("[X]") : ("[ ]"),
         (mask & _:ORG_PERM_FLEET) ? ("[X]") : ("[ ]"),
         (mask & _:ORG_PERM_ARMORY) ? ("[X]") : ("[ ]"),
@@ -1579,10 +1579,10 @@ static stock Internal_ShowRankPermissions(playerid, rank_index)
         playerid,
         DIALOG_ORG_RANK_PERMS,
         DIALOG_STYLE_LIST,
-        "{FFC800}Матрица прав должности",
+        "{FFC800}Matrix of position rights",
         body,
-        "Переключить",
-        "Назад");
+        "Switch",
+        "Back");
     return 1;
 }
 
@@ -1596,9 +1596,9 @@ static stock Internal_ShowMemberActions(playerid)
 
     new body[384];
     format(body, sizeof(body),
-        "{FFC800}Сотрудник:{FFFFFF} %s\n" \
-        "{FFC800}Идентификатор персонажа:{FFFFFF} %d\n\n" \
-        "Выберите кадровое действие.",
+        "{FFC800}Employee:{FFFFFF} %s\n" \
+        "{FFC800}Character ID:{FFFFFF} %d\n\n" \
+        "Select a personnel action.",
         sOrgMemberName[playerid][memberIndex],
         sOrgMemberCharId[playerid][memberIndex]);
 
@@ -1606,10 +1606,10 @@ static stock Internal_ShowMemberActions(playerid)
         playerid,
         DIALOG_ORG_MEMBER_ACTIONS,
         DIALOG_STYLE_LIST,
-        "{FFC800}Управление сотрудником",
+        "{FFC800}Employee management",
         body,
-        "Выбрать",
-        "Назад");
+        "Select",
+        "Back");
     return 1;
 }
 
@@ -1645,7 +1645,7 @@ static stock Internal_ShowPromotionRanks(playerid)
 
     if (count == 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Нет доступных должностей для назначения.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "There are no positions available for appointment.");
         return 0;
     }
 
@@ -1653,10 +1653,10 @@ static stock Internal_ShowPromotionRanks(playerid)
         playerid,
         DIALOG_ORG_PROMOTE,
         DIALOG_STYLE_LIST,
-        "{FFC800}Назначение на должность",
+        "{FFC800}Appointment to position",
         sOrgDialogBuffer,
-        "Назначить",
-        "Назад");
+        "Assign",
+        "Back");
     return 1;
 }
 
@@ -1670,13 +1670,13 @@ static stock Internal_ShowBankMenu(playerid)
     if (!Organizations_HasCharterFlag(orgId, FLAG_CAN_BANK))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "У вашей организации нет права на безналичный банковский счет (отсутствует право на банковский счет).");
+            "Your organization does not have the right to a non-cash bank account (there is no right to a bank account).");
         return 0;
     }
     if (Organizations_IsBankFrozen(orgId))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Банковский счет организации заморожен по решению суда или ФБР.");
+            "The organization's bank account has been frozen by a court order or the FBI.");
         return 0;
     }
 
@@ -1685,19 +1685,19 @@ static stock Internal_ShowBankMenu(playerid)
 
     new body[256];
     format(body, sizeof(body),
-        "{FFC800}Баланс организации:{FFFFFF} %s\n\n" \
-        "1. Пополнить счет с личного банковского счета\n" \
-        "2. Снять средства на личный банковский счет",
+        "{FFC800}Balance sheet of the organization:{FFFFFF} %s\n\n" \
+        "1. Top up your account from your personal bank account\n" \
+        "2. Withdraw funds to your personal bank account",
         balanceStr);
 
     ShowPlayerDialog(
         playerid,
         DIALOG_ORG_BANK,
         DIALOG_STYLE_LIST,
-        "{FFC800}Безналичный счет организации",
+        "{FFC800}Non-cash account of the organization",
         body,
-        "Выбрать",
-        "Назад");
+        "Select",
+        "Back");
     return 1;
 }
 
@@ -1708,27 +1708,27 @@ static stock Internal_ShowRadioInput(playerid)
 
     new body[256];
     format(body, sizeof(body),
-        "Текущая частота: %s.\n\n" \
-        "Введите новую частоту в килогерцах: от 100000 до 999900.\n" \
-        "Например, 100100 соответствует частоте 100.1 МГц.",
+        "Current frequency: %s.\n\n" \
+        "Enter the new frequency in kilohertz: 100000 to 999900.\n" \
+        "For example, 100100 corresponds to a frequency of 100.1 MHz.",
         freqText);
     ShowPlayerDialog(
         playerid,
         DIALOG_ORG_RADIO_INPUT,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Настройка радиочастоты организации",
+        "{FFC800}Setting up an organization's radio frequency",
         body,
-        "Сохранить",
-        "Отмена");
+        "Save",
+        "Cancel");
     return 1;
 }
 
 static stock Internal_ShowCharterHelp(playerid)
 {
     SendClientMessage(playerid, COLOR_UI_INFO,
-        "Хартия организации: /orgcharter [id] [флаг] [1/0]. Флаги: 1 — банк, 2 — тяжелое оружие, 4 — ордера,");
+        "Organization charter: /orgcharter [id] [flag] [1/0]. Flags: 1 - bank, 2 - heavy weapons, 4 - orders,");
     SendClientMessage(playerid, COLOR_UI_INFO,
-        "8 — прослушка, 16 — пограничный контроль, 32 — операции вне правового поля. Доступно Правительству.");
+        "8 - wiretapping, 16 - border control, 32 - operations outside the legal framework. Available to Government.");
     return 1;
 }
 
@@ -1746,7 +1746,7 @@ static stock Internal_CreateRankDialog(playerid)
     }
     if (sOrgs[slot][E_ORG_RANK_COUNT] >= MAX_ORG_RANKS)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Достигнут предел в 20 должностей организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The organization's 20-position limit has been reached.");
         return 0;
     }
 
@@ -1772,13 +1772,13 @@ static stock Internal_CreateRankDialog(playerid)
         slot,
         rankId,
         rankOrder,
-        "Новая должность",
+        "New position",
         0,
         _:ORG_PERM_RADIO);
 
     if (rankIndex < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось создать должность.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to create position.");
         return 0;
     }
 
@@ -1787,11 +1787,11 @@ static stock Internal_CreateRankDialog(playerid)
         new query[320];
         mysql_format(gMySQL, query, sizeof(query),
             "INSERT INTO `organization_ranks` (`id`, `org_id`, `rank_order`, `title`, `salary_usd`, `permissions_mask`) VALUES (%d, %d, %d, '%e', 0, %d);",
-            rankId, orgId, rankOrder, "Новая должность", _:ORG_PERM_RADIO);
+            rankId, orgId, rankOrder, "New position", _:ORG_PERM_RADIO);
         mysql_pquery(gMySQL, query);
     }
 
-    Audit_Log(Character_GetId(playerid), "ORG_RANK_CREATE", "ORG", "ORG_RANK", 0, rankOrder, "Создана новая должность");
+    Audit_Log(Character_GetId(playerid), "ORG_RANK_CREATE", "ORG", "ORG_RANK", 0, rankOrder, "New position created");
     Internal_ShowRankEdit(playerid, rankIndex);
     return 1;
 }
@@ -1810,12 +1810,12 @@ static stock Internal_DeleteRank(playerid, rank_index)
     }
     if (sOrgs[slot][E_ORG_RANK_COUNT] <= 1)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя удалить последнюю должность организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot delete the last position of an organization.");
         return 0;
     }
     if (rank_index == Internal_GetHighestRankIndex(slot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя удалить высшую должность руководителя.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The top management position cannot be removed.");
         return 0;
     }
 
@@ -1837,7 +1837,7 @@ static stock Internal_DeleteRank(playerid, rank_index)
         {
             Character_SetOrgMembership(memberPlayer, orgId, 0);
             SendClientMessage(memberPlayer, COLOR_UI_WARNING,
-                "Ваша должность была упразднена руководством организации.");
+                "Your position has been abolished by the organization's management.");
         }
     }
 
@@ -1850,8 +1850,8 @@ static stock Internal_DeleteRank(playerid, rank_index)
         mysql_tquery(gMySQL, query);
     }
 
-    Audit_Log(Character_GetId(playerid), "ORG_RANK_DELETE", "ORG", "ORG_RANK", 0, rankOrder, "Удалена должность организации");
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Должность удалена. Сотрудники переведены в резерв без должности.");
+    Audit_Log(Character_GetId(playerid), "ORG_RANK_DELETE", "ORG", "ORG_RANK", 0, rankOrder, "Organization position deleted");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "The position has been deleted. Employees were transferred to the reserve without positions.");
     Internal_ShowRankList(playerid, true);
     return 1;
 }
@@ -1864,7 +1864,7 @@ static stock Internal_ApplyRankTitle(playerid, rank_index, const title[])
     }
     if (title[0] == EOS || strlen(title) >= ORG_RANK_TITLE_LEN)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Название должности не должно быть пустым и длиннее 47 символов.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The job title must not be empty or longer than 47 characters.");
         return 0;
     }
 
@@ -1885,7 +1885,7 @@ static stock Internal_ApplyRankTitle(playerid, rank_index, const title[])
         mysql_tquery(gMySQL, query);
     }
 
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Название должности обновлено.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Job title has been updated.");
     Internal_ShowRankEdit(playerid, rank_index);
     return 1;
 }
@@ -1898,7 +1898,7 @@ static stock Internal_ApplyRankSalary(playerid, rank_index, salary)
     }
     if (salary < 0 || salary > 1000000)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Оклад должен быть в пределах от 0 до 1 000 000 USD.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The salary must be between 0 and 1,000,000 USD.");
         return 0;
     }
 
@@ -1919,7 +1919,7 @@ static stock Internal_ApplyRankSalary(playerid, rank_index, salary)
         mysql_tquery(gMySQL, query);
     }
 
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Оклад должности обновлен.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "The salary for the position has been updated.");
     Internal_ShowRankEdit(playerid, rank_index);
     return 1;
 }
@@ -1975,13 +1975,13 @@ static stock Internal_CreateOrganizationFlow(playerid)
         if (actorOrg != ORG_GOVERNMENT_DB_ID || Organizations_GetPlayerRankOrder(playerid) < 5)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "Государственное ведомство может учредить только действующий губернатор штата.");
+                "A government department can only be established by the current governor of the state.");
             return 0;
         }
     }
     else if (actorOrg > 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Сначала покиньте текущую организацию.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "First, leave your current organization.");
         return 0;
     }
 
@@ -1989,7 +1989,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
         Internal_OrgTagExists(sOrgCreateTag[playerid]))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Организация с таким названием или тегом уже существует в реестре.");
+            "An organization with the same name or tag already exists in the registry.");
         return 0;
     }
 
@@ -2014,7 +2014,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
             Organizations_GetBankBalance(ORG_GOVERNMENT_DB_ID) < cost)
         {
             SendClientMessage(playerid, COLOR_UI_ERROR,
-                "В казне Правительства недостаточно средств для учреждения ведомства.");
+                "There are not enough funds in the Government treasury to establish the department.");
             return 0;
         }
     }
@@ -2022,24 +2022,24 @@ static stock Internal_CreateOrganizationFlow(playerid)
     {
         if (!Banking_HasAccount(playerid))
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Для оплаты регистрации нужен личный банковский счет.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "To pay for registration you need a personal bank account.");
             return 0;
         }
         if (Banking_IsFrozen(playerid))
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "Ваш банковский счет заморожен: оплата регистрации невозможна.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "Your bank account is frozen: registration payment is not possible.");
             return 0;
         }
         if (Banking_GetBalance(playerid) < cost)
         {
-            SendClientMessage(playerid, COLOR_UI_ERROR, "На банковском счете недостаточно средств для регистрации.");
+            SendClientMessage(playerid, COLOR_UI_ERROR, "There are insufficient funds in the bank account for registration.");
             return 0;
         }
     }
 
     if (Iter_Free(OrganizationIter) == INVALID_ITERATOR_SLOT)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Реестр организаций переполнен. Обратитесь к администрации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The register of factions is full. Contact the administration.");
         return 0;
     }
 
@@ -2062,7 +2062,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
 
     if (orgSlot < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось создать организацию: внутренний предел пула.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to create organization: internal pool limit.");
         return 0;
     }
 
@@ -2081,7 +2081,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
     {
         Iter_Remove(OrganizationIter, orgSlot);
         Internal_ResetOrganizationSlot(orgSlot);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось создать казну организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to create the organization's treasury.");
         return 0;
     }
 
@@ -2093,7 +2093,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
         orgSlot,
         memberRankId,
         1,
-        "Сотрудник организации",
+        "Organization Employee",
         1000,
         _:ORG_PERM_RADIO | _:ORG_PERM_FLEET);
     if (memberRankIndex < 0)
@@ -2101,7 +2101,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
         Storage_DestroyExpiredOrEmpty(vaultSlot);
         Iter_Remove(OrganizationIter, orgSlot);
         Internal_ResetOrganizationSlot(orgSlot);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось создать базовую должность организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to create an organization base position.");
         return 0;
     }
 
@@ -2110,7 +2110,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
         orgSlot,
         leaderRankId,
         2,
-        "Лидер организации",
+        "Leader of the organization",
         5000,
         ORG_PERM_FULL_MASK);
     if (leaderRankIndex < 0)
@@ -2118,7 +2118,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
         Storage_DestroyExpiredOrEmpty(vaultSlot);
         Iter_Remove(OrganizationIter, orgSlot);
         Internal_ResetOrganizationSlot(orgSlot);
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось создать должность лидера.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to create leader position.");
         return 0;
     }
 
@@ -2143,12 +2143,12 @@ static stock Internal_CreateOrganizationFlow(playerid)
 
         mysql_format(gMySQL, query, sizeof(query),
             "INSERT INTO `organization_ranks` (`id`, `org_id`, `rank_order`, `title`, `salary_usd`, `permissions_mask`) VALUES (%d, %d, 1, '%e', 1000, %d);",
-            memberRankId, newOrgId, "Сотрудник организации", _:ORG_PERM_RADIO | _:ORG_PERM_FLEET);
+            memberRankId, newOrgId, "Organization Employee", _:ORG_PERM_RADIO | _:ORG_PERM_FLEET);
         mysql_pquery(gMySQL, query);
 
         mysql_format(gMySQL, query, sizeof(query),
             "INSERT INTO `organization_ranks` (`id`, `org_id`, `rank_order`, `title`, `salary_usd`, `permissions_mask`) VALUES (%d, %d, 2, '%e', 5000, %d);",
-            leaderRankId, newOrgId, "Лидер организации", ORG_PERM_FULL_MASK);
+            leaderRankId, newOrgId, "Leader of the organization", ORG_PERM_FULL_MASK);
         mysql_pquery(gMySQL, query);
     }
 
@@ -2158,7 +2158,7 @@ static stock Internal_CreateOrganizationFlow(playerid)
     }
     else
     {
-        Banking_DebitAccount(playerid, cost, "Регистрация организации");
+        Banking_DebitAccount(playerid, cost, "Registration of an organization");
     }
     Character_SetOrgMembership(playerid, newOrgId, leaderRankId);
     sNextOrgDbId++;
@@ -2166,12 +2166,12 @@ static stock Internal_CreateOrganizationFlow(playerid)
     new amountStr[32], msg[256];
     Utils_FormatMoney(cost, amountStr);
     format(msg, sizeof(msg),
-        "Организация «%s» [%s] успешно зарегистрирована. Стоимость: %s. Вы назначены лидером.",
+        "Organization \"%s\" [%s] has been successfully registered. Cost: %s. You have been appointed leader.",
         sOrgCreateName[playerid], sOrgCreateTag[playerid], amountStr);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     new details[192];
-    format(details, sizeof(details), "Создана организация #%d «%s»", newOrgId, sOrgCreateName[playerid]);
+    format(details, sizeof(details), "Organization #%d “%s” was created", newOrgId, sOrgCreateName[playerid]);
     Audit_Log(Character_GetId(playerid), "ORG_CREATE", "CHARACTER", "ORG", 0, cost, details);
     return 1;
 }
@@ -2182,12 +2182,12 @@ static stock Internal_ShowCreateStatus(playerid)
         playerid,
         DIALOG_ORG_CREATE_STATUS,
         DIALOG_STYLE_LIST,
-        "{FFC800}Регистрация новой организации",
-        "Незарегистрированная группировка (250 000 USD)\n" \
-        "Частная корпорация с банковским счетом (500 000 USD)\n" \
-        "Государственное ведомство (2 000 000 USD, только для Правительства)",
-        "Выбрать",
-        "Отмена");
+        "{FFC800}Registration of a new organization",
+        "Unregistered group (250,000 USD)\n" \
+        "Private corporation with bank account (USD 500,000)\n" \
+        "Government Department (USD 2,000,000, Government only)",
+        "Select",
+        "Cancel");
     return 1;
 }
 
@@ -2197,11 +2197,11 @@ static stock Internal_ShowCreateName(playerid)
         playerid,
         DIALOG_ORG_CREATE_NAME,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Название организации",
-        "Введите полное название организации (до 63 символов).\n" \
-        "Название будет отображаться в реестре и на панели управления.",
-        "Далее",
-        "Отмена");
+        "{FFC800}Name of organization",
+        "Enter the full name of the organization (up to 63 characters).\n" \
+        "The name will appear in the registry and control panel.",
+        "Next",
+        "Cancel");
     return 1;
 }
 
@@ -2209,18 +2209,18 @@ static stock Internal_ShowCreateTag(playerid)
 {
     new body[256];
     format(body, sizeof(body),
-        "Организация: %s\n\n" \
-        "Введите короткий тег организации (до 7 символов, латиница или цифры).\n" \
-        "Тег используется в рации и списках сотрудников.",
+        "Organization: %s\n\n" \
+        "Enter a short organization tag (up to 7 characters, Latin or numbers).\n" \
+        "The tag is used in walkie-talkies and employee lists.",
         sOrgCreateName[playerid]);
     ShowPlayerDialog(
         playerid,
         DIALOG_ORG_CREATE_TAG,
         DIALOG_STYLE_INPUT,
-        "{FFC800}Тег организации",
+        "{FFC800}Organization tag",
         body,
-        "Зарегистрировать",
-        "Отмена");
+        "Register",
+        "Cancel");
     return 1;
 }
 
@@ -2233,13 +2233,13 @@ static stock Internal_LoadMembers(playerid)
     }
     if (!DB_IsConnected())
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Список сотрудников доступен только при подключенной базе данных.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The list of employees is only available when the database is connected.");
         return 0;
     }
 
     new query[512];
     mysql_format(gMySQL, query, sizeof(query),
-        "SELECT c.`id` AS `char_id`, c.`rp_name`, IFNULL(c.`org_rank_id`, 0) AS `rank_id`, IFNULL(r.`title`, 'Без должности') AS `rank_title`, IFNULL(r.`rank_order`, 0) AS `rank_order` FROM `characters` c LEFT JOIN `organization_ranks` r ON r.`id` = c.`org_rank_id` WHERE c.`org_id` = %d AND c.`is_ck_dead` = 0 ORDER BY `rank_order` DESC, c.`rp_name` ASC LIMIT %d;",
+        "SELECT c.`id` AS `char_id`, c.`rp_name`, IFNULL(c.`org_rank_id`, 0) AS `rank_id`, IFNULL(r.`title`, 'No position') AS `rank_title`, IFNULL(r.`rank_order`, 0) AS `rank_order` FROM `characters` c LEFT JOIN `organization_ranks` r ON r.`id` = c.`org_rank_id` WHERE c.`org_id` = %d AND c.`is_ck_dead` = 0 ORDER BY `rank_order` DESC, c.`rp_name` ASC LIMIT %d;",
         orgId,
         ORG_MAX_MEMBER_ROWS);
     mysql_tquery(gMySQL, query, "OnOrgMembersLoaded", "dd",
@@ -2336,14 +2336,14 @@ static stock Internal_ExecuteVaultHeist(playerid)
     }
     if (Survival_IsCuffed(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы скованы наручниками и не можете взламывать сейф.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are handcuffed and cannot crack the safe.");
         return 0;
     }
 
     new const nowTick = GetTickCount();
     if ((nowTick - sOrgLastHeistTick[playerid]) < ORG_VAULT_HEIST_COOLDOWN_MS)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Инструмент остывает: подождите несколько секунд.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The instrument is cooling down: wait a few seconds.");
         return 0;
     }
     sOrgLastHeistTick[playerid] = nowTick;
@@ -2352,19 +2352,19 @@ static stock Internal_ExecuteVaultHeist(playerid)
     new const orgSlot = Internal_FindNearestOrgVault(playerid, STORAGE_INTERACT_DISTANCE, orgDbId);
     if (orgSlot < 0 || !Organizations_IsValid(orgDbId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Рядом нет бронированной казны организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There is no armored treasury of the organization nearby.");
         return 0;
     }
 
     new const vaultSlot = Organizations_GetVaultStorage(orgDbId);
     if (!Storage_IsValidSlot(vaultSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Хранилище казны повреждено и недоступно.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The treasury vault is damaged and inaccessible.");
         return 0;
     }
     if (!Storage_GetIsLocked(vaultSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "Казна уже открыта. Забирайте содержимое.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The treasury is already open. Take the contents.");
         return 0;
     }
 
@@ -2373,7 +2373,7 @@ static stock Internal_ExecuteVaultHeist(playerid)
     if (!hasExplosive && !hasLockpick)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Для взлома казны нужен взрывпакет с детонатором или набор отмычек.");
+            "To break into the treasury, you need an explosive package with a detonator or a set of master keys.");
         return 0;
     }
 
@@ -2419,9 +2419,9 @@ static stock Internal_ExecuteVaultHeist(playerid)
             Character_GetWantedLevel(playerid) + 5);
         Character_ResetActivePlaySeconds(playerid);
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Замок выстоял! Сработала скрытая сигнализация, а на месте остались следы взлома.");
+            "The castle survived! A hidden alarm went off, and traces of a break-in remained at the site.");
         Audit_Log(Character_GetId(playerid), "ORG_VAULT_HEIST_FAIL", "CHARACTER", "ORG_VAULT",
-            0, 0, "Неудачная попытка взлома казны организации");
+            0, 0, "Unsuccessful attempt to hack the organization's treasury");
         return 0;
     }
 
@@ -2456,28 +2456,28 @@ static stock Internal_ExecuteVaultHeist(playerid)
     if (moved > 0)
     {
         format(msg, sizeof(msg),
-            "Казна организации «%s» вскрыта! Вы вынесли %d стек(ов) имущества.",
+            "The treasury of the organization \"%s\" has been opened! You took out %d stack(s) of property.",
             orgName, moved);
         SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
     }
     else
     {
         format(msg, sizeof(msg),
-            "Казна организации «%s» вскрыта, но в ней нет имущества или ваш инвентарь переполнен.",
+            "The treasury of the organization \"%s\" has been opened, but there is no property in it or your inventory is full.",
             orgName);
         SendClientMessage(playerid, COLOR_UI_WARNING, msg);
     }
 
     new alarm[192];
     format(alarm, sizeof(alarm),
-        "[Тревога] Казна организации «%s» была вскрыта посторонним лицом!", orgName);
+        "[Alarm] The treasury of the \"%s\" organization has been opened by an outsider!", orgName);
     Organizations_NotifyMembers(orgDbId, alarm);
 
     Character_SetWantedLevel(playerid, Character_GetWantedLevel(playerid) + 10);
     Character_ResetActivePlaySeconds(playerid);
 
     new details[192];
-    format(details, sizeof(details), "Взлом казны организации #%d, вынесено стеков: %d", orgDbId, moved);
+    format(details, sizeof(details), "Hacking the treasury of the organization #%d, stacks taken: %d", orgDbId, moved);
     Audit_Log(Character_GetId(playerid), "ORG_VAULT_HEIST", "ORG_VAULT", "CHARACTER",
         0, moved, details);
     return 1;
@@ -2488,12 +2488,12 @@ static stock Internal_OpenOrgVault(playerid)
     new const orgId = Character_GetOrgId(playerid);
     if (orgId <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Вы не состоите в организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You are not a member of the organization.");
         return 0;
     }
     if (!Organizations_PlayerHasPermission(playerid, ORG_PERM_ARMORY))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "У вашей должности нет доступа к оружейке и казне.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Your position does not have access to the armory or treasury.");
         return 0;
     }
 
@@ -2501,7 +2501,7 @@ static stock Internal_OpenOrgVault(playerid)
     new const vaultSlot = Organizations_GetVaultStorage(orgId);
     if (orgSlot < 0 || !Storage_IsValidSlot(vaultSlot))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Казна организации недоступна.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The organization's treasury is not accessible.");
         return 0;
     }
 
@@ -2538,7 +2538,7 @@ public OnOrgMembersLoaded(playerid, sessionToken)
     cache_get_row_count(rows);
     if (rows <= 0)
     {
-        SendClientMessage(playerid, COLOR_UI_WARNING, "В организации пока нет сотрудников.");
+        SendClientMessage(playerid, COLOR_UI_WARNING, "The organization has no employees yet.");
         return 1;
     }
 
@@ -2563,7 +2563,7 @@ public OnOrgMembersLoaded(playerid, sessionToken)
         count++;
 
         new row[192];
-        format(row, sizeof(row), "%s | %s | ранг %d\n", name, rankTitle, rankOrder);
+        format(row, sizeof(row), "%s | %s | rank %d\n", name, rankTitle, rankOrder);
         if ((strlen(dialogBody) + strlen(row)) >= sizeof(dialogBody))
         {
             break;
@@ -2576,10 +2576,10 @@ public OnOrgMembersLoaded(playerid, sessionToken)
         playerid,
         DIALOG_ORG_MEMBERS,
         DIALOG_STYLE_LIST,
-        "{FFC800}Сотрудники организации",
+        "{FFC800}Employees of the organization",
         dialogBody,
-        "Управлять",
-        "Назад");
+        "Manage",
+        "Back");
     return 1;
 }
 
@@ -2616,7 +2616,7 @@ hook OnGameModeInit()
 
     Internal_LoadOrganizationsSync();
 
-    printf("%s [Systems/Organizations] Загружено организаций: %d, должностей: суммарно по реестру.",
+    printf("%s [Systems/Factions] Loaded factions: %d, positions: total according to the registry.",
         SERVER_LOG_PREFIX, Iter_Count(OrganizationIter));
     return 1;
 }
@@ -2748,14 +2748,14 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     if (orgId > 0 && Organizations_GetPlayerRankOrder(playerid) >= 5)
                     {
                         SendClientMessage(playerid, COLOR_UI_ERROR,
-                            "Лидер не может покинуть организацию. Передайте руководство или расформируйте структуру.");
+                            "A leader cannot leave the organization. Transfer leadership or disband the structure.");
                     }
                     else
                     {
                         Organizations_RevokeMembership(playerid);
-                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "Вы покинули организацию.");
+                        SendClientMessage(playerid, COLOR_UI_SUCCESS, "You have left the organization.");
                         Audit_Log(Character_GetId(playerid), "ORG_LEAVE", "CHARACTER", "ORG", 0, 0,
-                            "Выход из организации");
+                            "Leaving the organization");
                     }
                 }
             }
@@ -2806,19 +2806,19 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     }
                     new body[256];
                     format(body, sizeof(body),
-                        "Введите новое название должности.\nТекущее название: %s.",
+                        "Enter a new job title.\nCurrent title: %s.",
                         title);
                     ShowPlayerDialog(playerid, DIALOG_ORG_RANK_TITLE_INPUT, DIALOG_STYLE_INPUT,
-                        "{FFC800}Название должности", body, "Сохранить", "Отмена");
+                        "{FFC800}Job title", body, "Save", "Cancel");
                 }
                 case 1:
                 {
                     sOrgInputRankIndex[playerid] = rankIndex;
                     ShowPlayerDialog(playerid, DIALOG_ORG_RANK_SALARY_INPUT, DIALOG_STYLE_INPUT,
-                        "{FFC800}Оклад должности",
-                        "Введите новый оклад должности в USD (целое число от 0 до 1 000 000).",
-                        "Сохранить",
-                        "Отмена");
+                        "{FFC800}Salary position",
+                        "Enter the new position salary in USD (integer from 0 to 1,000,000).",
+                        "Save",
+                        "Cancel");
                 }
                 case 2:
                 {
@@ -2869,7 +2869,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new salary = 0;
             if (!Internal_ParsePositiveInt(inputtext, salary) && strcmp(inputtext, "0") != 0)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректное целое число USD.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Please enter a valid USD integer.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (strcmp(inputtext, "0") == 0)
@@ -2916,7 +2916,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new const targetPlayer = Internal_FindPlayerByCharId(memberCharId);
                     if (targetPlayer == INVALID_PLAYER_ID)
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Сотрудник должен находиться в сети для увольнения.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "The employee must be online to be terminated.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (!Internal_CanManageOrganization(playerid, ORG_PERM_HIRE))
@@ -2925,30 +2925,30 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     }
                     if (targetPlayer == playerid)
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя уволить самого себя.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "You can't fire yourself.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (Utils_GetDistanceBetweenPlayers(playerid, targetPlayer) > STORAGE_INTERACT_DISTANCE)
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Сотрудник находится слишком далеко.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "The employee is too far away.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (Character_GetOrgId(targetPlayer) != Character_GetOrgId(playerid))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Сотрудник уже не состоит в вашей организации.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "The employee is no longer a member of your organization.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
                     if (Organizations_GetPlayerRankOrder(playerid) <= Organizations_GetPlayerRankOrder(targetPlayer))
                     {
-                        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя уволить сотрудника равного или более высокого ранга.");
+                        SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot fire an employee of equal or higher rank.");
                         return Y_HOOKS_BREAK_RETURN_1;
                     }
 
                     Organizations_RevokeMembership(targetPlayer);
-                    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Сотрудник уволен из организации.");
-                    SendClientMessage(targetPlayer, COLOR_UI_WARNING, "Вы были уволены из организации.");
+                    SendClientMessage(playerid, COLOR_UI_SUCCESS, "The employee has been dismissed from the organization.");
+                    SendClientMessage(targetPlayer, COLOR_UI_WARNING, "You have been fired from the organization.");
                     Audit_Log(Character_GetId(playerid), "ORG_FIRE", "ORG", "CHARACTER",
-                        0, 0, "Увольнение сотрудника организации");
+                        0, 0, "Dismissal of an employee of the organization");
                     Internal_LoadMembers(playerid);
                 }
                 case 2:
@@ -2979,17 +2979,17 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new const targetPlayer = Internal_FindPlayerByCharId(memberCharId);
             if (targetPlayer == INVALID_PLAYER_ID)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Сотрудник должен находиться в сети.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The employee must be online.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (targetPlayer == playerid)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя изменить собственную должность.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot change your own position.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (Utils_GetDistanceBetweenPlayers(playerid, targetPlayer) > STORAGE_INTERACT_DISTANCE)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Сотрудник находится слишком далеко.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The employee is too far away.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -3006,12 +3006,12 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new const newOrder = sOrgRanks[orgSlot][rankIndex][E_ORG_RANK_ORDER];
             if (actorOrder <= targetOrder)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя повысить сотрудника равного или более высокого ранга.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot promote an employee of equal or higher rank.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (newOrder >= actorOrder)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя назначить должность не ниже собственной.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot assign a position no lower than your own.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
@@ -3021,13 +3021,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 sOrgRanks[orgSlot][rankIndex][E_ORG_RANK_DB_ID]);
 
             new msg[192];
-            format(msg, sizeof(msg), "Вы назначены на должность: %s.",
+            format(msg, sizeof(msg), "You have been assigned to position: %s.",
                 sOrgRanks[orgSlot][rankIndex][E_ORG_RANK_TITLE]);
-            SendClientMessage(playerid, COLOR_UI_SUCCESS, "Должность сотрудника обновлена.");
+            SendClientMessage(playerid, COLOR_UI_SUCCESS, "The employee's position has been updated.");
             SendClientMessage(targetPlayer, COLOR_UI_SUCCESS, msg);
 
             Audit_Log(Character_GetId(playerid), "ORG_PROMOTE", "ORG", "CHARACTER",
-                0, newOrder, "Изменение должности сотрудника");
+                0, newOrder, "Changing an employee's position");
             Internal_LoadMembers(playerid);
             return Y_HOOKS_BREAK_RETURN_1;
         }
@@ -3049,19 +3049,19 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     sOrgBankAction[playerid] = _:ORG_BANK_ACTION_DEPOSIT;
                     ShowPlayerDialog(playerid, DIALOG_ORG_BANK_AMOUNT, DIALOG_STYLE_INPUT,
-                        "{FFC800}Пополнение счета организации",
-                        "Введите сумму USD для перевода с личного банковского счета на счет организации.",
-                        "Перевести",
-                        "Отмена");
+                        "{FFC800}Replenishment of an organization's account",
+                        "Enter the USD amount to transfer from your personal bank account to your organization's account.",
+                        "Translate",
+                        "Cancel");
                 }
                 case 1:
                 {
                     sOrgBankAction[playerid] = _:ORG_BANK_ACTION_WITHDRAW;
                     ShowPlayerDialog(playerid, DIALOG_ORG_BANK_AMOUNT, DIALOG_STYLE_INPUT,
-                        "{FFC800}Снятие средств организации",
-                        "Введите сумму USD для перевода со счета организации на ваш личный банковский счет.",
-                        "Перевести",
-                        "Отмена");
+                        "{FFC800}Withdrawal of funds from an organization",
+                        "Enter the USD amount to transfer from the organization's account to your personal bank account.",
+                        "Translate",
+                        "Cancel");
                 }
             }
             return Y_HOOKS_BREAK_RETURN_1;
@@ -3077,39 +3077,39 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new amount = 0;
             if (!Internal_ParsePositiveInt(inputtext, amount))
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Введите корректную сумму цифрами.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "Enter the correct amount in numbers.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
 
             new const orgId = Character_GetOrgId(playerid);
             if (sOrgBankAction[playerid] == _:ORG_BANK_ACTION_DEPOSIT)
             {
-                if (!Banking_DebitAccount(playerid, amount, "Пополнение счета организации"))
+                if (!Banking_DebitAccount(playerid, amount, "Replenishment of an organization's account"))
                 {
-                    SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось списать средства с личного счета.");
+                    SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to debit funds from your personal account.");
                     return Y_HOOKS_BREAK_RETURN_1;
                 }
                 Organizations_AddBankBalance(orgId, amount);
-                SendClientMessage(playerid, COLOR_UI_SUCCESS, "Счет организации пополнен.");
+                SendClientMessage(playerid, COLOR_UI_SUCCESS, "The organization's account has been replenished.");
                 Audit_Log(Character_GetId(playerid), "ORG_BANK_DEPOSIT", "CHARACTER_BANK", "ORG_BANK",
-                    0, amount, "Пополнение счета организации");
+                    0, amount, "Replenishment of an organization's account");
             }
             else if (sOrgBankAction[playerid] == _:ORG_BANK_ACTION_WITHDRAW)
             {
                 if (!Organizations_TakeBankBalance(orgId, amount))
                 {
-                    SendClientMessage(playerid, COLOR_UI_ERROR, "На счете организации недостаточно средств.");
+                    SendClientMessage(playerid, COLOR_UI_ERROR, "There are insufficient funds in the organization's account.");
                     return Y_HOOKS_BREAK_RETURN_1;
                 }
-                if (!Banking_CreditAccount(playerid, amount, "Снятие средств организации"))
+                if (!Banking_CreditAccount(playerid, amount, "Withdrawing funds from an organization"))
                 {
                     Organizations_AddBankBalance(orgId, amount);
-                    SendClientMessage(playerid, COLOR_UI_ERROR, "Не удалось зачислить средства на личный счет.");
+                    SendClientMessage(playerid, COLOR_UI_ERROR, "Failed to credit funds to personal account.");
                     return Y_HOOKS_BREAK_RETURN_1;
                 }
-                SendClientMessage(playerid, COLOR_UI_SUCCESS, "Средства переведены на ваш личный счет.");
+                SendClientMessage(playerid, COLOR_UI_SUCCESS, "The funds have been transferred to your personal account.");
                 Audit_Log(Character_GetId(playerid), "ORG_BANK_WITHDRAW", "ORG_BANK", "CHARACTER_BANK",
-                    0, amount, "Снятие средств организации");
+                    0, amount, "Withdrawing funds from an organization");
             }
             sOrgBankAction[playerid] = _:ORG_BANK_ACTION_NONE;
             Internal_ShowBankMenu(playerid);
@@ -3127,7 +3127,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             if (!Internal_ParsePositiveInt(inputtext, freq) || freq < 100000 || freq > 999900)
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Частота должна быть целым числом от 100000 до 999900 килогерц.");
+                    "The frequency must be an integer between 100000 and 999900 kilohertz.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (!Internal_CanManageOrganization(playerid, ORG_PERM_RADIO))
@@ -3153,10 +3153,10 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
             new freqText[32], msg[160];
             Internal_FormatRadioFreq(freq, freqText, sizeof(freqText));
-            format(msg, sizeof(msg), "Радиочастота организации настроена: %s.", freqText);
+            format(msg, sizeof(msg), "The organization's radio frequency is set to: %s.", freqText);
             SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
             Audit_Log(Character_GetId(playerid), "ORG_RADIO", "ORG", "ORG_RADIO", 0, freq,
-                "Изменение радиочастоты организации");
+                "Changing an organization's radio frequency");
             return Y_HOOKS_BREAK_RETURN_1;
         }
 
@@ -3183,7 +3183,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (strlen(inputtext) < 3 || strlen(inputtext) >= ORG_NAME_LEN)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Название должно содержать от 3 до 63 символов.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The name must contain from 3 to 63 characters.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             format(sOrgCreateName[playerid], ORG_NAME_LEN, "%s", inputtext);
@@ -3199,13 +3199,13 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
             if (strlen(inputtext) < 2 || strlen(inputtext) >= ORG_TAG_LEN)
             {
-                SendClientMessage(playerid, COLOR_UI_ERROR, "Тег должен содержать от 2 до 7 символов.");
+                SendClientMessage(playerid, COLOR_UI_ERROR, "The tag must contain from 2 to 7 characters.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             if (!Internal_IsValidOrgTag(inputtext))
             {
                 SendClientMessage(playerid, COLOR_UI_ERROR,
-                    "Тег может содержать только латинские буквы, цифры, дефис и подчеркивание.");
+                    "The tag can only contain Latin letters, numbers, hyphens and underscores.");
                 return Y_HOOKS_BREAK_RETURN_1;
             }
             format(sOrgCreateTag[playerid], ORG_TAG_LEN, "%s", inputtext);
@@ -3294,29 +3294,29 @@ CMD:orginvite(playerid, params[])
     new values[2];
     if (Internal_ParseInts(params, values, 2) < 1)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /orginvite [id игрока]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /orginvite [player id]");
         return 1;
     }
 
     new const targetid = values[0];
     if (targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок не найден в сети.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player was not found online.");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя пригласить самого себя.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You can't invite yourself.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > STORAGE_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок находится слишком далеко.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player is too far away.");
         return 1;
     }
     if (Character_GetOrgId(targetid) > 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок уже состоит в другой организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player is already a member of another organization.");
         return 1;
     }
 
@@ -3325,7 +3325,7 @@ CMD:orginvite(playerid, params[])
     new const rankIndex = Internal_GetEntryRankIndex(orgSlot);
     if (orgSlot < 0 || rankIndex < 0)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "В организации нет настроенных должностей.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "There are no configured positions in the organization.");
         return 1;
     }
 
@@ -3337,13 +3337,13 @@ CMD:orginvite(playerid, params[])
     Organizations_GetRankTitle(orgId, rankIndex, rankTitle, sizeof(rankTitle));
 
     new msg[224];
-    format(msg, sizeof(msg), "Вы приняты в организацию «%s» на должность %s.", orgName, rankTitle);
+    format(msg, sizeof(msg), "You have been accepted into the organization “%s” for the position %s.", orgName, rankTitle);
     SendClientMessage(targetid, COLOR_UI_SUCCESS, msg);
-    format(msg, sizeof(msg), "Игрок принят в организацию на должность %s.", rankTitle);
+    format(msg, sizeof(msg), "The player has been accepted into the organization for the position %s.", rankTitle);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "ORG_INVITE", "ORG", "CHARACTER",
-        0, Character_GetId(targetid), "Прием сотрудника в организацию");
+        0, Character_GetId(targetid), "Hiring an employee into the organization");
     return 1;
 }
 
@@ -3365,43 +3365,43 @@ CMD:orgfire(playerid, params[])
     new values[2];
     if (Internal_ParseInts(params, values, 2) < 1)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /orgfire [id игрока]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /orgfire [player id]");
         return 1;
     }
 
     new const targetid = values[0];
     if (targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок не найден в сети.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player was not found online.");
         return 1;
     }
     if (targetid == playerid)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя уволить самого себя.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You can't fire yourself.");
         return 1;
     }
     if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > STORAGE_INTERACT_DISTANCE)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок находится слишком далеко.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player is too far away.");
         return 1;
     }
     if (Character_GetOrgId(targetid) != Character_GetOrgId(playerid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Игрок не состоит в вашей организации.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "The player is not a member of your organization.");
         return 1;
     }
     if (Organizations_GetPlayerRankOrder(playerid) <= Organizations_GetPlayerRankOrder(targetid))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Нельзя уволить сотрудника равного или более высокого ранга.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "You cannot fire an employee of equal or higher rank.");
         return 1;
     }
 
     Organizations_RevokeMembership(targetid);
-    SendClientMessage(targetid, COLOR_UI_WARNING, "Вы были уволены из организации.");
-    SendClientMessage(playerid, COLOR_UI_SUCCESS, "Сотрудник уволен.");
+    SendClientMessage(targetid, COLOR_UI_WARNING, "You have been fired from the organization.");
+    SendClientMessage(playerid, COLOR_UI_SUCCESS, "The employee was fired.");
 
     Audit_Log(Character_GetId(playerid), "ORG_FIRE", "ORG", "CHARACTER",
-        0, Character_GetId(targetid), "Увольнение сотрудника организации");
+        0, Character_GetId(targetid), "Dismissal of an employee of the organization");
     return 1;
 }
 
@@ -3483,7 +3483,7 @@ CMD:orgcharter(playerid, params[])
     if (Character_GetOrgId(playerid) != ORG_GOVERNMENT_DB_ID || Organizations_GetPlayerRankOrder(playerid) < 5)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Изменять хартии организаций может только действующий губернатор штата.");
+            "Only the current governor of a state can change the charters of factions.");
         return 1;
     }
 
@@ -3499,12 +3499,12 @@ CMD:orgcharter(playerid, params[])
     new const enabled = values[2];
     if (!Organizations_IsValid(orgId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Организация не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Organization not found.");
         return 1;
     }
     if (flagValue != 1 && flagValue != 2 && flagValue != 4 && flagValue != 8 && flagValue != 16 && flagValue != 32)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недопустимый флаг хартии.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Invalid charter flag.");
         return 1;
     }
 
@@ -3512,12 +3512,12 @@ CMD:orgcharter(playerid, params[])
 
     new msg[192];
     format(msg, sizeof(msg),
-        "Флаг хартии %d организации #%d %s.",
-        flagValue, orgId, (enabled != 0) ? ("выдан") : ("отозван"));
+        "Charter flag of the %d organization #%d %s.",
+        flagValue, orgId, (enabled != 0) ? ("issued") : ("withdrawn"));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "ORG_CHARTER", "GOVERNMENT", "ORG",
-        0, flagValue, (enabled != 0) ? ("Выдача флага хартии") : ("Отзыв флага хартии"));
+        0, flagValue, (enabled != 0) ? ("Issue of the charter flag") : ("Revocation of the charter flag"));
     return 1;
 }
 
@@ -3534,7 +3534,7 @@ CMD:orgstatus(playerid, params[])
     if (Character_GetOrgId(playerid) != ORG_GOVERNMENT_DB_ID || Organizations_GetPlayerRankOrder(playerid) < 5)
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Изменять правовой статус организаций может только действующий губернатор штата.");
+            "Only the current governor of the state can change the legal status of factions.");
         return 1;
     }
 
@@ -3542,7 +3542,7 @@ CMD:orgstatus(playerid, params[])
     if (Internal_ParseInts(params, values, 2) < 2)
     {
         SendClientMessage(playerid, COLOR_UI_INFO,
-            "Использование: /orgstatus [id] [1-незарегистрированная, 2-корпорация, 3-госведомство]");
+            "Usage: /orgstatus [id] [1-unincorporated, 2-corporation, 3-government agency]");
         return 1;
     }
 
@@ -3550,12 +3550,12 @@ CMD:orgstatus(playerid, params[])
     new const statusValue = values[1];
     if (!Organizations_IsValid(orgId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Организация не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Organization not found.");
         return 1;
     }
     if (statusValue < 1 || statusValue > 3)
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Недопустимый правовой статус.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Invalid legal status.");
         return 1;
     }
 
@@ -3563,11 +3563,11 @@ CMD:orgstatus(playerid, params[])
 
     new statusTitle[48], msg[192];
     Organizations_GetStatusTitleRu(E_ORG_LEGAL_STATUS:(statusValue - 1), statusTitle, sizeof(statusTitle));
-    format(msg, sizeof(msg), "Правовой статус организации #%d изменен: %s.", orgId, statusTitle);
+    format(msg, sizeof(msg), "The legal status of organization #%d has been changed: %s.", orgId, statusTitle);
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
     Audit_Log(Character_GetId(playerid), "ORG_STATUS", "GOVERNMENT", "ORG",
-        0, statusValue, "Изменение правового статуса организации");
+        0, statusValue, "Changing the legal status of an organization");
     return 1;
 }
 
@@ -3584,36 +3584,36 @@ CMD:orgfreeze(playerid, params[])
     if (!Internal_CanFreezeOrgBank(playerid))
     {
         SendClientMessage(playerid, COLOR_UI_ERROR,
-            "Заморозить счет организации могут только Правительство, ФБР или ЦРУ с соответствующими полномочиями.");
+            "Only the Government, FBI or CIA with appropriate authority can freeze an organization's account.");
         return 1;
     }
 
     new values[2];
     if (Internal_ParseInts(params, values, 2) < 2)
     {
-        SendClientMessage(playerid, COLOR_UI_INFO, "Использование: /orgfreeze [id организации] [1/0]");
+        SendClientMessage(playerid, COLOR_UI_INFO, "Usage: /orgfreeze [organization id] [1/0]");
         return 1;
     }
 
     new const orgId = values[0];
     if (!Organizations_IsValid(orgId))
     {
-        SendClientMessage(playerid, COLOR_UI_ERROR, "Организация не найдена.");
+        SendClientMessage(playerid, COLOR_UI_ERROR, "Organization not found.");
         return 1;
     }
 
     Organizations_SetBankFrozen(orgId, (values[1] != 0));
 
     new msg[192];
-    format(msg, sizeof(msg), "Банковский счет организации #%d %s.",
-        orgId, (values[1] != 0) ? ("заморожен") : ("разморожен"));
+    format(msg, sizeof(msg), "Organization bank account #%d %s.",
+        orgId, (values[1] != 0) ? ("frozen") : ("defrosted"));
     SendClientMessage(playerid, COLOR_UI_SUCCESS, msg);
 
-    format(msg, sizeof(msg), "[Финансы] Банковский счет вашей организации %s.",
-        (values[1] != 0) ? ("заморожен по решению следствия") : ("разморожен"));
+    format(msg, sizeof(msg), "[Finance] Your organization's bank account is %s.",
+        (values[1] != 0) ? ("frozen by decision of the investigation") : ("defrosted"));
     Organizations_NotifyMembers(orgId, msg);
 
     Audit_Log(Character_GetId(playerid), "ORG_FREEZE", "GOVERNMENT", "ORG_BANK",
-        0, values[1], "Изменение режима заморозки банковского счета организации");
+        0, values[1], "Changing the regime for freezing an organization's bank account");
     return 1;
 }
