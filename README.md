@@ -1,14 +1,5 @@
+<img width="1024" height="572" alt="image" src="https://github.com/user-attachments/assets/894069ff-df3d-4906-91eb-ac428ce808e7" />
 <div align="center">
-
-```text
-  ____    _    _   _      _    _   _ ____  ____  _____    _    ____     ____  ____  
- / ___|  / \  | \ | |    / \  | \ | |  _ \|  _ \| ____|  / \  / ___|   |  _ \|  _ \ 
- \___ \ / _ \ |  \| |   / _ \ |  \| | | | | |_) |  _|   / _ \ \___ \   | |_) | |_) |
-  ___) / ___ \| |\  |  / ___ \| |\  | |_| |  _ <| |___ / ___ \ ___) |  |  _ <|  __/ 
- |____/_/   \_\_| \_| /_/   \_\_| \_|____/|_| \_\_____/_/   \_\____/   |_| \_\_|    
-                                                                                    
-          [ SERVER-AUTHORITATIVE HARDCORE SANDBOX • ZERO-FAUCET ECONOMY ]
-```
 
 **Hardcore Text-First Multiplayer Roleplay Sandbox on Native `open.mp`**  
 *Libertarian Capitalism • Integer Physics • Dual-Layer Inventory • Dynamic RBAC*
