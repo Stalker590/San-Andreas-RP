@@ -88,6 +88,7 @@ enum E_RAM_ACCOUNT_CACHE
 };
 
 static stock sPlayerAccounts[MAX_PLAYERS][E_PLAYER_ACCOUNT];
+static stock bool:sPlayerLoginAudioActive[MAX_PLAYERS];
 static stock sRamAccountCache[MAX_RAM_CACHED_ACCOUNTS][E_RAM_ACCOUNT_CACHE];
 static stock sSyntheticAccountIdSeq = 0;
 static stock sSyntheticSessionIdSeq = 0;
@@ -115,6 +116,7 @@ static stock Internal_ResetAccountSlot(playerid)
     sPlayerAccounts[playerid][E_ACC_HWID][0] = EOS;
     sPlayerAccounts[playerid][E_ACC_LOGIN_ATTEMPTS] = 0;
     sPlayerAccounts[playerid][E_ACC_CONNECTED_UNIX] = 0;
+    sPlayerLoginAudioActive[playerid] = false;
 }
 
 static stock bool:Internal_ValidateRpNickFormat(const nickname[])
@@ -895,6 +897,10 @@ hook OnPlayerConnect(playerid)
     SendClientMessage(playerid, COLOR_SERVER_GOLD,
         "Welcome to SAN ANDREAS RP | Fair market, honest physics and survival!");
 
+    // Запуск фонового аудиопотока на время авторизации, регистрации и создания персонажа
+    PlayAudioStreamForPlayer(playerid, LOGIN_AUDIO_STREAM_URL);
+    sPlayerLoginAudioActive[playerid] = true;
+
     // 1. Валидация формата RP-ника First_Last через Pawn.Regex
     if (!Internal_ValidateRpNickFormat(sPlayerAccounts[playerid][E_ACC_USERNAME]))
     {
@@ -1002,8 +1008,21 @@ hook OnPlayerDisconnect(playerid, reason)
         mysql_tquery(gMySQL, sAccountSqlBuffer);
     }
 
+    sPlayerLoginAudioActive[playerid] = false;
     Internal_ResetAccountSlot(playerid);
     return 1;
+}
+
+hook OnPlayerSpawn(playerid)
+{
+    if (sPlayerLoginAudioActive[playerid] &&
+        sPlayerAccounts[playerid][E_ACC_STATE] == ACC_STATE_AUTHENTICATED &&
+        sPlayerAccounts[playerid][E_ACC_BOUND_CHAR_DB_ID] > 0)
+    {
+        StopAudioStreamForPlayer(playerid);
+        sPlayerLoginAudioActive[playerid] = false;
+    }
+    return Y_HOOKS_CONTINUE_RETURN_1;
 }
 
 hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])

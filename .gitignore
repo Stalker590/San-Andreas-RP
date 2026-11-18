@@ -16,6 +16,9 @@ scriptfiles/mysql.ini
 # Резервные копии БД
 scriptfiles/backups/
 
+# Бинарные аудиофайлы фоновой музыки
+scriptfiles/audio/*.mp3
+
 # Python-кеш тестовых скриптов
 __pycache__/
 *.pyc
