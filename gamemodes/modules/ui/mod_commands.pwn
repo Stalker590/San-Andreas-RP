@@ -947,6 +947,210 @@ CMD:give(playerid, params[])
     return Internal_TransferHandCash(playerid, targetid, amount);
 }
 
+/*
+ * œÓ‚ÂÍ‡ Ì‡ÎË˜Ëˇ ÔÂ‰ÏÂÚ‡ ÔÓ definition_id ‚ —ÎÓÂ 1 ËÎË —ÎÓÂ 2 Ë„ÓÍ‡.
+ */
+static stock bool:Internal_HasItemInAnyLayer(playerid, def_id)
+{
+    new layers[2];
+    layers[0] = Character_GetLayer1Slot(playerid);
+    layers[1] = Character_GetLayer2Slot(playerid);
+    for (new i = 0; i < 2; i++)
+    {
+        if (!Storage_IsValidSlot(layers[i]))
+        {
+            continue;
+        }
+        new itemSlot = Storage_GetFirstItemSlot(layers[i]);
+        while (itemSlot != INVALID_ITEM_SLOT)
+        {
+            if (Storage_GetItemDefId(itemSlot) == def_id && Storage_GetItemAmount(itemSlot) > 0)
+            {
+                return true;
+            }
+            itemSlot = Storage_GetNextItemSlot(itemSlot);
+        }
+    }
+    return false;
+}
+
+CMD:uncuff(playerid, params[])
+{
+    if (!Character_IsLoaded(playerid)) return 1;
+    if (Survival_IsCuffed(playerid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You are handcuffed and cannot remove handcuffs.");
+        return 1;
+    }
+
+    new targetid = INVALID_PLAYER_ID;
+    if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
+    {
+        SendClientMessage(playerid, COLOR_INFO, "Usage: /uncuff [player id]");
+        return 1;
+    }
+    if (targetid == playerid)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: You cannot uncuff yourself.");
+        return 1;
+    }
+    if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
+        return 1;
+    }
+    if (!Survival_IsCuffed(targetid))
+    {
+        SendClientMessage(playerid, COLOR_WARNING, "[Action]: This player is not handcuffed.");
+        return 1;
+    }
+
+    Survival_SetCuffed(targetid, false);
+
+    new actorName[MAX_PLAYER_NAME + 8];
+    new targetName[MAX_PLAYER_NAME + 8];
+    Internal_GetRoleplayName(playerid, actorName, sizeof(actorName));
+    Internal_GetRoleplayName(targetid, targetName, sizeof(targetName));
+
+    new rpMsg[160];
+    format(rpMsg, sizeof(rpMsg), "* %s unlocked and removed the steel handcuffs from %s's wrists.", actorName, targetName);
+    Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
+    return 1;
+}
+
+CMD:showpass(playerid, params[])
+{
+    if (!Character_IsLoaded(playerid)) return 1;
+    if (Survival_IsCuffed(playerid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Your hands are handcuffed.");
+        return 1;
+    }
+
+    new targetid = playerid;
+    if (params[0] != '\0')
+    {
+        if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
+        {
+            SendClientMessage(playerid, COLOR_INFO, "Usage: /showpass [player id]");
+            return 1;
+        }
+    }
+
+    if (targetid != playerid && Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
+        return 1;
+    }
+
+    new const bool:hasPassportItem = Internal_HasItemInAnyLayer(playerid, ITEM_ID_PASSPORT);
+    new const E_CITIZENSHIP_TYPE:cit = Character_GetCitizenship(playerid);
+    if (!hasPassportItem && cit != CITIZENSHIP_CITIZEN)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Documents]: You do not have a US Passport / ID card in your inventory.");
+        return 1;
+    }
+
+    new rpName[MAX_PLAYER_NAME + 1], ssnBuf[20], roleTitle[48], orgTag[16];
+    Character_GetRpName(playerid, rpName, sizeof(rpName));
+    Character_GetSSN(playerid, ssnBuf, sizeof(ssnBuf));
+    if (ssnBuf[0] == '\0')
+    {
+        format(ssnBuf, sizeof(ssnBuf), "UNREGISTERED");
+    }
+    Roles_GetNameRu(Character_GetRoleId(playerid), roleTitle, sizeof(roleTitle));
+
+    new const orgId = Character_GetOrgId(playerid);
+    if (orgId > 0 && Organizations_IsValid(orgId))
+    {
+        Organizations_GetTag(orgId, orgTag, sizeof(orgTag));
+    }
+    else
+    {
+        format(orgTag, sizeof(orgTag), "Civilian");
+    }
+
+    new actorDisplay[MAX_PLAYER_NAME + 8], targetDisplay[MAX_PLAYER_NAME + 8];
+    Internal_GetRoleplayName(playerid, actorDisplay, sizeof(actorDisplay));
+    Internal_GetRoleplayName(targetid, targetDisplay, sizeof(targetDisplay));
+
+    new rpMsg[160];
+    format(rpMsg, sizeof(rpMsg), "* %s took out their passport and showed it to %s.", actorDisplay, targetDisplay);
+    Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
+
+    new cardLine[192];
+    SendClientMessage(targetid, COLOR_SERVER_GOLD, "================ [ STATE OF SAN ANDREAS PASSPORT ] ================");
+    format(cardLine, sizeof(cardLine), "Full Name: {FFFFFF}%s {88CCFF}| Age: {FFFFFF}%d yrs (Level %d) {88CCFF}| SSN: {FFFFFF}%s",
+        rpName, Character_GetAge(playerid), Character_GetLevel(playerid), ssnBuf);
+    SendClientMessage(targetid, COLOR_UI_INFO, cardLine);
+    format(cardLine, sizeof(cardLine), "Citizenship: {FFFFFF}%s {88CCFF}| Affiliation: {FFFFFF}%s {88CCFF}| Background: {FFFFFF}%s",
+        (cit == CITIZENSHIP_CITIZEN) ? ("US Citizen") : ("Foreign National / Immigrant"),
+        orgTag,
+        roleTitle);
+    SendClientMessage(targetid, COLOR_UI_INFO, cardLine);
+    SendClientMessage(targetid, COLOR_SERVER_GOLD, "===================================================================");
+    return 1;
+}
+alias:showpass("pass");
+
+CMD:showlic(playerid, params[])
+{
+    if (!Character_IsLoaded(playerid)) return 1;
+    if (Survival_IsCuffed(playerid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: Your hands are handcuffed.");
+        return 1;
+    }
+
+    new targetid = playerid;
+    if (params[0] != '\0')
+    {
+        if (!Internal_ParseSingleInt(params, targetid) || targetid < 0 || targetid >= MAX_PLAYERS || !Character_IsLoaded(targetid))
+        {
+            SendClientMessage(playerid, COLOR_INFO, "Usage: /showlic [player id]");
+            return 1;
+        }
+    }
+
+    if (targetid != playerid && Utils_GetDistanceBetweenPlayers(playerid, targetid) > RP_INTERACT_DISTANCE)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Error]: The player is too far from you (maximum 3.0 m).");
+        return 1;
+    }
+
+    new const bool:hasPassport = Internal_HasItemInAnyLayer(playerid, ITEM_ID_PASSPORT);
+    new const bool:hasWeaponLic = Internal_HasItemInAnyLayer(playerid, ITEM_ID_WEAPON_LICENSE);
+    new const bool:hasVehTitle = Internal_HasItemInAnyLayer(playerid, ITEM_ID_VEHICLE_TITLE);
+    new const bool:hasBankCard = Internal_HasItemInAnyLayer(playerid, ITEM_ID_BANK_CARD);
+
+    new rpName[MAX_PLAYER_NAME + 1];
+    Character_GetRpName(playerid, rpName, sizeof(rpName));
+
+    new actorDisplay[MAX_PLAYER_NAME + 8], targetDisplay[MAX_PLAYER_NAME + 8];
+    Internal_GetRoleplayName(playerid, actorDisplay, sizeof(actorDisplay));
+    Internal_GetRoleplayName(targetid, targetDisplay, sizeof(targetDisplay));
+
+    new rpMsg[160];
+    format(rpMsg, sizeof(rpMsg), "* %s presented their folder of state licenses and permits to %s.", actorDisplay, targetDisplay);
+    Commands_SendProximityMessage(playerid, RP_RADIUS_ACTION, COLOR_RP_ME, rpMsg);
+
+    new line[192];
+    SendClientMessage(targetid, COLOR_SERVER_GOLD, "============== [ SAN ANDREAS LICENSES & CERTIFICATES ] ==============");
+    format(line, sizeof(line), "Holder: {FFFFFF}%s {88CCFF}| Passport / ID: %s {88CCFF}| Firearms License: %s",
+        rpName,
+        hasPassport ? ("{66CC66}VALID") : ("{FF4444}NONE"),
+        hasWeaponLic ? ("{66CC66}VALID") : ("{FF4444}NONE"));
+    SendClientMessage(targetid, COLOR_UI_INFO, line);
+    format(line, sizeof(line), "Vehicle Title Deed: %s {88CCFF}| Bank Debit Card: %s {88CCFF}| Driving Skill: {FFFFFF}%d/1000",
+        hasVehTitle ? ("{66CC66}PRESENT") : ("{AFAFAF}NONE"),
+        hasBankCard ? ("{66CC66}ACTIVE") : ("{AFAFAF}NONE"),
+        Skills_Get(playerid, SKILL_DRIVING));
+    SendClientMessage(targetid, COLOR_UI_INFO, line);
+    SendClientMessage(targetid, COLOR_SERVER_GOLD, "=====================================================================");
+    return 1;
+}
+alias:showlic("lic", "licenses");
+
 // =============================================================================
 //  7. œ≈–≈’¬¿“ Œ¡€◊ÕŒ√Œ œ–Œ—“–¿Õ—“¬≈ÕÕŒ√Œ RP-◊¿“¿ (y_hooks)
 // =============================================================================

@@ -3617,3 +3617,9 @@ CMD:orgfreeze(playerid, params[])
         0, values[1], "Changing the regime for freezing an organization's bank account");
     return 1;
 }
+
+stock Organizations_FindNearestVault(playerid, Float:maxRadius, &orgDbId)
+{
+    return Internal_FindNearestOrgVault(playerid, maxRadius, orgDbId);
+}
+

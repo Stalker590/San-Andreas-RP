@@ -1836,6 +1836,57 @@ stock Vehicle_AdminGetNearestSlot(playerid, Float:radius)
     return Vehicle_GetNearestSlot(playerid, radius);
 }
 
+stock bool:Vehicle_IsNearDealership(playerid)
+{
+    return Internal_PlayerNearDealership(playerid);
+}
+
+stock bool:Vehicle_IsNearChopShop(playerid, Float:radius = 12.0)
+{
+    new enterprise = VEHICLE_INVALID_ENTERPRISE;
+    new warehouse = INVALID_STORAGE_SLOT;
+    return Vehicles_FindChopShop(playerid, radius, enterprise, warehouse);
+}
+
+stock bool:Vehicle_IsSlotLocked(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    return sVehicles[slot][E_VEH_LOCKED];
+}
+
+stock bool:Vehicle_IsSlotEngineOn(slot)
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        return false;
+    }
+    return sVehicles[slot][E_VEH_ENGINE_ON];
+}
+
+stock Vehicle_GetSlotPlate(slot, output[], len = sizeof(output))
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        format(output, len, "NONE");
+        return 0;
+    }
+    format(output, len, "%s", sVehicles[slot][E_VEH_PLATE]);
+    return 1;
+}
+
+stock Vehicle_GetSlotModelName(slot, output[], len = sizeof(output))
+{
+    if (!Vehicle_IsValidSlot(slot))
+    {
+        format(output, len, "Vehicle");
+        return 0;
+    }
+    return Internal_GetCatalogName(sVehicles[slot][E_VEH_MODEL], output, len);
+}
+
 // =============================================================================
 //  5. ¿—»Õ’–ŒÕÕ€≈ SQL- ŒÀ¡≈ » » «¿√–”« ¿ (forward / public)
 // =============================================================================
@@ -2960,4 +3011,9 @@ CMD:vunpark(playerid, params[])
         "{FFC800}Vehicles in the garage", body, "Check out", "Cancel");
     return 1;
 }
+
+alias:vlock("lock");
+alias:vengine("engine", "en");
+alias:chop("chopshop");
+alias:vunpark("garage");
 

@@ -2,3 +2,4 @@
 [ts=1794669686] actor=0 | action=SERVER_STARTUP | src=CORE_ENGINE | dst=AUDIT_SUBSYSTEM | item=0 | amount=1 | details=Èíèöèàëèçàöèÿ ïîäñèñòåìû àóäèòà òðàíçàêöèé SAN ANDREAS RP
 [ts=1794669811] actor=0 | action=SERVER_STARTUP | src=CORE_ENGINE | dst=AUDIT_SUBSYSTEM | item=0 | amount=1 | details=Èíèöèàëèçàöèÿ ïîäñèñòåìû àóäèòà òðàíçàêöèé SAN ANDREAS RP
 [ts=1794669915] actor=0 | action=SERVER_STARTUP | src=CORE_ENGINE | dst=AUDIT_SUBSYSTEM | item=0 | amount=1 | details=Èíèöèàëèçàöèÿ ïîäñèñòåìû àóäèòà òðàíçàêöèé SAN ANDREAS RP
+[ts=1795207962] actor=0 | admin=0 | target_acc=0 | target_char=0 | action=SERVER_STARTUP | src=CORE_ENGINE | dst=AUDIT_SUBSYSTEM | item=0 | amount=1 | details=Initializing the SAN ANDREAS RP transaction audit subsystem

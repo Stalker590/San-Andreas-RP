@@ -24,9 +24,81 @@
 #define DIALOG_INV_EXTERNAL_CONTAINER           (1103)
 #define DIALOG_INV_CONTEXT_MENU_Y               (1104)
 #define DIALOG_INV_SEARCH_INSPECT               (1105)
+#define DIALOG_ACT_PLAYER_CARD                  (1106)
+#define DIALOG_ACT_PAY_INPUT                    (1107)
 
 #define MAX_DIALOG_INV_ROWS                     (64)
-#define CONTEXT_INTERACT_RADIUS_M               (2.5)
+#define MAX_ACT_MENU_ROWS                       (48)
+#define CONTEXT_INTERACT_RADIUS_M               (3.0)
+#define KEYBIND_INTERACT_COOLDOWN_MS            (350)
+
+forward MainMenu_Open(playerid);
+forward pc_cmd_inv(playerid, params[]);
+forward pc_cmd_showpass(playerid, params[]);
+forward pc_cmd_showlic(playerid, params[]);
+forward pc_cmd_frisk(playerid, params[]);
+forward pc_cmd_search(playerid, params[]);
+forward pc_cmd_pickpocket(playerid, params[]);
+forward pc_cmd_cuff(playerid, params[]);
+forward pc_cmd_uncuff(playerid, params[]);
+forward pc_cmd_pay(playerid, params[]);
+forward pc_cmd_mm(playerid, params[]);
+
+enum E_ACT_ENTRY_TYPE
+{
+    ACT_ENTRY_NONE = 0,
+    ACT_ENTRY_PLAYER,
+    ACT_ENTRY_VEH_ENGINE,
+    ACT_ENTRY_VEH_LOCK,
+    ACT_ENTRY_VEH_TRUNK,
+    ACT_ENTRY_VEH_GLOVEBOX,
+    ACT_ENTRY_VEH_REFUEL,
+    ACT_ENTRY_VEH_REPAIR,
+    ACT_ENTRY_VEH_LOCKPICK,
+    ACT_ENTRY_VEH_BREAKWINDOW,
+    ACT_ENTRY_VEH_HOTWIRE,
+    ACT_ENTRY_VEH_CHOP,
+    ACT_ENTRY_VEH_PARK,
+    ACT_ENTRY_VEH_UNPARK,
+    ACT_ENTRY_VEH_BUY,
+    ACT_ENTRY_WORLD_CONTAINER,
+    ACT_ENTRY_PROPERTY_MENU,
+    ACT_ENTRY_PROPERTY_LOCK,
+    ACT_ENTRY_PROPERTY_PAYBILLS,
+    ACT_ENTRY_PROPERTY_LOCKPICK,
+    ACT_ENTRY_PROPERTY_KICKDOOR,
+    ACT_ENTRY_ENT_MINE,
+    ACT_ENTRY_ENT_DELIVER,
+    ACT_ENTRY_ENT_CRAFT,
+    ACT_ENTRY_ENT_BIZ,
+    ACT_ENTRY_ENT_MARKET,
+    ACT_ENTRY_PORT_MENU,
+    ACT_ENTRY_CONTRACTS,
+    ACT_ENTRY_BANK_MENU,
+    ACT_ENTRY_LAUNDER_MENU,
+    ACT_ENTRY_ORG_VAULT,
+    ACT_ENTRY_VAULT_BREACH,
+    ACT_ENTRY_FORENSICS,
+    ACT_ENTRY_SELF_INV,
+    ACT_ENTRY_SELF_MM
+};
+
+enum E_ACT_PLAYER_OP
+{
+    ACT_PL_NONE = 0,
+    ACT_PL_GIVE_ITEM,
+    ACT_PL_PAY_CASH,
+    ACT_PL_SHOW_PASS,
+    ACT_PL_SHOW_LIC,
+    ACT_PL_TRIAGE,
+    ACT_PL_TREAT,
+    ACT_PL_FRISK,
+    ACT_PL_SEARCH,
+    ACT_PL_PICKPOCKET,
+    ACT_PL_CUFF,
+    ACT_PL_UNCUFF,
+    ACT_PL_ARREST
+};
 
 enum E_INV_VIEW_MODE
 {
@@ -70,6 +142,16 @@ static stock bool:sPlayerSearchAllowConfiscate[MAX_PLAYERS];
 static stock bool:sPlayerSearchIncludeLayer2[MAX_PLAYERS];
 static stock sPlayerSearchStorageMap[MAX_PLAYERS][MAX_DIALOG_INV_ROWS];
 
+// Серверный маппинг контекстного меню /act (защита от подмены listitem)
+static stock E_ACT_ENTRY_TYPE:sPlayerActTypeMap[MAX_PLAYERS][MAX_ACT_MENU_ROWS];
+static stock sPlayerActTargetMap[MAX_PLAYERS][MAX_ACT_MENU_ROWS];
+static stock sPlayerActRowCount[MAX_PLAYERS];
+static stock sPlayerActSelectedPlayer[MAX_PLAYERS];
+static stock E_ACT_PLAYER_OP:sPlayerActPlayerOpMap[MAX_PLAYERS][16];
+static stock sPlayerActPlayerOpCount[MAX_PLAYERS];
+static stock sPlayerLastKeybindTick[MAX_PLAYERS];
+static stock sDialogEmptyCmdParams[4];
+
 // =============================================================================
 //  3. ВНУТРЕННИЕ ФУНКЦИИ СБРОСА И ОБЕСПЕЧЕНИЯ ВЛОЖЕННОГО КОНТЕЙНЕРА
 // =============================================================================
@@ -95,6 +177,9 @@ static stock Dialogs_ResetPlayerState(playerid)
     sPlayerSearchTarget[playerid] = INVALID_PLAYER_ID;
     sPlayerSearchAllowConfiscate[playerid] = false;
     sPlayerSearchIncludeLayer2[playerid] = false;
+    sPlayerActRowCount[playerid] = 0;
+    sPlayerActSelectedPlayer[playerid] = INVALID_PLAYER_ID;
+    sPlayerActPlayerOpCount[playerid] = 0;
 }
 
 static stock Internal_MergeSimilarStacks(storage_slot, item_slot)
@@ -688,10 +773,562 @@ hook OnPlayerDisconnect(playerid, reason)
     return 1;
 }
 
+static stock Internal_AddActRow(
+    playerid,
+    body[],
+    bodySize,
+    E_ACT_ENTRY_TYPE:entryType,
+    targetId,
+    const category[],
+    const objectLabel[],
+    const actionLabel[])
+{
+    if (sPlayerActRowCount[playerid] >= MAX_ACT_MENU_ROWS)
+    {
+        return 0;
+    }
+
+    new const idx = sPlayerActRowCount[playerid];
+    sPlayerActTypeMap[playerid][idx] = entryType;
+    sPlayerActTargetMap[playerid][idx] = targetId;
+    sPlayerActRowCount[playerid]++;
+
+    new line[192];
+    format(line, sizeof(line), "%s	%s	%s
+", category, objectLabel, actionLabel);
+    strcat(body, line, bodySize);
+    return 1;
+}
+
+static stock Internal_ShowActPlayerCard(playerid, targetid)
+{
+    if (targetid == INVALID_PLAYER_ID || !IsPlayerConnected(targetid) || !Character_IsLoaded(targetid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: The selected player is no longer available.");
+        return 0;
+    }
+    if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > CONTEXT_INTERACT_RADIUS_M + 0.5)
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: The player moved too far away (maximum 3.0 m).");
+        return 0;
+    }
+
+    sPlayerActSelectedPlayer[playerid] = targetid;
+    sPlayerActPlayerOpCount[playerid] = 0;
+
+    static body[1024];
+    body[0] = '\0';
+    strcat(body, "Action	Command Shortcut
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_GIVE_ITEM;
+    strcat(body, "1. Hand over an item from inventory	/inv -> Pass nearby
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_PAY_CASH;
+    strcat(body, "2. Hand over physical cash (USD)	/pay [id] [amount]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_SHOW_PASS;
+    strcat(body, "3. Show Passport / State ID	/showpass [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_SHOW_LIC;
+    strcat(body, "4. Show Licenses & Certificates	/showlic [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_TRIAGE;
+    strcat(body, "5. Medical Triage (Inspect injuries)	/triage [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_TREAT;
+    strcat(body, "6. Provide First Aid / Surgery	/treat [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_FRISK;
+    strcat(body, "7. Pat down outer gear (Layer 1)	/frisk [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_SEARCH;
+    strcat(body, "8. Full Search & Seizure (Layer 1 + Layer 2)	/search [id]
+", sizeof(body));
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_PICKPOCKET;
+    strcat(body, "9. Attempt stealth pickpocket	/pickpocket [id]
+", sizeof(body));
+
+    if (!Survival_IsCuffed(targetid))
+    {
+        sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_CUFF;
+        strcat(body, "10. Put on Steel Handcuffs	/cuff [id]
+", sizeof(body));
+    }
+    else
+    {
+        sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_UNCUFF;
+        strcat(body, "10. Remove Steel Handcuffs	/uncuff [id]
+", sizeof(body));
+    }
+
+    sPlayerActPlayerOpMap[playerid][sPlayerActPlayerOpCount[playerid]++] = ACT_PL_ARREST;
+    strcat(body, "11. Law Enforcement Arrest	/arrest [id]
+", sizeof(body));
+
+    new targetName[MAX_PLAYER_NAME + 1];
+    Character_GetRpName(targetid, targetName, sizeof(targetName));
+
+    new title[128];
+    format(title, sizeof(title), "Player Interaction: %s [ID %d]", targetName, targetid);
+
+    ShowPlayerDialog(
+        playerid,
+        DIALOG_ACT_PLAYER_CARD,
+        DIALOG_STYLE_TABLIST_HEADERS,
+        title,
+        body,
+        "Execute",
+        "Back"
+    );
+    return 1;
+}
+
 /*
- * Контекстная клавиша KEY_YES (Y): сканирует радиус 2.5 м вокруг игрока
- * (лежащие свертки WORLD_DROP, вещи погибшего CORPSE_LOOT, хранилища)
- * и открывает русскоязычное меню контекстного взаимодействия.
+ * Контекстный сканер окружения /act (и клавиша Y).
+ * Сканирует радиус 3.0 м вокруг игрока: ближайшие игроки, транспорт (внутри/снаружи),
+ * мировые контейнеры (CORPSE_LOOT, WORLD_DROP), двери недвижимости, предприятия,
+ * портовые терминалы, банки, сейфы организаций и физические улики.
+ */
+stock Dialogs_OpenActMenu(playerid)
+{
+    if (!Character_IsLoaded(playerid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: Your character has not yet been loaded.");
+        return 0;
+    }
+    if (Survival_IsCuffed(playerid))
+    {
+        SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: Your hands are handcuffed!");
+        return 0;
+    }
+    if (Character_GetJailSecondsLeft(playerid) > 0)
+    {
+        SendClientMessage(playerid, COLOR_WARNING, "[Interaction]: Most context actions are restricted while serving a prison sentence (/labor is available).");
+    }
+
+    sPlayerActRowCount[playerid] = 0;
+
+    static body[3584];
+    body[0] = '\0';
+    strcat(body, "Category	Target / Object	Available Action (Command)
+", sizeof(body));
+
+    // 1. Ближайшие игроки в радиусе 3.0 м
+    foreach (new targetid : Player)
+    {
+        if (targetid == playerid || !Character_IsLoaded(targetid))
+        {
+            continue;
+        }
+        new const Float:dist = Utils_GetDistanceBetweenPlayers(playerid, targetid);
+        if (dist <= CONTEXT_INTERACT_RADIUS_M)
+        {
+            new rpName[MAX_PLAYER_NAME + 1], targetLabel[64];
+            Character_GetRpName(targetid, rpName, sizeof(rpName));
+            format(targetLabel, sizeof(targetLabel), "%s [ID %d] (%.1fm)", rpName, targetid, dist);
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_PLAYER, targetid,
+                "{81D4FA}[Player]",
+                targetLabel,
+                "Open Player Interaction Menu >>"
+            );
+        }
+    }
+
+    // 2. Транспорт (внутри салона или в радиусе 3.0 м снаружи)
+    new const vehSlot = Vehicle_GetNearestSlot(playerid, CONTEXT_INTERACT_RADIUS_M + 0.5);
+    if (Vehicle_IsValidSlot(vehSlot))
+    {
+        new modelName[32], plate[16], vehLabel[64];
+        Vehicle_GetSlotModelName(vehSlot, modelName, sizeof(modelName));
+        Vehicle_GetSlotPlate(vehSlot, plate, sizeof(plate));
+        format(vehLabel, sizeof(vehLabel), "%s [%s]", modelName, plate);
+
+        new const bool:isLocked = Vehicle_IsSlotLocked(vehSlot);
+        new const bool:isEngineOn = Vehicle_IsSlotEngineOn(vehSlot);
+        new const bool:inVeh = IsPlayerInAnyVehicle(playerid);
+
+        if (inVeh && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_VEH_ENGINE, vehSlot,
+                "{FFD54F}[Vehicle]",
+                vehLabel,
+                isEngineOn ? ("Stop Engine (/engine)") : ("Start Engine (/engine)")
+            );
+            if (!isEngineOn)
+            {
+                Internal_AddActRow(
+                    playerid, body, sizeof(body),
+                    ACT_ENTRY_VEH_HOTWIRE, vehSlot,
+                    "{FFD54F}[Vehicle]",
+                    vehLabel,
+                    "Hotwire Ignition Wires (/hotwire)"
+                );
+            }
+        }
+
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VEH_LOCK, vehSlot,
+            "{FFD54F}[Vehicle]",
+            vehLabel,
+            isLocked ? ("Unlock Doors (/lock)") : ("Lock Doors (/lock)")
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VEH_TRUNK, vehSlot,
+            "{FFD54F}[Vehicle]",
+            vehLabel,
+            "Open Vehicle Trunk (/trunk)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VEH_GLOVEBOX, vehSlot,
+            "{FFD54F}[Vehicle]",
+            vehLabel,
+            "Open Glove Compartment (/glovebox)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VEH_REFUEL, vehSlot,
+            "{FFD54F}[Vehicle]",
+            vehLabel,
+            "Refuel Tank (/refuel)"
+        );
+
+        if (!inVeh)
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_VEH_REPAIR, vehSlot,
+                "{FFD54F}[Vehicle]",
+                vehLabel,
+                "Field Repair with Wrench Kit (/repair)"
+            );
+            if (isLocked)
+            {
+                Internal_AddActRow(
+                    playerid, body, sizeof(body),
+                    ACT_ENTRY_VEH_LOCKPICK, vehSlot,
+                    "{FFAB91}[Vehicle Crime]",
+                    vehLabel,
+                    "Pick Door Lock (/lockpick)"
+                );
+                Internal_AddActRow(
+                    playerid, body, sizeof(body),
+                    ACT_ENTRY_VEH_BREAKWINDOW, vehSlot,
+                    "{FFAB91}[Vehicle Crime]",
+                    vehLabel,
+                    "Smash Window (/breakwindow)"
+                );
+            }
+            if (Vehicle_IsNearChopShop(playerid, 14.0))
+            {
+                Internal_AddActRow(
+                    playerid, body, sizeof(body),
+                    ACT_ENTRY_VEH_CHOP, vehSlot,
+                    "{FFAB91}[Chop Shop]",
+                    vehLabel,
+                    "Dismantle Vehicle for Parts (/chopshop)"
+                );
+            }
+        }
+    }
+
+    if (Vehicle_IsNearDealership(playerid))
+    {
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VEH_BUY, 0,
+            "{66CC66}[Dealership]",
+            "Auto Dealership Showroom",
+            "Browse & Purchase Vehicles (/vbuy)"
+        );
+    }
+
+    // 3. Мировые контейнеры на земле (CORPSE_LOOT, WORLD_DROP) в радиусе 3.0 м
+    new const nearContainer = Storage_FindNearestWorldContainer(playerid, CONTEXT_INTERACT_RADIUS_M);
+    if (Storage_IsValidSlot(nearContainer))
+    {
+        sPlayerExternalStorageSlot[playerid] = nearContainer;
+        new const E_STORAGE_TYPE:stType = Storage_GetType(nearContainer);
+        if (stType == STORAGE_CORPSE_LOOT)
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_WORLD_CONTAINER, nearContainer,
+                "{FF8A65}[Corpse Loot]",
+                "Deceased Person's Belongings",
+                "Search & Loot Corpse Container"
+            );
+        }
+        else
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_WORLD_CONTAINER, nearContainer,
+                "{81D4FA}[World Drop]",
+                "Dropped Package / Stash",
+                "Inspect & Pick Up Items"
+            );
+        }
+    }
+
+    // 4. Недвижимость и гаражи (внутри или у двери в радиусе 3.0 м)
+    new propDbId = Properties_GetInsideDbId(playerid);
+    if (propDbId <= 0)
+    {
+        Properties_GetNearestProperty(playerid, CONTEXT_INTERACT_RADIUS_M + 0.5, propDbId);
+    }
+    if (propDbId > 0)
+    {
+        new propType[32], propLabel[64];
+        Properties_GetTypeNameRu(propDbId, propType, sizeof(propType));
+        format(propLabel, sizeof(propLabel), "%s #%d", propType, propDbId);
+
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_PROPERTY_MENU, propDbId,
+            "{AED581}[Real Estate]",
+            propLabel,
+            "Open Property Menu (/house)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_PROPERTY_LOCK, propDbId,
+            "{AED581}[Real Estate]",
+            propLabel,
+            "Toggle Property Door Lock (/plock)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_PROPERTY_PAYBILLS, propDbId,
+            "{AED581}[Real Estate]",
+            propLabel,
+            "Pay Utility Bills (/paybills)"
+        );
+        if (!Properties_IsPlayerInside(playerid))
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_PROPERTY_LOCKPICK, propDbId,
+                "{FFAB91}[Burglary]",
+                propLabel,
+                "Pick Property Door Lock (/lockpick)"
+            );
+            if (Character_GetRoleId(playerid) == 24)
+            {
+                Internal_AddActRow(
+                    playerid, body, sizeof(body),
+                    ACT_ENTRY_PROPERTY_KICKDOOR, propDbId,
+                    "{FFAB91}[SWAT Breach]",
+                    propLabel,
+                    "Breach Door with One Kick (/kickdoor)"
+                );
+            }
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_VEH_PARK, propDbId,
+                "{AED581}[Garage]",
+                propLabel,
+                "Park Vehicle in Garage (/vpark)"
+            );
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_VEH_UNPARK, propDbId,
+                "{AED581}[Garage]",
+                propLabel,
+                "Retrieve Vehicle from Garage (/garage)"
+            );
+        }
+    }
+
+    // 5. Предприятия, шахты, заводы, магазины и АЗС
+    new const nearEnt = Enterprise_FindNearest(playerid, 15.0);
+    if (nearEnt != INVALID_ENTERPRISE_ID)
+    {
+        new entName[64];
+        Enterprise_GetName(nearEnt, entName, sizeof(entName));
+        new const E_ENTERPRISE_TYPE:entType = Enterprise_GetType(nearEnt);
+
+        if (entType == ENTERPRISE_MINE_ORE || entType == ENTERPRISE_OIL_RIG ||
+            entType == ENTERPRISE_SAWMILL || entType == ENTERPRISE_FARM)
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_ENT_MINE, nearEnt,
+                "{FFB74D}[Extraction]",
+                entName,
+                "Extract Raw Resources (/mine)"
+            );
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_ENT_DELIVER, nearEnt,
+                "{FFB74D}[Extraction]",
+                entName,
+                "Deliver Raw Material to Warehouse (/deliver)"
+            );
+        }
+        else if (entType == ENTERPRISE_REFINERY || entType == ENTERPRISE_METALLURGY ||
+                 entType == ENTERPRISE_FACTORY || entType == ENTERPRISE_CHOP_SHOP)
+        {
+            Internal_AddActRow(
+                playerid, body, sizeof(body),
+                ACT_ENTRY_ENT_CRAFT, nearEnt,
+                "{FFB74D}[Production]",
+                entName,
+                "Open Crafting & Processing Bench (/craft)"
+            );
+        }
+
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_ENT_BIZ, nearEnt,
+            "{FFB74D}[Enterprise]",
+            entName,
+            "Enterprise Desk & Shop (/biz)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_ENT_MARKET, nearEnt,
+            "{FFB74D}[Enterprise]",
+            entName,
+            "Supply & Buy/Sell Orders (/market)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_LAUNDER_MENU, nearEnt,
+            "{CE93D8}[Cash Register]",
+            entName,
+            "Money Laundering Desk (/launder)"
+        );
+    }
+
+    // 6. Портовые терминалы LS / SF / LV
+    new const nearPort = Ports_FindNearestPort(playerid, 25.0);
+    if (nearPort > 0)
+    {
+        new portName[48];
+        Ports_GetPortNameRu(nearPort, portName, sizeof(portName));
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_PORT_MENU, nearPort,
+            "{4FC3F7}[Port Hub]",
+            portName,
+            "Import/Export Terminal (/port)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_CONTRACTS, nearPort,
+            "{4FC3F7}[Logistics]",
+            portName,
+            "Freight Contracts Exchange (/contracts)"
+        );
+    }
+
+    // 7. Отделения банков и банкоматы
+    if (Banking_IsPlayerNearBranch(playerid))
+    {
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_BANK_MENU, 0,
+            "{66BB6A}[Banking]",
+            "Bank Branch / ATM Terminal",
+            "Open Banking Operations (/bank)"
+        );
+    }
+
+    // 8. Физический сейф организации (ORG_VAULT) в радиусе 3.5 м
+    new vaultOrgId = 0;
+    if (Organizations_FindNearestVault(playerid, 3.5, vaultOrgId) >= 0 && vaultOrgId > 0)
+    {
+        new orgName[64];
+        Organizations_GetName(vaultOrgId, orgName, sizeof(orgName));
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_ORG_VAULT, vaultOrgId,
+            "{BA68C8}[Faction Vault]",
+            orgName,
+            "Access Organization Vault (/orgvault)"
+        );
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_VAULT_BREACH, vaultOrgId,
+            "{EF5350}[Vault Heist]",
+            orgName,
+            "Breach Vault Safe (/vaultbreak)"
+        );
+    }
+
+    // 9. Криминалистические улики поблизости (в радиусе 12.0 м)
+    new const nearEvidenceCount = Forensics_CountNearbyEvidence(playerid, 12.0);
+    if (nearEvidenceCount > 0)
+    {
+        new evLabel[48];
+        format(evLabel, sizeof(evLabel), "Crime Scene (%d trace(s) within 12m)", nearEvidenceCount);
+        Internal_AddActRow(
+            playerid, body, sizeof(body),
+            ACT_ENTRY_FORENSICS, nearEvidenceCount,
+            "{FFF176}[Forensics]",
+            evLabel,
+            "Inspect & Collect Evidence (/evidence)"
+        );
+    }
+
+    // 10. Базовые быстрые действия персонажа (всегда доступны)
+    Internal_AddActRow(
+        playerid, body, sizeof(body),
+        ACT_ENTRY_SELF_INV, 0,
+        "{ECEFF1}[Self]",
+        "Dual-Layer Inventory (Key N)",
+        "Open Personal Inventory (/inv)"
+    );
+    Internal_AddActRow(
+        playerid, body, sizeof(body),
+        ACT_ENTRY_SELF_MM, 0,
+        "{ECEFF1}[Self]",
+        "Main Menu & Codex (Key H / LALT)",
+        "Open Character Menu & Help (/mm)"
+    );
+
+    ShowPlayerDialog(
+        playerid,
+        DIALOG_INV_CONTEXT_MENU_Y,
+        DIALOG_STYLE_TABLIST_HEADERS,
+        "{FFC800}SAN ANDREAS RP {FFFFFF}| Context Interaction Scanner (/act | Key Y)",
+        body,
+        "Select",
+        "Close"
+    );
+    return 1;
+}
+
+CMD:act(playerid, params[])
+{
+    #pragma unused params
+    Dialogs_OpenActMenu(playerid);
+    return 1;
+}
+alias:act("interact", "action");
+
+/*
+ * Единый обработчик горячих клавиш (Command-First & Keybind-Wrapper, Фаза 12):
+ * - KEY_YES (Y)            -> вызывает cmd_act (/act — контекстное меню взаимодействия)
+ * - KEY_NO (N)             -> вызывает cmd_inv (/inv — двухслойный инвентарь)
+ * - KEY_CTRL_BACK (H) /
+ *   KEY_WALK (LALT пешком) -> вызывает MainMenu_Open (/mm — главное меню персонажа)
  */
 hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
@@ -700,51 +1337,38 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
         return 1;
     }
 
-    if ((newkeys & KEY_YES) && !(oldkeys & KEY_YES))
+    new const bool:pressedY = ((newkeys & KEY_YES) != KEY:0) && ((oldkeys & KEY_YES) == KEY:0);
+    new const bool:pressedN = ((newkeys & KEY_NO) != KEY:0) && ((oldkeys & KEY_NO) == KEY:0);
+    new const bool:pressedH = ((newkeys & KEY_CTRL_BACK) != KEY:0) && ((oldkeys & KEY_CTRL_BACK) == KEY:0);
+    new const bool:pressedAlt = (GetPlayerState(playerid) == PLAYER_STATE_ONFOOT) &&
+                                ((newkeys & KEY_WALK) != KEY:0) && ((oldkeys & KEY_WALK) == KEY:0);
+
+    if (!pressedY && !pressedN && !pressedH && !pressedAlt)
     {
-        if (Survival_IsCuffed(playerid))
-        {
-            SendClientMessage(playerid, COLOR_ERROR, "[Action]: Your hands are handcuffed!");
-            return 1;
-        }
+        return 1;
+    }
 
-        new nearSlot = Storage_FindNearestWorldContainer(playerid, CONTEXT_INTERACT_RADIUS_M);
-        sPlayerExternalStorageSlot[playerid] = nearSlot;
+    new const nowTick = GetTickCount();
+    if ((nowTick - sPlayerLastKeybindTick[playerid]) < KEYBIND_INTERACT_COOLDOWN_MS)
+    {
+        return 1;
+    }
+    sPlayerLastKeybindTick[playerid] = nowTick;
 
-        new menuStr[512];
-        menuStr[0] = '\0';
-        strcat(menuStr, "1. Open personal inventory - Layer 1 (External)\n", sizeof(menuStr));
-        strcat(menuStr, "2. Open the secret pocket - Layer 2 (Hidden)\n", sizeof(menuStr));
-
-        if (Storage_IsValidSlot(nearSlot))
-        {
-            new E_STORAGE_TYPE:stType = Storage_GetType(nearSlot);
-            if (stType == STORAGE_CORPSE_LOOT)
-            {
-                strcat(menuStr, "3. {FFAB91}Search the deceased's belongings nearby (2.5 m)\n", sizeof(menuStr));
-            }
-            else
-            {
-                strcat(menuStr, "3. {81D4FA}Inspect the package/container nearby (2.5 m)\n", sizeof(menuStr));
-            }
-        }
-        else
-        {
-            strcat(menuStr, "3. {90A4AE}There are no objects on the ground nearby (2.5 m)\n", sizeof(menuStr));
-        }
-
-        strcat(menuStr, "4. Character card and passport data (/stats)\n", sizeof(menuStr));
-        strcat(menuStr, "5. Character skills and characteristics (/skills)", sizeof(menuStr));
-
-        ShowPlayerDialog(
-            playerid,
-            DIALOG_INV_CONTEXT_MENU_Y,
-            DIALOG_STYLE_LIST,
-            "Interaction Context Menu (Y Key)",
-            menuStr,
-            "Select",
-            "Close"
-        );
+    if (pressedY)
+    {
+        pc_cmd_act(playerid, sDialogEmptyCmdParams);
+        return 1;
+    }
+    if (pressedN)
+    {
+        pc_cmd_inv(playerid, sDialogEmptyCmdParams);
+        return 1;
+    }
+    if (pressedH || pressedAlt)
+    {
+        pc_cmd_mm(playerid, sDialogEmptyCmdParams);
+        return 1;
     }
     return 1;
 }
@@ -1004,25 +1628,159 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         case DIALOG_INV_CONTEXT_MENU_Y:
         {
             if (!response) return Y_HOOKS_BREAK_RETURN_1;
-            switch (listitem)
+            if (listitem < 0 || listitem >= sPlayerActRowCount[playerid])
             {
-                case 0: Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
-                case 1: Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_2);
-                case 2:
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+            if (Survival_IsCuffed(playerid))
+            {
+                SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: Your hands are handcuffed!");
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+
+            new const E_ACT_ENTRY_TYPE:entryType = sPlayerActTypeMap[playerid][listitem];
+            new const targetVal = sPlayerActTargetMap[playerid][listitem];
+
+            switch (entryType)
+            {
+                case ACT_ENTRY_PLAYER:
                 {
-                    new nearSlot = Storage_FindNearestWorldContainer(playerid, CONTEXT_INTERACT_RADIUS_M);
+                    Internal_ShowActPlayerCard(playerid, targetVal);
+                }
+                case ACT_ENTRY_VEH_ENGINE:      pc_cmd_vengine(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_LOCK:        pc_cmd_vlock(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_TRUNK:       pc_cmd_trunk(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_GLOVEBOX:    pc_cmd_glovebox(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_REFUEL:      pc_cmd_refuel(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_REPAIR:      pc_cmd_repair(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_LOCKPICK:    pc_cmd_lockpick(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_BREAKWINDOW: pc_cmd_breakwindow(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_HOTWIRE:     pc_cmd_hotwire(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_CHOP:        pc_cmd_chop(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_PARK:        pc_cmd_vpark(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_UNPARK:      pc_cmd_vunpark(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VEH_BUY:         pc_cmd_vbuy(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_WORLD_CONTAINER:
+                {
+                    new const nearSlot = Storage_FindNearestWorldContainer(playerid, CONTEXT_INTERACT_RADIUS_M);
                     if (Storage_IsValidSlot(nearSlot))
                     {
                         Dialogs_OpenExternalContainer(playerid, nearSlot);
                     }
                     else
                     {
-                        SendClientMessage(playerid, COLOR_GRAY, "[Inspection]: There are no lying objects or open storage within a radius of 2.5 meters.");
+                        SendClientMessage(playerid, COLOR_WARNING, "[Interaction]: The container nearby is no longer available.");
                     }
                 }
-                case 3: Character_ShowStatsDialog(playerid);
-                case 4: Skills_ShowDialog(playerid);
+                case ACT_ENTRY_PROPERTY_MENU:     pc_cmd_property(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_PROPERTY_LOCK:     pc_cmd_plock(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_PROPERTY_PAYBILLS: pc_cmd_payutils(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_PROPERTY_LOCKPICK: pc_cmd_lockpick(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_PROPERTY_KICKDOOR: pc_cmd_kickdoor(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ENT_MINE:          pc_cmd_mine(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ENT_DELIVER:       pc_cmd_deliver(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ENT_CRAFT:         pc_cmd_craft(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ENT_BIZ:           pc_cmd_enterprise(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ENT_MARKET:        pc_cmd_market(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_PORT_MENU:         pc_cmd_port(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_CONTRACTS:         pc_cmd_contracts(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_BANK_MENU:         pc_cmd_bank(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_LAUNDER_MENU:      pc_cmd_launder(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_ORG_VAULT:         pc_cmd_orgvault(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_VAULT_BREACH:      pc_cmd_vaultbreak(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_FORENSICS:         pc_cmd_evidence(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_SELF_INV:          pc_cmd_inv(playerid, sDialogEmptyCmdParams);
+                case ACT_ENTRY_SELF_MM:           pc_cmd_mm(playerid, sDialogEmptyCmdParams);
+                default: {}
             }
+            return Y_HOOKS_BREAK_RETURN_1;
+        }
+        case DIALOG_ACT_PLAYER_CARD:
+        {
+            if (!response)
+            {
+                Dialogs_OpenActMenu(playerid);
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+            if (listitem < 0 || listitem >= sPlayerActPlayerOpCount[playerid])
+            {
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+
+            new const targetid = sPlayerActSelectedPlayer[playerid];
+            if (targetid == INVALID_PLAYER_ID || !IsPlayerConnected(targetid) || !Character_IsLoaded(targetid))
+            {
+                SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: The target player has disconnected.");
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+            if (Utils_GetDistanceBetweenPlayers(playerid, targetid) > CONTEXT_INTERACT_RADIUS_M + 0.5)
+            {
+                SendClientMessage(playerid, COLOR_ERROR, "[Interaction]: The target player is too far away (maximum 3.0 m).");
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+
+            new argBuf[16];
+            format(argBuf, sizeof(argBuf), "%d", targetid);
+
+            switch (sPlayerActPlayerOpMap[playerid][listitem])
+            {
+                case ACT_PL_GIVE_ITEM:
+                {
+                    Dialogs_OpenInventory(playerid, INV_VIEW_LAYER_1);
+                    SendClientMessage(playerid, COLOR_INFO, "[Tip]: Click on any item in your inventory and select '7. Pass it to the person nearby'.");
+                }
+                case ACT_PL_PAY_CASH:
+                {
+                    new targetName[MAX_PLAYER_NAME + 1], prompt[256];
+                    Character_GetRpName(targetid, targetName, sizeof(targetName));
+                    format(prompt, sizeof(prompt),
+                        "Enter the amount of physical cash (USD) to hand over to %s [ID %d]:
+(Your current pocket cash: $%d)",
+                        targetName, targetid, Character_GetPhysicalCashUsd(playerid));
+                    ShowPlayerDialog(
+                        playerid,
+                        DIALOG_ACT_PAY_INPUT,
+                        DIALOG_STYLE_INPUT,
+                        "Hand Over Cash (/pay)",
+                        prompt,
+                        "Pay",
+                        "Back"
+                    );
+                }
+                case ACT_PL_SHOW_PASS:  pc_cmd_showpass(playerid, argBuf);
+                case ACT_PL_SHOW_LIC:   pc_cmd_showlic(playerid, argBuf);
+                case ACT_PL_TRIAGE:     pc_cmd_triage(playerid, argBuf);
+                case ACT_PL_TREAT:      pc_cmd_treat(playerid, argBuf);
+                case ACT_PL_FRISK:      pc_cmd_frisk(playerid, argBuf);
+                case ACT_PL_SEARCH:     pc_cmd_search(playerid, argBuf);
+                case ACT_PL_PICKPOCKET: pc_cmd_pickpocket(playerid, argBuf);
+                case ACT_PL_CUFF:       pc_cmd_cuff(playerid, argBuf);
+                case ACT_PL_UNCUFF:     pc_cmd_uncuff(playerid, argBuf);
+                case ACT_PL_ARREST:     pc_cmd_arrest(playerid, argBuf);
+                default: {}
+            }
+            return Y_HOOKS_BREAK_RETURN_1;
+        }
+        case DIALOG_ACT_PAY_INPUT:
+        {
+            new const targetid = sPlayerActSelectedPlayer[playerid];
+            if (!response)
+            {
+                if (targetid != INVALID_PLAYER_ID && IsPlayerConnected(targetid) && Character_IsLoaded(targetid))
+                {
+                    Internal_ShowActPlayerCard(playerid, targetid);
+                }
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+            new const amount = strval(inputtext);
+            if (amount <= 0)
+            {
+                SendClientMessage(playerid, COLOR_ERROR, "[Cash]: Please enter a positive USD amount.");
+                return Y_HOOKS_BREAK_RETURN_1;
+            }
+            new payParams[32];
+            format(payParams, sizeof(payParams), "%d %d", targetid, amount);
+            pc_cmd_pay(playerid, payParams);
             return Y_HOOKS_BREAK_RETURN_1;
         }
         case DIALOG_INV_MAIN_LIST:

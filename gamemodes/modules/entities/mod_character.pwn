@@ -2777,7 +2777,6 @@ CMD:stats(playerid, params[])
     Character_ShowStatsDialog(playerid);
     return 1;
 }
-alias:stats("mm");
 
 CMD:roleinfo(playerid, params[])
 {

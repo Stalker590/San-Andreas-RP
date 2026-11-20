@@ -1811,7 +1811,7 @@ CMD:property(playerid, params[])
     Internal_OpenPropertyMenu(playerid, propertyDbId);
     return 1;
 }
-alias:property("prop");
+alias:property("prop", "house", "rent");
 
 CMD:payutils(playerid, params[])
 {
@@ -1970,3 +1970,24 @@ CMD:propertykey(playerid, params[])
         0, PROPERTY_KEY_COPY_COST_USD, "Making a duplicate of property keys");
     return 1;
 }
+
+alias:payutils("paybills");
+
+stock bool:Properties_IsPlayerInside(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return false;
+    }
+    return (sPropertyInsideDbId[playerid] > 0);
+}
+
+stock Properties_GetInsideDbId(playerid)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        return 0;
+    }
+    return sPropertyInsideDbId[playerid];
+}
+

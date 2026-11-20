@@ -59,7 +59,13 @@ Every pocket, backpack, glovebox, vehicle trunk, enterprise warehouse, faction v
 
 ### 7. Dynamic RBAC Admin System (`/apanel`)
 * Replaces hardcoded numeric admin levels with database-driven roles (`admin_roles`, `admin_role_permissions`, `admin_punishments`).
-* Ships with a single immutable **`Root Administrator`** system role (`level = 100`, `is_root = 1`) capable of creating custom staff ranks, configuring granular permission matrices, managing online/offline admins, spectating (`/sp` with live HUD), spawning items/vehicles/keys, and auditing every privileged action in `audit_logs`.
+* Ships with a single immutable **`Root Administrator`** system role (`level = 100`, `is_root = 1`) capable of creating custom staff ranks, configuring granular permission matrices, managing online/offline admins, spectating (`/sp` with live HUD), handling live player tickets (`/reports`, `/ans`), spawning items/vehicles/keys, and auditing every privileged action in `audit_logs`.
+
+### 8. Command-First UX, Context Scanner (`/act`) & Main Menu (`/mm`)
+* **100% PC & Mobile Feature Parity (`Command-First & Keybind-Wrapper`):** Every server mechanic is accessible via a chat command (`Pawn.CMD`), while desktop hotkeys act as instant wrappers:
+  * **`Y` (`KEY_YES`) or `/act` (`/interact`):** Dynamic `3.0m` context scanner for nearby players (hand over items/cash, show passport/licenses, medical triage/treatment, frisk/search, handcuffs, arrest), vehicles (engine, doors, trunk, glovebox, refuel, repair, lockpick, break window, hotwire, chop shop), world loot (`CORPSE_LOOT`, `WORLD_DROP`), real estate doors, mines, workbenches, ports, banks, faction vaults, and forensic evidence.
+  * **`N` (`KEY_NO`) or `/inv` (`/i`):** Dual-Layer Inventory (`Layer 1` Outer Gear + `Layer 2` Concealed Pocket & nested backpacks).
+  * **`H` (`KEY_CTRL_BACK`) / `LALT` or `/mm` (`/menu`):** Central Character Menu featuring **Character Statistics** (`/stats`), **41-Skill Matrix & Role Perks** (`/skills`, `/roleinfo`), **Server Help & Command Codex** (`/help` with dynamic faction guides), **Contact Administration** (`/report` / `/ask`), **Interface & Account Settings** (`/settings` with `bcrypt` password change), and **State GPS Navigator** (`/gps`).
 
 ---
 
@@ -86,7 +92,7 @@ Server/
         ├── core/               # mod_config, mod_database (Dirty-Flag), mod_utils, mod_audit, mod_anticheat
         ├── entities/           # mod_account, mod_character, mod_roles, mod_skills, mod_storage, mod_items, mod_vehicles, mod_properties
         ├── systems/            # mod_survival, mod_medical, mod_weapons, mod_crafting, mod_economy, mod_ports, mod_logistics, mod_banking, mod_organizations, mod_justice, mod_forensics, mod_telecom, mod_admin
-        └── ui/                 # mod_dialogs, mod_commands, mod_hud, mod_admin_panel
+        └── ui/                 # mod_hud, mod_dialogs (/act, /inv), mod_commands, mod_admin_panel (/apanel), mod_main_menu (/mm, /help, /gps, /report)
 ```
 
 ### Engineering Highlights
@@ -166,6 +172,6 @@ Use `/apanel` or `/ahelp` in-game to configure staff roles, spawn items/vehicles
 ## Project Documentation
 
 * [`CONTEXT_OF_PROJECT.md`](CONTEXT_OF_PROJECT.md) — Full Game Design Document (GDD), item registry, 25 roles & 21 core factions.
-* [`TECH_CONTEXT.MD`](TECH_CONTEXT.MD) — Relational database DDL, module contracts, formulas, RBAC & Docker specifications.
-* [`ROADMAP.md`](ROADMAP.md) — Engineering implementation plan across Phases 0–11.
+* [`TECH_CONTEXT.MD`](TECH_CONTEXT.MD) — Relational database DDL, module contracts, formulas, RBAC, Docker & Command-First UI specifications.
+* [`ROADMAP.md`](ROADMAP.md) — Engineering implementation plan across Phases 0–12.
 * [`AGENTS.MD`](AGENTS.MD) — Engineering standards, Pawn invariants & AI agent workflow rules.

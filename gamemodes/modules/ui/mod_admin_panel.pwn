@@ -15,6 +15,8 @@
 #include <YSI_Coding\y_hooks>
 
 forward bool:AC_AreIntegrationTestsPassed();
+forward AdminReports_GetActiveCount();
+forward AdminReports_OpenQueueDialog(playerid);
 timer Admin_DelayedRestart[250]()
 {
     SendRconCommand("gmx");
@@ -65,7 +67,8 @@ enum E_ADMIN_MAIN_ACTION
     AM_MAIN_ROLES,
     AM_MAIN_AUDIT,
     AM_MAIN_ANTICHEAT,
-    AM_MAIN_SPECTATE
+    AM_MAIN_SPECTATE,
+    AM_MAIN_REPORTS
 };
 
 enum E_ADMIN_PLAYER_ACTION
@@ -452,6 +455,12 @@ static stock AdminPanel_ShowMain(playerid)
     if (Admin_HasPermission(playerid, ADMIN_PERM_PLAYER_SPECTATE))
     {
         AdminPanel_AddAction(playerid, body, sizeof(body), _:AM_MAIN_SPECTATE, "Spectate\tHUD-panel /sp");
+    }
+    if (Admin_HasPermission(playerid, ADMIN_PERM_PANEL_ACCESS) || Admin_IsRoot(playerid))
+    {
+        new repRow[128];
+        format(repRow, sizeof(repRow), "Player Reports (%d)\tIncoming /report tickets & /ans", AdminReports_GetActiveCount());
+        AdminPanel_AddAction(playerid, body, sizeof(body), _:AM_MAIN_REPORTS, repRow);
     }
 
     if (sAdminMenuCount[playerid] == 0)
@@ -1621,6 +1630,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case AM_MAIN_AUDIT: AdminPanel_ShowAudit(playerid);
                 case AM_MAIN_ANTICHEAT: AdminPanel_ShowAnticheat(playerid);
                 case AM_MAIN_SPECTATE: AdminPanel_ShowTargets(playerid, ATM_SPECTATE, "Spectate: Select Player");
+                case AM_MAIN_REPORTS: AdminReports_OpenQueueDialog(playerid);
             }
             return Y_HOOKS_BREAK_RETURN_1;
         }

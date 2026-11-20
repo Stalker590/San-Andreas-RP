@@ -53,6 +53,9 @@
                                       │
                                       ▼
 [Фаза 11: Docker-контейнеризация, Multi-Stage сборка, .env конфигурация и Docker Compose]
+                                      │
+                                      ▼
+[Фаза 12: Единая система взаимодействия (Command-First UX), контекстное меню /act (Y), инвентарь /inv (N), главное меню /mm (H/LALT), кодекс /help, GPS и репорты /report]
 
 ```
 
@@ -968,6 +971,76 @@
     * Настроить автоматический workflow GitHub Actions на `push` и `pull_request`: проверка кодировки `CP1251`, компиляция `./build.sh` (`0 warnings`), накатывание `sql/001..004_*.sql` на сервисный контейнер `mariadb:10.11`, валидация `docker compose config --quiet` и тестовая сборка стадий `builder` и `runtime`.
 
   * **Критерий готовности (DoD):** Любое нарушение кодировки `CP1251`, ошибка SQL-схемы или поломка `Dockerfile` / `docker-compose.yml` автоматически блокируется на этапе CI.
+
+## Фаза 12: Единая система взаимодействия (Command-First UX), контекстное меню `/act` (`Y`), инвентарь `/inv` (`N`), главное меню `/mm`, кодекс команд `/help` и репорты `/report`
+
+**Цель фазы:** Внедрить архитектуру **Command-First & Keybind-Wrapper** (100% паритет возможностей между ПК и мобильными клиентами Android/iOS), переназначить горячие клавиши (`Y` $\rightarrow$ `/act`, `N` $\rightarrow$ `/inv`, `H`/`LALT` $\rightarrow$ `/mm`), реализовать интеллектуальный контекстный сканер окружения `/act` в радиусе $3.0\text{ м}$, центральное меню персонажа `/mm`, полный многостраничный кодекс команд `/help`, GPS-навигатор `/gps`, настройки `/settings` со сменой пароля через `bcrypt` и систему репортов `/report` с интеграцией в `/apanel`.
+
+**Зависимости фазы:** Фаза 1 (`mod_config`, `mod_utils`, `mod_audit`), Фаза 2 (`mod_items`, `mod_storage`), Фаза 3 (`mod_account`, `mod_character`, `mod_roles`, `mod_skills`), Фаза 4 (`mod_survival`, `mod_hud`, `mod_dialogs`, `mod_commands`), Фаза 5–8 (`mod_medical`, `mod_forensics`, `mod_crafting`, `mod_economy`, `mod_ports`, `mod_logistics`, `mod_banking`, `mod_organizations`, `mod_justice`, `mod_vehicles`, `mod_properties`, `mod_telecom`), Фаза 10 (`mod_admin`, `mod_admin_panel`).
+
+* \[x] **12.1. Command-First аудит всех модулей и единый биндинг клавиш (`Y` / `N` / `H` / `LALT`)**
+
+  * **Зависимости:** Фазы 2–10.
+
+  * **Файлы:** `ui/mod_commands.pwn`, `ui/mod_dialogs.pwn`, `entities/mod_vehicles.pwn`, `entities/mod_properties.pwn`, `entities/mod_account.pwn`, `entities/mod_character.pwn`.
+
+  * **Задачи:**
+
+    * Провести ревизию всех модулей и гарантировать наличие консольных команд (`Pawn.CMD`) и удобных алиасов для каждого действия: `/give`, `/pay`, `/frisk`, `/search`, `/pickpocket`, `/triage`, `/treat`, `/cuff`, `/uncuff`, `/arrest`, `/showpass` (`/pass`), `/showlic` (`/lic`), `/engine` (`/vengine`, `/en`), `/lock` (`/vlock`), `/trunk`, `/glovebox`, `/refuel`, `/repair`, `/lockpick`, `/breakwindow`, `/hotwire`, `/chopshop` (`/chop`), `/house` (`/property`, `/prop`, `/rent`), `/paybills` (`/payutils`), `/garage` (`/vunpark`), `/vpark`, `/mine`, `/deliver`, `/craft`, `/biz`, `/market`, `/port`, `/contracts`, `/bank`, `/launder`, `/phone`, `/call`, `/sms`, `/radio`, `/sim`, `/evidence`.
+
+    * Настроить в `OnPlayerKeyStateChange` (`ui/mod_dialogs.pwn`) тонкие обертки с антифлуд-кулдауном (`350 ms`): `KEY_YES` (`Y`) $\rightarrow$ `/act`, `KEY_NO` (`N`) $\rightarrow$ `/inv`, `KEY_CTRL_BACK` (`H`) / `KEY_WALK` (`LALT` пешком) $\rightarrow$ `/mm`.
+
+  * **Критерий готовности (DoD):** Любое действие на сервере выполняется как через горячую клавишу/меню на ПК, так и прямой текстовой командой с мобильного клиента.
+
+* \[x] **12.2. Контекстный сканер окружения и взаимодействия с игроками `/act` (`ui/mod_dialogs.pwn`)**
+
+  * **Зависимости:** `12.1`.
+
+  * **Файлы:** `ui/mod_dialogs.pwn`.
+
+  * **Задачи:**
+
+    * Реализовать команду `/act` (`/interact`, клавиша `Y`), сканирующую окружение игрока в радиусе $3.0\text{ м}$ и формирующую динамический диалог `DIALOG_STYLE_TABLIST_HEADERS` на английском языке.
+
+    * Включить в сканер: ближайших игроков (с переходом в карточку действий над игроком `DIALOG_ACT_PLAYER_CARD`), транспорт (внутри салона и снаружи), мировые контейнеры (`CORPSE_LOOT`, `WORLD_DROP`), двери и интерьеры недвижимости, гаражи, шахты/вышки/лесопилки/фермы, верстаки и заводы, портовые терминалы, отделения банков, сейфы фракций (`ORG_VAULT`) и физические улики (`forensic_evidence`).
+
+    * Обеспечить строгий серверный маппинг строк `sPlayerActTypeMap[MAX_PLAYERS][MAX_ACT_MENU_ROWS]` и `sPlayerActTargetMap[MAX_PLAYERS][MAX_ACT_MENU_ROWS]` с повторной валидацией дистанции и состояния игрока в `OnDialogResponse`.
+
+  * **Критерий готовности (DoD):** Нажатие `Y` или ввод `/act` показывает только реально доступные объекты в радиусе $3.0\text{ м}$ и вызывает те же серверные обработчики, что и профильные команды.
+
+* \[x] **12.3. Главное меню персонажа `/mm`, динамический Кодекс команд `/help`, настройки `/settings` и GPS `/gps` (`ui/mod_main_menu.pwn`)**
+
+  * **Зависимости:** `12.1`, `12.2`.
+
+  * **Файлы:** `ui/mod_main_menu.pwn`, `gamemodes/main.pwn`.
+
+  * **Задачи:**
+
+    * Реализовать `/mm` (`/menu`) на английском языке с 8 пунктами: `Character Statistics` (`/stats`), `Skills & Role Perks` (`/skills`), `Server Help & Command Codex` (`/help`), `Contact Administration` (`/report`), `Interface & Account Settings` (`/settings`), `GPS & Key Locations` (`/gps`), а также быстрыми переходами в `/act` и `/inv`.
+
+    * Реализовать многостраничный справочник `/help` (`/commands`, `/cmds`, `/codex`, `/faq`) по 7 категориям, включая динамический раздел команд текущей фракции игрока.
+
+    * Реализовать `/settings`: переключение текстового HUD (`/hud`), подсказок для новичков, настроек чата и двухэтапную смену пароля аккаунта через `bcrypt_verify` и `bcrypt_hash` (`cost = 12`).
+
+    * Реализовать `/gps` (`/nav`): навигатор по 20 ключевым локациям штата (5 категорий + отключение чекпоинта) с автоматическим сбросом маршрута в `OnPlayerEnterCheckpoint`.
+
+  * **Критерий готовности (DoD):** Игрок открывает `/mm` командой или клавишей `H`/`LALT`, просматривает статистику, 41 навык по категориям, справочник `/help`, ставит GPS-метку и меняет пароль аккаунта с сохранением нового bcrypt-хеша в БД.
+
+* \[x] **12.4. Система обращений к администрации `/report` и интеграция с `/apanel` (`ui/mod_main_menu.pwn`, `ui/mod_admin_panel.pwn`)**
+
+  * **Зависимости:** `10.2`, `12.3`.
+
+  * **Файлы:** `ui/mod_main_menu.pwn`, `ui/mod_admin_panel.pwn`.
+
+  * **Задачи:**
+
+    * Реализовать команду `/report` (`/ask`, `/rep`) и диалог отправки обращения из `/mm` с защитой от спама (кулдаун `60 сек`) и валидацией длины текста (`4..130` символов).
+
+    * Создать очередь активных репортов `sAdminReports[MAX_ADMIN_REPORTS]` с мгновенным уведомлением онлайн-администраторов.
+
+    * Интегрировать раздел `Player Reports` в `/apanel` (`ui/mod_admin_panel.pwn`) и команду `/reports`: просмотр очереди тикетов, ответ игроку через диалог или команду `/ans [id] [text]` (`/pm`), быстрый переход в режим слежки `/sp` или телепорт `/goto` к автору репорта, закрытие тикета и запись каждого действия в `Admin_Audit`.
+
+  * **Критерий готовности (DoD):** Игрок отправляет тикет через `/report`, администратор видит его в `/apanel` $\rightarrow$ `Player Reports` (и по `/reports`), отвечает через диалог или `/ans`, а событие фиксируется в `audit_logs`.
 
 ## Протокол работы с ИИ-ассистентом по данному Roadmap
 

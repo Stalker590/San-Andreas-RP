@@ -1167,3 +1167,33 @@ timer Forensics_LoadActiveEvidenceTask[1000]()
 {
     Internal_StartLoadActiveEvidence();
 }
+
+stock Forensics_CountNearbyEvidence(playerid, Float:radius = 12.0)
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !IsPlayerConnected(playerid))
+    {
+        return 0;
+    }
+    new nearCount = 0;
+    new const vw = GetPlayerVirtualWorld(playerid);
+    new const interior = GetPlayerInterior(playerid);
+    new Float:px = 0.0, Float:py = 0.0, Float:pz = 0.0;
+    GetPlayerPos(playerid, px, py, pz);
+
+    foreach (new slot : sEvidenceIter)
+    {
+        if (!sEvidence[slot][E_FE_VALID] ||
+            sEvidence[slot][E_FE_VW] != vw ||
+            sEvidence[slot][E_FE_INTERIOR] != interior)
+        {
+            continue;
+        }
+        if (Utils_GetDistance3D(px, py, pz,
+            sEvidence[slot][E_FE_X], sEvidence[slot][E_FE_Y], sEvidence[slot][E_FE_Z]) <= radius)
+        {
+            nearCount++;
+        }
+    }
+    return nearCount;
+}
+

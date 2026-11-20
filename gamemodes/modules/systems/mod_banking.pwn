@@ -1721,3 +1721,9 @@ CMD:launder(playerid, params[])
     return 1;
 }
 alias:launder("wash");
+
+stock bool:Banking_IsPlayerNearBranch(playerid)
+{
+    return Internal_IsPlayerNearBankBranch(playerid);
+}
+

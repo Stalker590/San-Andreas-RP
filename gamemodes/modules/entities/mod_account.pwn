@@ -858,6 +858,41 @@ stock Account_GetHwid(playerid, output[], len = sizeof(output))
     return 1;
 }
 
+stock Account_GetPasswordHash(playerid, output[], len = sizeof(output))
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS)
+    {
+        output[0] = EOS;
+        return 0;
+    }
+    format(output, len, "%s", sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH]);
+    return 1;
+}
+
+stock bool:Account_UpdatePasswordHash(playerid, const new_hash[])
+{
+    if (playerid < 0 || playerid >= MAX_PLAYERS || !Account_IsLogged(playerid))
+    {
+        return false;
+    }
+    if (strlen(new_hash) < 55)
+    {
+        return false;
+    }
+    format(sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH], BCRYPT_HASH_LENGTH, "%s", new_hash);
+    Internal_SaveRamAccountCache(playerid);
+
+    if (DB_IsConnected() && sPlayerAccounts[playerid][E_ACC_DB_ID] > 0)
+    {
+        mysql_format(gMySQL, sAccountSqlBuffer, sizeof(sAccountSqlBuffer),
+            "UPDATE `accounts` SET `password_hash` = '%e' WHERE `id` = %d;",
+            sPlayerAccounts[playerid][E_ACC_PASSWORD_HASH],
+            sPlayerAccounts[playerid][E_ACC_DB_ID]);
+        mysql_tquery(gMySQL, sAccountSqlBuffer);
+    }
+    return true;
+}
+
 // =============================================================================
 //  6. —»—“≈ÃÕ€≈ ’” » » Œ¡–¿¡Œ“◊» » ƒ»¿ÀŒ√Œ¬ (y_hooks)
 // =============================================================================

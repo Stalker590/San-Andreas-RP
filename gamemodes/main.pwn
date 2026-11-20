@@ -146,6 +146,7 @@ stock Main_GetUptimeSeconds()
 #tryinclude "modules/ui/mod_dialogs.pwn"
 #tryinclude "modules/ui/mod_commands.pwn"
 #tryinclude "modules/ui/mod_admin_panel.pwn"
+#tryinclude "modules/ui/mod_main_menu.pwn"
 
 // Phase 9: network anti-cheat depends on every previous phase, so load it last.
 #tryinclude "modules/core/mod_anticheat.pwn"
