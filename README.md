@@ -73,7 +73,12 @@ Server/
 ├── sql/
 │   ├── 001_schema.sql          # Core 22-table InnoDB relational schema
 │   ├── 002_seed_data.sql       # 75+ items, craft recipes, 21 core factions, port quotes
-│   └── 003_admin_rbac.sql      # Dynamic RBAC roles, permissions & punishments (Phase 10)
+│   ├── 003_admin_rbac.sql      # Dynamic RBAC roles, permissions & punishments (Phase 10)
+│   └── 004_english_localization_update.sql # Idempotent English localization sync
+├── Dockerfile                  # Multi-Stage build (Stage 1: pawncc builder -> Stage 2: slim runtime)
+├── docker-compose.yml          # Isolated sar_net stack (open.mp + MariaDB 10.11 + persistent volumes)
+├── docker-entrypoint.sh        # Dynamic config.json & mysql.ini generator + DB health wait
+├── .env.example                # Environment template for Docker Compose, MySQL & open.mp
 ├── config.json                 # open.mp v1.6.7+ server configuration
 └── gamemodes/
     ├── main.pwn                # Entry point & deterministic module include order
@@ -93,22 +98,49 @@ Server/
 
 ## Getting Started
 
-### Prerequisites
-* **OS:** Linux x86/x64 (Debian, Ubuntu, Arch/CachyOS, Fedora)
+### Option A: Quick Start with Docker Compose (Recommended)
+
+The repository ships with a **Multi-Stage `Dockerfile`** (compiling `gamemodes/main.pwn` $\rightarrow$ `main.amx` with `-O2 -d1` in an isolated builder stage and running `omp-server` as non-root `ompuser` in a minimal Debian Bookworm runtime) and a **`docker-compose.yml`** stack with **MariaDB 10.11**, healthchecks, and automatic SQL initialization.
+
+1. **Create your `.env` configuration from the template:**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` to set strong passwords (`MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `OMP_RCON_PASSWORD`) and desired server parameters (`OMP_SERVER_NAME`, `OMP_PORT`, `OMP_MAX_PLAYERS`).
+
+2. **Build and launch the stack:**
+   ```bash
+   docker compose up -d --build
+   ```
+   On first boot, MariaDB automatically executes `sql/001_schema.sql`, `sql/002_seed_data.sql`, `sql/003_admin_rbac.sql`, and `sql/004_english_localization_update.sql` inside the persistent `sar_mysql_data` volume. The `omp-server` entrypoint waits for MariaDB readiness, generates `config.json` and `mysql.ini` (`cp1251` client charset, 12-thread pool), and starts the server on UDP/TCP port `7777`.
+
+3. **View logs or stop the stack:**
+   ```bash
+   docker compose logs -f omp-server
+   docker compose down
+   ```
+
+---
+
+### Option B: Manual Linux Build & Run
+
+#### Prerequisites
+* **OS:** Linux x86/x64 with 32-bit runtime libraries (`libc6:i386`, `libstdc++6:i386`, `libmariadb3:i386`)
 * **Server:** `omp-server` v1.6.7+
 * **Database:** MariaDB 10.11+ or MySQL 8.0+
 * **Compiler:** `pawncc` (`qawno`) with YSI-Includes (`y_hooks`, `y_iterate`, `y_timers`, `y_va`)
 
-### 1. Database Setup
+#### 1. Database Setup
 ```bash
 sudo mariadb -e "CREATE DATABASE san_andreas_rp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 sudo mariadb san_andreas_rp < sql/001_schema.sql
 sudo mariadb san_andreas_rp < sql/002_seed_data.sql
 sudo mariadb san_andreas_rp < sql/003_admin_rbac.sql
+sudo mariadb san_andreas_rp < sql/004_english_localization_update.sql
 ```
 
-### 2. Build & Run
-1. Configure your MySQL credentials in your local `.env` / database config (`cp1251` client charset is enforced automatically on connect).
+#### 2. Build & Run
+1. Configure your MySQL credentials in `.env` or `scriptfiles/mysql.ini` (`MYSQL_HOST=127.0.0.1` for bare-metal; `cp1251` client charset is enforced automatically on connect).
 2. Compile the gamemode (`-O2 -d1`, preserving `Windows-1251` source encoding):
    ```bash
    ./build.sh
@@ -118,7 +150,9 @@ sudo mariadb san_andreas_rp < sql/003_admin_rbac.sql
    ./omp-server
    ```
 
-### 3. Granting Root Administrator Access
+---
+
+### Granting Root Administrator Access
 After registering your account in-game, assign the system `Root Administrator` role in MariaDB:
 ```sql
 UPDATE accounts
@@ -132,6 +166,6 @@ Use `/apanel` or `/ahelp` in-game to configure staff roles, spawn items/vehicles
 ## Project Documentation
 
 * [`CONTEXT_OF_PROJECT.md`](CONTEXT_OF_PROJECT.md) — Full Game Design Document (GDD), item registry, 25 roles & 21 core factions.
-* [`TECH_CONTEXT.MD`](TECH_CONTEXT.MD) — Relational database DDL, module contracts, formulas & RBAC specifications.
-* [`ROADMAP.md`](ROADMAP.md) — Engineering implementation plan across Phases 0–10.
+* [`TECH_CONTEXT.MD`](TECH_CONTEXT.MD) — Relational database DDL, module contracts, formulas, RBAC & Docker specifications.
+* [`ROADMAP.md`](ROADMAP.md) — Engineering implementation plan across Phases 0–11.
 * [`AGENTS.MD`](AGENTS.MD) — Engineering standards, Pawn invariants & AI agent workflow rules.

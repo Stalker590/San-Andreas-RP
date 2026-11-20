@@ -2,7 +2,7 @@
  * =============================================================================
  *  SAN ANDREAS RP — Асинхронный слой СУБД MySQL и очередь паттерна Dirty-Flag
  *  Файл:      gamemodes/modules/core/mod_database.pwn
- *  Пункт:     ROADMAP [1.3] — Асинхронный слой БД и паттерн Dirty-Flag
+ *  Пункт:     ROADMAP [1.3, 11.3] — Асинхронный слой БД, паттерн Dirty-Flag и .env / mysql.ini
  *  Кодировка: Windows-1251 (CP1251) без BOM
  * =============================================================================
  */
@@ -23,6 +23,7 @@
 #define DB_DEFAULT_PASSWORD                     "change_me_in_production"
 #define DB_DEFAULT_DATABASE                     "san_andreas_rp"
 #define DB_DEFAULT_PORT                         (3306)
+#define DB_DEFAULT_POOL_SIZE                    (12)
 #define DB_CONFIG_FILE_NAME                     "mysql.ini"
 
 #define MAX_DIRTY_QUEUE_ENTRIES                 (1024)
@@ -60,6 +61,35 @@ static stock Internal_TrimLineEndings(str[])
     {
         str[--len] = '\0';
     }
+
+    new start = 0;
+    while (str[start] == ' ' || str[start] == '\t')
+    {
+        start++;
+    }
+    if (start > 0)
+    {
+        new i = 0;
+        while (str[start + i] != '\0')
+        {
+            str[i] = str[start + i];
+            i++;
+        }
+        str[i] = '\0';
+        len = i;
+    }
+
+    if (len >= 2)
+    {
+        if ((str[0] == '"' && str[len - 1] == '"') || (str[0] == '\'' && str[len - 1] == '\''))
+        {
+            for (new j = 0; j < len - 2; j++)
+            {
+                str[j] = str[j + 1];
+            }
+            str[len - 2] = '\0';
+        }
+    }
 }
 
 static stock Internal_LoadDbConfigFromIni(
@@ -67,13 +97,15 @@ static stock Internal_LoadDbConfigFromIni(
     user[], userLen,
     pass[], passLen,
     db[], dbLen,
-    &port)
+    &port,
+    &poolSize)
 {
     format(host, hostLen, "%s", DB_DEFAULT_HOST);
     format(user, userLen, "%s", DB_DEFAULT_USER);
     format(pass, passLen, "%s", DB_DEFAULT_PASSWORD);
     format(db, dbLen, "%s", DB_DEFAULT_DATABASE);
     port = DB_DEFAULT_PORT;
+    poolSize = MYSQL_ASYNC_POOL_THREADS;
 
     if (!fexist(DB_CONFIG_FILE_NAME))
     {
@@ -90,7 +122,7 @@ static stock Internal_LoadDbConfigFromIni(
     while (fread(cfgFile, line, sizeof(line)))
     {
         Internal_TrimLineEndings(line);
-        if (line[0] == '\0' || line[0] == '#' || line[0] == ';')
+        if (line[0] == '\0' || line[0] == '#' || line[0] == ';' || line[0] == '[')
         {
             continue;
         }
@@ -124,12 +156,20 @@ static stock Internal_LoadDbConfigFromIni(
         {
             format(db, dbLen, "%s", val);
         }
-        else if (!strcmp(key, "port", true) || !strcmp(key, "MYSQL_PORT", true))
+        else if (!strcmp(key, "port", true) || !strcmp(key, "server_port", true) || !strcmp(key, "MYSQL_PORT", true))
         {
             new const parsedPort = strval(val);
             if (parsedPort > 0 && parsedPort <= 65535)
             {
                 port = parsedPort;
+            }
+        }
+        else if (!strcmp(key, "pool_size", true) || !strcmp(key, "MYSQL_POOL_SIZE", true))
+        {
+            new const parsedPool = strval(val);
+            if (parsedPool >= 1 && parsedPool <= 64)
+            {
+                poolSize = parsedPool;
             }
         }
     }
@@ -142,25 +182,36 @@ static stock Internal_ConnectDatabase()
 {
     new host[64], user[64], pass[128], db[64];
     new port = DB_DEFAULT_PORT;
+    new poolSize = MYSQL_ASYNC_POOL_THREADS;
 
-    Internal_LoadDbConfigFromIni(
+    new const hasIniFile = Internal_LoadDbConfigFromIni(
         host, sizeof(host),
         user, sizeof(user),
         pass, sizeof(pass),
         db, sizeof(db),
-        port
+        port,
+        poolSize
     );
 
-    new const MySQLOpt:opt = mysql_init_options();
-    if (opt != MySQLOpt:0)
+    if (hasIniFile && fexist(DB_CONFIG_FILE_NAME))
     {
-        mysql_set_option(opt, AUTO_RECONNECT, true);
-        mysql_set_option(opt, MULTI_STATEMENTS, true);
-        mysql_set_option(opt, POOL_SIZE, MYSQL_ASYNC_POOL_THREADS);
-        mysql_set_option(opt, SERVER_PORT, port);
+        gMySQL = mysql_connect_file(DB_CONFIG_FILE_NAME);
     }
 
-    gMySQL = mysql_connect(host, user, pass, db, opt);
+    if (!hasIniFile || gMySQL == MYSQL_INVALID_HANDLE || mysql_errno(gMySQL) != 0)
+    {
+        new const MySQLOpt:opt = mysql_init_options();
+        if (opt != MySQLOpt:0)
+        {
+            mysql_set_option(opt, AUTO_RECONNECT, true);
+            mysql_set_option(opt, MULTI_STATEMENTS, true);
+            mysql_set_option(opt, POOL_SIZE, poolSize);
+            mysql_set_option(opt, SERVER_PORT, port);
+        }
+
+        gMySQL = mysql_connect(host, user, pass, db, opt);
+    }
+
     new const errno = mysql_errno(gMySQL);
 
     if (gMySQL != MYSQL_INVALID_HANDLE && errno == 0)
@@ -171,7 +222,7 @@ static stock Internal_ConnectDatabase()
         new activeCharset[32];
         mysql_get_charset(activeCharset, sizeof(activeCharset), gMySQL);
         printf("%s [Core/Database] Successful connection to the DBMS %s@%s:%d/%s (client encoding: %s, threads: %d).",
-            SERVER_LOG_PREFIX, user, host, port, db, activeCharset, MYSQL_ASYNC_POOL_THREADS);
+            SERVER_LOG_PREFIX, user, host, port, db, activeCharset, poolSize);
     }
     else
     {

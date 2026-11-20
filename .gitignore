@@ -1,4 +1,5 @@
 # Артефакты сборки игрового режима
+*.amx
 gamemodes/main.amx
 *.lst
 *.asm
@@ -6,15 +7,20 @@ gamemodes/main.amx
 # Рантайм-логи сервера и компонентов
 log.txt
 logs/
+*.log
 
 # Локальные конфигурации окружения и секреты БД
 .env
 .env.*
 !.env.example
+mysql.ini
 scriptfiles/mysql.ini
 
-# Резервные копии БД
+# Резервные копии и локальные дампы БД
+backups/
 scriptfiles/backups/
+*.sql.gz
+*.dump
 
 # Бинарные аудиофайлы фоновой музыки
 scriptfiles/audio/*.mp3

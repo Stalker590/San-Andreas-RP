@@ -1,0 +1,83 @@
+# =============================================================================
+#  SAN ANDREAS RP — Конвейер непрерывной интеграции (GitHub Actions CI)
+#  Выполняет:
+#  1. Контроль кодировки Windows-1251 (CP1251) и сборку main.amx (-O2 -d1, 0 warnings).
+#  2. Проверку схемы БД (001_schema.sql, 002_seed_data.sql, 003_admin_rbac.sql,
+#     004_english_localization_update.sql) на живом сервисе MariaDB 10.11.
+#  3. Валидацию docker-compose.yml и тестовую сборку Multi-Stage Dockerfile.
+# =============================================================================
+name: San Andreas RP — Pawn & Docker CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  verify-pawn-and-docker:
+    name: Build Pawn AMX, Verify SQL & Docker Image
+    runs-on: ubuntu-24.04
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: ci_root_password
+          MARIADB_DATABASE: san_andreas_rp
+          MARIADB_USER: sarp_server
+          MARIADB_PASSWORD: ci_sarp_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot -pci_root_password --silent"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install 32-bit runtime libraries & MariaDB client
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libc6:i386 \
+            libgcc-s1:i386 \
+            libstdc++6:i386 \
+            mariadb-client \
+            jq
+
+      - name: Verify CP1251 encoding & Compile gamemodes/main.pwn (-O2 -d1)
+        run: |
+          chmod +x ./build.sh ./qawno/pawncc ./docker-entrypoint.sh
+          ./build.sh
+          test -s gamemodes/main.amx
+
+      - name: Verify SQL schema, seeds & RBAC migrations on MariaDB 10.11
+        run: |
+          mysql -h 127.0.0.1 -P 3306 -uroot -pci_root_password san_andreas_rp < sql/001_schema.sql
+          mysql -h 127.0.0.1 -P 3306 -uroot -pci_root_password san_andreas_rp < sql/002_seed_data.sql
+          mysql -h 127.0.0.1 -P 3306 -uroot -pci_root_password san_andreas_rp < sql/003_admin_rbac.sql
+          mysql -h 127.0.0.1 -P 3306 -uroot -pci_root_password san_andreas_rp < sql/004_english_localization_update.sql
+          mysql -h 127.0.0.1 -P 3306 -uroot -pci_root_password -e "
+            USE san_andreas_rp;
+            SELECT COUNT(*) AS items_count FROM item_definitions;
+            SELECT COUNT(*) AS orgs_count FROM organizations WHERE is_permanent = 1;
+            SELECT COUNT(*) AS root_roles FROM admin_roles WHERE is_root = 1;
+          "
+
+      - name: Validate docker-compose.yml & Multi-Stage Docker build
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          docker build --target builder -t sarp-builder:ci .
+          docker build --target runtime -t sarp-runtime:ci .

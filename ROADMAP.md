@@ -50,6 +50,9 @@
                                       │
                                       ▼
 [Фаза 10: Динамическая админ-система, RBAC-ранги и многофункциональная админ-панель (mod_admin, mod_admin_panel)]
+                                      │
+                                      ▼
+[Фаза 11: Docker-контейнеризация, Multi-Stage сборка, .env конфигурация и Docker Compose]
 
 ```
 
@@ -897,6 +900,74 @@
     * Гарантировать, что каждое привилегированное действие (включая отказ в доступе) оставляет запись в `audit_logs`; экстренное сохранение БД (`/asave`) доступно только роли с `SERVER_SAVE`.
 
   * **Критерий готовности (DoD):** `/sp` показывает актуальные HP, пинг и транспорт цели и корректно выходит без зависшей камеры; оффлайн-бан по HWID блокирует вход; мут автоматически снимается по TTL; по любому админ-действию можно найти запись в `audit_logs` с администратором, целью и параметрами.
+
+## Фаза 11: Docker-контейнеризация, Multi-Stage сборка, `.env` конфигурация и Docker Compose
+
+**Цель фазы:** Перевести сборку и развертывание сервера **SAN ANDREAS RP** в полностью воспроизводимый контейнеризированный контур с двухэтапной (`Multi-Stage`) сборкой `main.amx`, изолированной сетью `Docker Compose` (`open.mp` + `MariaDB 10.11`), динамическим управлением конфигурацией через `.env` без хардкода секретов и персистентными `Docker Volumes`.
+
+**Зависимости фазы:** Фаза 0 (`config.json`, `build.sh`, `sql/001_schema.sql`, `sql/002_seed_data.sql`), Фаза 1 (`core/mod_database.pwn`), Фаза 9 (`deploy/`), Фаза 10 (`sql/003_admin_rbac.sql`).
+
+* \[x] **11.1. Multi-Stage `Dockerfile`, `.dockerignore` и `docker-entrypoint.sh`**
+
+  * **Зависимости:** `0.1`, `0.2`, `9.3`.
+
+  * **Файлы:** `Dockerfile`, `.dockerignore`, `docker-entrypoint.sh`.
+
+  * **Задачи:**
+
+    * Реализовать стадию **`builder`** (`debian:bookworm-slim` + `i386` runtime): копирование `qawno/`, `build.sh` и `gamemodes/`, проверка кодировки `Windows-1251 (CP1251)` без UTF-8 BOM и компиляция `gamemodes/main.pwn` $\rightarrow$ `gamemodes/main.amx` с флагами `-O2 -d1` (сборка образа падает при любом `warning` или `error`).
+
+    * Реализовать минимальную стадию **`runtime`** (`debian:bookworm-slim` с 32-битными библиотеками `libc6:i386`, `libstdc++6:i386`, `libgcc-s1:i386`, `libatomic1:i386`, `libmariadb3:i386`, `libssl3:i386`, а также `jq` и `mariadb-client`), куда копируются **только** `omp-server`, `log-core.so`, `components/`, `plugins/`, `models/`, `scriptfiles/`, `config.json` и скомпилированный `gamemodes/main.amx` — без `.pwn` исходников и компилятора.
+
+    * Настроить запуск процесса в `runtime`-контейнере от непривилегированного пользователя `ompuser` (`UID 1000`, `GID 1000`).
+
+    * Реализовать `docker-entrypoint.sh` (`set -euo pipefail`): подстановка параметров `OMP_*` в `config.json` через `jq`, генерация `scriptfiles/mysql.ini` и `./mysql.ini` (`chmod 0600`), ожидание готовности БД (`mysqladmin ping` / `mariadb-admin ping`) и передача управления `exec ./omp-server` (PID 1).
+
+  * **Критерий готовности (DoD):** Образ собирается через `docker build`, в финальном слое отсутствуют `.pwn` файлы и `qawno/`, а `omp-server` стартует от `ompuser` с корректно сгенерированным `config.json` и `mysql.ini`.
+
+* \[x] **11.2. Оркестрация `docker-compose.yml`, MariaDB 10.11 и персистентные Volumes**
+
+  * **Зависимости:** `0.3`, `0.4`, `10.1`, `11.1`.
+
+  * **Файлы:** `docker-compose.yml`.
+
+  * **Задачи:**
+
+    * Описать сервисы `db` (`mariadb:10.11`, `--character-set-server=utf8mb4`, `--collation-server=utf8mb4_unicode_ci`) и `omp-server`, объединенные во внутреннюю изолированную bridge-сеть `sar_network` (`sar_net`) без публикации порта `3306` наружу хоста.
+
+    * Настроить `healthcheck` для `db` (`mariadb-admin ping`), `depends_on: db: condition: service_healthy` для `omp-server`, `restart: unless-stopped`, `ulimits` (`nofile: 65535`) и проброс портов `${OMP_PORT:-7777}:7777/udp` и `${OMP_PORT:-7777}:7777/tcp`.
+
+    * Подключить именованный том `sar_mysql_data:/var/lib/mysql`, автоинициализацию схемы и сидов в `/docker-entrypoint-initdb.d/` (`001_schema.sql`, `002_seed_data.sql`, `003_admin_rbac.sql`, `004_english_localization_update.sql` в режиме `:ro`) и персистентные bind-тома `./scriptfiles:/opt/omp-server/scriptfiles`, `./logs:/opt/omp-server/logs`, `./backups:/backups`.
+
+  * **Критерий готовности (DoD):** `docker compose config --quiet` проходит без ошибок; при первом старте чистой БД автоматически накатываются все 25 таблиц, 91 предмет, 21 фракция и роль `Root Administrator`.
+
+* \[x] **11.3. Управление конфигурацией через `.env` и интеграция с `mod_database.pwn`**
+
+  * **Зависимости:** `1.3`, `11.1`, `11.2`.
+
+  * **Файлы:** `.env.example`, `.gitignore`, `gamemodes/modules/core/mod_database.pwn`.
+
+  * **Задачи:**
+
+    * Создать полный шаблон `.env.example` со всеми параметрами СУБД (`MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `MYSQL_CHARSET=cp1251`, `MYSQL_POOL_SIZE=12`), сервера `open.mp` (`OMP_SERVER_NAME`, `OMP_LANGUAGE`, `OMP_MAX_PLAYERS`, `OMP_PORT`, `OMP_RCON_ENABLE`, `OMP_RCON_PASSWORD`) и бэкапов (`SARP_BACKUP_DIR`, `SARP_BACKUP_RETENTION_DAYS`).
+
+    * Гарантировать исключение `.env`, `.env.*` (кроме `!.env.example`), `mysql.ini`, `scriptfiles/mysql.ini`, `*.amx`, `logs/` и `backups/` в `.gitignore`.
+
+    * Обновить `gamemodes/modules/core/mod_database.pwn`: обеспечить чтение `mysql.ini` через `mysql_connect_file("mysql.ini")` и парсер `Internal_LoadDbConfigFromIni` (включая `pool_size` / `MYSQL_POOL_SIZE`) с фолбэком на `mysql_connect`, сохранив обязательный вызов `mysql_set_charset("cp1251", gMySQL)` и асинхронный пул из 12 потоков.
+
+  * **Критерий готовности (DoD):** В репозитории нет захардкоженных продакшн-секретов; `mod_database.pwn` компилируется в `CP1251` с `0 errors, 0 warnings` и подключается к БД по параметрам из `.env` / `mysql.ini`.
+
+* \[x] **11.4. CI/CD пайплайн проверки сборки и контейнеров (`.github/workflows/ci.yml`)**
+
+  * **Зависимости:** `11.1`, `11.2`, `11.3`.
+
+  * **Файлы:** `.github/workflows/ci.yml`.
+
+  * **Задачи:**
+
+    * Настроить автоматический workflow GitHub Actions на `push` и `pull_request`: проверка кодировки `CP1251`, компиляция `./build.sh` (`0 warnings`), накатывание `sql/001..004_*.sql` на сервисный контейнер `mariadb:10.11`, валидация `docker compose config --quiet` и тестовая сборка стадий `builder` и `runtime`.
+
+  * **Критерий готовности (DoD):** Любое нарушение кодировки `CP1251`, ошибка SQL-схемы или поломка `Dockerfile` / `docker-compose.yml` автоматически блокируется на этапе CI.
 
 ## Протокол работы с ИИ-ассистентом по данному Roadmap
 

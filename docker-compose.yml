@@ -1,0 +1,100 @@
+# =============================================================================
+#  SAN ANDREAS RP — Конфигурация Docker Compose (open.mp v1.6.7+ & MariaDB 10.11)
+#  Запуск: cp .env.example .env && docker compose up -d --build
+# =============================================================================
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: sar_mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-sarp_root_local_dev_2026}
+      MARIADB_DATABASE: ${MYSQL_DATABASE:-san_andreas_rp}
+      MARIADB_USER: ${MYSQL_USER:-sarp_server}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD:-sarp_local_dev_password_2026}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=512M
+      - --max-connections=250
+    volumes:
+      - sar_mysql_data:/var/lib/mysql
+      - ./sql/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./sql/002_seed_data.sql:/docker-entrypoint-initdb.d/002_seed_data.sql:ro
+      - ./sql/003_admin_rbac.sql:/docker-entrypoint-initdb.d/003_admin_rbac.sql:ro
+      - ./sql/004_english_localization_update.sql:/docker-entrypoint-initdb.d/004_english_localization_update.sql:ro
+      - ./backups:/backups
+    networks:
+      sar_network:
+        aliases:
+          - mysql
+          - mariadb
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mariadb-admin ping -h 127.0.0.1 -u\"$${MARIADB_USER}\" -p\"$${MARIADB_PASSWORD}\" --silent"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+
+  omp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: san-andreas-rp/omp-server:1.1.0
+    container_name: sar_omp_server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST:-db}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-san_andreas_rp}
+      MYSQL_USER: ${MYSQL_USER:-sarp_server}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-sarp_local_dev_password_2026}
+      MYSQL_CHARSET: ${MYSQL_CHARSET:-cp1251}
+      MYSQL_POOL_SIZE: ${MYSQL_POOL_SIZE:-12}
+      OMP_SERVER_NAME: ${OMP_SERVER_NAME:-SAN ANDREAS RP | English Roleplay}
+      OMP_LANGUAGE: ${OMP_LANGUAGE:-English}
+      OMP_MAX_PLAYERS: ${OMP_MAX_PLAYERS:-500}
+      OMP_PORT: ${OMP_PORT:-7777}
+      OMP_RCON_ENABLE: ${OMP_RCON_ENABLE:-false}
+      OMP_RCON_PASSWORD: ${OMP_RCON_PASSWORD:-change_rcon_secret_in_production}
+    ports:
+      - "${OMP_PORT:-7777}:7777/udp"
+      - "${OMP_PORT:-7777}:7777/tcp"
+    volumes:
+      - ./scriptfiles:/opt/omp-server/scriptfiles
+      - ./logs:/opt/omp-server/logs
+      - ./backups:/backups
+    networks:
+      - sar_network
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    tty: true
+    stdin_open: true
+
+networks:
+  sar_network:
+    name: sar_net
+    driver: bridge
+
+volumes:
+  sar_mysql_data:
+    name: sar_mysql_data
